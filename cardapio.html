@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>LM Sabor Caseiro — Cardápio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cardapio.css">
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader-overlay">
+  <div class="loader-spinner"></div>
+  <div class="loader-texto">Carregando cardápio...</div>
+</div>
+
+<!-- FUNDO -->
+<div id="bg-fallback"></div>
+<img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
+<div id="overlay-left"></div>
+<div id="overlay-right"></div>
+<div id="overlay-bottom"></div>
+<div id="grain"></div>
+
+<!-- PAINEL CENTRAL -->
+<div id="slide-container">
+  <div id="slide-num">01 / --</div>
+</div>
+
+<!-- UI PRINCIPAL -->
+<div id="ui">
+
+  <!-- ESQUERDA -->
+  <div id="left">
+    <div id="logo-area">
+      <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
+      <div id="logo-texto">
+        <div id="brand-nome">LM Sabor Caseiro</div>
+        <div id="brand-slogan">Comida feita com amor</div>
+      </div>
+    </div>
+
+    <div id="dish-area">
+      <div id="dish-categoria">
+        <div id="cat-linha"></div>
+        <div id="cat-texto">...</div>
+      </div>
+      <div id="nome">—</div>
+      <div id="separador">
+        <div id="sep-bolinha"></div>
+        <div id="sep-linha"></div>
+      </div>
+      <div id="dish-desc"></div>
+      <div id="dish-tags"></div>
+    </div>
+
+    <div id="bottom-left">
+      <div id="progress-wrap">
+        <div id="prox-info">
+          <span id="prox-label">A seguir</span>
+          <span id="prox-seta">→</span>
+          <span id="prox-nome">...</span>
+        </div>
+        <div id="progress-dots"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIREITA -->
+  <div id="right">
+
+    <div id="datetime-box">
+      <div id="date"></div>
+      <div id="clock">--:--</div>
+    </div>
+
+    <!-- DESTAQUES DO DIA -->
+    <div id="destaques-box">
+      <div id="dest-titulo">✦ No cardápio hoje</div>
+      <div id="dest-lista"></div>
+    </div>
+
+    <!-- CLIMA -->
+    <div id="weather-box">
+      <div id="weather-header">
+        <div id="weather-cidade">📍 Fortaleza, CE</div>
+        <div id="weather-atualizando">ao vivo</div>
+      </div>
+      <div id="weather-principal">
+        <div>
+          <div id="weather-temp">--<sup>°C</sup></div>
+          <div id="weather-cond">Carregando...</div>
+        </div>
+        <div id="weather-icone">🌤️</div>
+      </div>
+      <div id="weather-linha"></div>
+      <div id="weather-extras">
+        <div class="w-item">
+          <span class="w-item-label">Umidade</span>
+          <span class="w-item-val" id="w-hum">--%</span>
+        </div>
+        <div class="w-item">
+          <span class="w-item-label">Sensação</span>
+          <span class="w-item-val" id="w-feel">--°</span>
+        </div>
+        <div class="w-item">
+          <span class="w-item-label">Vento</span>
+          <span class="w-item-val" id="w-wind">--</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right -->
+</div><!-- /ui -->
+
+
+<!-- TIMER BAR -->
+<div id="timer-bar"><div id="timer-fill"></div></div>
+
+<script src="ofertas.js"></script>
+</body>
+</html>
