@@ -34,6 +34,7 @@ const IMAGENS = {
   'Dindins Gourmet':    'assets/dindin-gourmet.webp',
   'Suco Natural':       'assets/sucos.webp',
   'Canja':              'assets/canja.webp',
+  'Sopa de Carne':      'assets/caldo-de-carne.webp',
 };
 
 function getImagem(nome) {
@@ -134,7 +135,7 @@ function construirSlides(dados) {
     saboresPrincipais: dindins.slice(0, 5).map(d => d.nome),
     saboresTodos:      dindins.map(d => d.nome),
     preco:     DINDIN_VALOR,
-    tags:      [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: `R$ ${DINDIN_VALOR},00 un.` }],
+    tags:      [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }],
     imagem:    getImagem('Dindin'),
   }] : [];
 
@@ -559,6 +560,17 @@ setInterval(async () => {
     }
   } catch (_) { }
 }, 5 * 60 * 1000);
+// Forçar reflow ao redimensionar a tela
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    setAtivo(true);
+  }, 100);
+});
+
+// Detectar orientação da TV (paisagem)
+window.addEventListener('load', () => {
+  document.body.style.visibility = 'visible';
+});
 
 /* ── INIT ────────────────────────────────────────────── */
 carregarDados();
