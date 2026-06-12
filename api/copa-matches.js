@@ -17,8 +17,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // CORRIGIDO: Usar ID 764 (Brasil) em vez de 759 (Alemanha)
     const response = await fetch(
-      'https://api.football-data.org/v4/teams/759/matches?competitions=WC&season=2026&limit=10',
+      'https://api.football-data.org/v4/teams/764/matches?competitions=WC&season=2026&limit=20',
       {
         headers: {
           'X-Auth-Token': token,
