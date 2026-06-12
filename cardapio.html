@@ -84,81 +84,78 @@
     </div>
 
     <!-- COPA DO MUNDO 2026 -->
-<div id="copa-box">
+    <div id="copa-box">
 
-  <div id="copa-header">
-    <span id="copa-flag">🇧🇷</span>
-    <div id="copa-titulo-wrap">
-      <div id="copa-titulo">COPA DO MUNDO 2026</div>
-      <div id="copa-subtitulo">Grupo C · Brasil</div>
-    </div>
-    <div id="copa-trofeu">🏆</div>
-  </div>
-
-  <div id="copa-tabs">
-    <button class="copa-tab ativo" data-tab="jogo">Hoje</button>
-    <button class="copa-tab" data-tab="grupo">Grupo</button>
-    <button class="copa-tab" data-tab="jogos">Jogos</button>
-    <button class="copa-tab" data-tab="fotos">Seleção</button>
-  </div>
-
-  <div id="copa-content">
-
-    <!-- ABA: JOGO DE HOJE -->
-    <div class="copa-panel ativo" id="tab-jogo">
-      <div id="placar-wrap">
-        <div class="placar-time">
-          <div class="placar-bandeira">🇧🇷</div>
-          <div class="placar-nome">Brasil</div>
-          <div class="placar-gol" id="gol-bra">–</div>
+      <div id="copa-header">
+        <span id="copa-flag">🇧🇷</span>
+        <div id="copa-titulo-wrap">
+          <div id="copa-titulo">COPA DO MUNDO 2026</div>
+          <div id="copa-subtitulo">Grupo C · Brasil</div>
         </div>
-        <div id="placar-meio">
-          <div id="placar-status">19:00</div>
-          <div id="placar-local">MetLife · NY</div>
+        <div id="copa-trofeu">🏆</div>
+      </div>
+
+      <div id="copa-tabs">
+        <button class="copa-tab ativo" data-tab="jogo">📅 Próximo Jogo</button>
+        <button class="copa-tab" data-tab="grupo">📊 Grupo</button>
+        <button class="copa-tab" data-tab="jogos">⚽ Jogos</button>
+        <button class="copa-tab" data-tab="fotos">🇧🇷 Seleção</button>
+      </div>
+
+      <div id="copa-content">
+
+        <!-- ABA: PRÓXIMO JOGO (sem escalação) -->
+        <div class="copa-panel ativo" id="tab-jogo">
+          <div id="placar-wrap">
+            <div class="placar-time">
+              <div class="placar-bandeira">🇧🇷</div>
+              <div class="placar-nome">Brasil</div>
+              <div class="placar-gol" id="gol-bra">–</div>
+            </div>
+            <div id="placar-meio">
+              <div id="placar-status">Próximo Jogo</div>
+              <div id="placar-local">A definir</div>
+              <div id="placar-data" style="font-size: 0.45rem; color: rgba(255,255,255,0.4); margin-top: 4px;"></div>
+            </div>
+            <div class="placar-time">
+              <div class="placar-bandeira">🏳️</div>
+              <div class="placar-nome">A definir</div>
+              <div class="placar-gol" id="gol-mar">–</div>
+            </div>
+          </div>
+          <div id="jogo-info">
+            <span class="jogo-tag">Grupo C</span>
+            <span class="jogo-tag jogo-tag-ao-vivo" id="jogo-live-badge" style="display:none">🔴 AO VIVO</span>
+          </div>
+          <!-- ESCALAÇÃO REMOVIDA DA PRIMEIRA ABA -->
         </div>
-        <div class="placar-time">
-          <div class="placar-bandeira">🇲🇦</div>
-          <div class="placar-nome">Marrocos</div>
-          <div class="placar-gol" id="gol-mar">–</div>
+
+        <!-- ABA: GRUPO C -->
+        <div class="copa-panel" id="tab-grupo">
+          <table id="grupo-tabela">
+            <thead>
+              <tr><th>Seleção</th><th>J</th><th>P</th><th>SG</th></tr>
+            </thead>
+            <tbody id="grupo-tbody"></tbody>
+          </table>
+          <div id="grupo-nota">Os 2 primeiros + melhores 3ºs avançam</div>
         </div>
-      </div>
-      <div id="jogo-info">
-        <span class="jogo-tag">Grupo C · Rodada 1</span>
-        <span class="jogo-tag jogo-tag-ao-vivo" id="jogo-live-badge" style="display:none">🔴 AO VIVO</span>
-      </div>
-      <div id="escalacao-mini">
-        <div class="esc-label">Convocados em destaque</div>
-        <div id="esc-nomes"></div>
-      </div>
-    </div>
 
-    <!-- ABA: GRUPO C -->
-    <div class="copa-panel" id="tab-grupo">
-      <table id="grupo-tabela">
-        <thead>
-          <tr><th>Seleção</th><th>J</th><th>P</th><th>SG</th></tr>
-        </thead>
-        <tbody id="grupo-tbody"></tbody>
-      </table>
-      <div id="grupo-nota">Os 2 primeiros + melhores 3ºs avançam</div>
-    </div>
+        <!-- ABA: PRÓXIMOS JOGOS -->
+        <div class="copa-panel" id="tab-jogos">
+          <div id="jogos-lista"></div>
+        </div>
 
-    <!-- ABA: PRÓXIMOS JOGOS -->
-    <div class="copa-panel" id="tab-jogos">
-      <div id="jogos-lista"></div>
-    </div>
+        <!-- ABA: SELEÇÃO (escalação completa) -->
+        <div class="copa-panel" id="tab-fotos">
+          <div id="fotos-grid"></div>
+          <div id="fotos-caption"></div>
+        </div>
 
-    <!-- ABA: SELEÇÃO -->
-    <div class="copa-panel" id="tab-fotos">
-      <div id="fotos-grid"></div>
-      <div id="fotos-caption"></div>
-    </div>
-
-  </div><!-- /copa-content -->
-</div><!-- /copa-box -->
+      </div><!-- /copa-content -->
+    </div><!-- /copa-box -->
   </div><!-- /right -->
 </div><!-- /ui -->
-
 
 <!-- TIMER BAR -->
 <div id="timer-bar"><div id="timer-fill"></div></div>
