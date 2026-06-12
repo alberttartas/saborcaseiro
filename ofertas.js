@@ -461,174 +461,14 @@ setInterval(atualizarHora, 1000);
 atualizarHora();
 
 /* ══════════════════════════════════════════════════════
-   COPA DO MUNDO 2026 — Dados via football-data.org
+   COPA DO MUNDO 2026 — Dados via proxy local
 ══════════════════════════════════════════════════════ */
-
-const FOOTBALL_API_TOKEN = 'b6ce09dc56fc47cb99f9749acca05033';
-const FOOTBALL_API_BASE  = 'https://api.football-data.org/v4';
 
 // Dados locais — preenchidos automaticamente pela API
 const COPA = {
   grupo: [],
   jogos: [],
-  convocados: ['Alisson','Marquinhos','Casemiro','Vini Jr.','Neymar','Raphinha',
-               'Endrick','Bruno G.','Paquetá','Rodrygo','Bremer','Ederson'],
-};
-
-let copaTabAtual = 'jogo';
-let copaAutoTimer = null;
-const COPA_TABS = ['jogo','grupo','jogos','fotos'];
-
-/* ── Busca todos os dados da API ─────────────────────── */
-async function copaCarregarDados() {
-  try {
-    // 1. Standings (tabela do grupo)
-    const resStand = await fetch(`${FOOTBALL_API_BASE}/competitions/WC/standings?season=2026`, {
-      headers: { 'X-Auth-Token': FOOTBALL_API_TOKEN }
-    });
-    const dataStand = await resStand.json();
-
-    // Pega o grupo do Brasil
-    const grupos = dataStand.standings || [];
-    const grupoBrasil = grupos.find(g =>
-      g.type === 'TOTAL' &&
-      g.table.some(t => t.team.name === 'Brazil')
-    );
-
-    if (grupoBrasil) {
-      COPA.grupo = grupoBrasil.table.map(t => ({
-        nome: t.team.name === 'Brazil'   ? 'Brasil'
-            : t.team.name === 'Morocco'  ? 'Marrocos'
-            : t.team.name === 'Scotland' ? 'Escócia'
-            : t.team.name === 'Haiti'    ? 'Haiti'
-            : t.team.name,
-        j:  t.playedGames,
-        v:  t.won,
-        e:  t.draw,
-        d:  t.lost,
-        gp: t.goalsFor,
-        gc: t.goalsAgainst,
-        p:  t.points,
-      }));
-    }
-
-    // 2. Jogos do Brasil
-    const resMat = await fetch(`${FOOTBALL_API_BASE}/teams/759/matches?competitions=WC&season=2026`, {
-      headers: { 'X-Auth-Token': FOOTBALL_API_TOKEN }
-    });
-    const dataMat = await resMat.json();
-
-    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
-    COPA.jogos = (dataMat.matches || [])
-      .filter(m => m.stage === 'GROUP_STAGE')
-      .map(m => {
-        const dt     = new Date(m.utcDate);
-        // Converte para horário de Brasília (UTC-3)
-        const dtBR   = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-        const dia    = dtBR.getDate();
-        const mes    = meses[dtBR.getMonth()];
-        const hora   = `${String(dtBR.getHours()).padStart(2,'0')}:${String(dtBR.getMinutes()).padStart(2,'0')}`;
-
-        const braCasa = m.homeTeam.name === 'Brazil';
-        const adversario = braCasa ? m.awayTeam.name : m.homeTeam.name;
-        const advNome = adversario === 'Morocco'  ? 'Marrocos'
-                      : adversario === 'Scotland' ? 'Escócia'
-                      : adversario === 'Haiti'    ? 'Haiti'
-                      : adversario;
-
-        // "hoje" = mesmo dia calendario em Brasília
-        const hoje = new Date();
-        const hojeStr = `${hoje.getFullYear()}-${hoje.getMonth()}-${hoje.getDate()}`;
-        const jogoStr = `${dtBR.getFullYear()}-${dtBR.getMonth()}-${dtBR.getDate()}`;
-
-        return {
-          data:   `${dia} ${mes}`,
-          hora:   hora,
-          casa:   braCasa ? 'Brasil' : advNome,
-          fora:   braCasa ? advNome  : 'Brasil',
-          local:  m.venue || '—',
-          status: m.status,                       // SCHEDULED, IN_PLAY, FINISHED
-          golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
-          golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
-          hoje:   hojeStr === jogoStr,
-          matchId: m.id,
-        };
-      });
-
-    // Renderiza tudo com dados frescos
-    copaMudarAba(copaTabAtual);
-
-  } catch (e) {
-    console.warn('Copa API erro:', e);
-  }
-}
-
-
-function copaRenderGrupo() {
-  const tbody = document.getElementById('grupo-tbody');
-  if (!tbody) return;
-  // Ordena por pontos → saldo de gols
-  const sorted = [...COPA.grupo].sort((a,b) => (b.p - a.p) || ((b.gp-b.gc)-(a.gp-a.gc)));
-  tbody.innerHTML = sorted.map((s,i) => `
-    <tr class="${s.nome==='Brasil'?'brasil-row':''}">
-      <td><span class="pos-num">${i+1}</span> ${s.band} ${s.nome}</td>
-      <td>${s.j}</td>
-      <td><strong>${s.p}</strong></td>
-      <td>${s.gp-s.gc >= 0 ? '+':''}${s.gp-s.gc}</td>
-    </tr>`).join('');
-}
-
-/* ── Render: Jogo de hoje / próximo ─────────────────── */
-async function copaRenderJogo() {
-  // Jogo de hoje ou o próximo agendado
-  const jogo = COPA.jogos.find(j => j.hoje)
-            || COPA.jogos.find(j => j.status === 'SCHEDULED');
-
-  if (!jogo) {
-    document.getElementById('placar-status').textContent = 'Fase de grupos concluída';
-    document.getElementById('gol-bra').textContent = '—';
-    document.getElementById('gol-mar').textContent = '—';
-    return;
-  }
-
-  // Atualiza adversário no HTML (pode mudar a cada jogo)
-  const advNome = jogo.casa === 'Brasil' ? jogo.fora : jogo.casa;
-  const advEl   = document.querySelector('.placar-time:last-child .placar-nome');
-  const advGol  = document.getElementById('gol-mar');
-  if (advEl) advEl.textContent = advNome;
-
-  // Placar
-  const golBra = jogo.golBra ?? '–';
-  const golAdv = jogo.golAdv ?? '–';
-  document.getElementById('gol-bra').textContent = golBra;
-  if (advGol) advGol.textContent = golAdv;
-
-  // Status
-  const statusTexto = jogo.status === 'IN_PLAY'  ? 'AO VIVO'
-                    : jogo.status === 'FINISHED'  ? 'FIM'
-                    : jogo.status === 'PAUSED'    ? 'INTERVALO'
-                    : jogo.hora;
-
-  document.getElementById('placar-status').textContent = statusTexto;
-  document.getElementById('placar-local').textContent  = jogo.local;
-
-  const badge = document.getElementById('jogo-live-badge');
-  if (badge) badge.style.display =
-    (jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') ? 'inline' : 'none';
-
-  // Convocados
-  const esc = document.getElementById('esc-nomes');
-  if (esc) esc.innerHTML = COPA.convocados
-    .map(n => `<span class="esc-chip">${n}</span>`).join('');
-}
-
-function copaRenderFotos() {
-  const grid = document.getElementById('fotos-grid');
-  const cap  = document.getElementById('fotos-caption');
-  if (!grid) return;
-
-  const convocados = [
+  convocados: [
     { nome: 'Alisson',      num: 1,  pos: 'GOL' },
     { nome: 'Marquinhos',   num: 4,  pos: 'ZAG' },
     { nome: 'Casemiro',     num: 5,  pos: 'VOL' },
@@ -641,7 +481,202 @@ function copaRenderFotos() {
     { nome: 'Rodrygo',      num: 11, pos: 'ATA' },
     { nome: 'Bremer',       num: 3,  pos: 'ZAG' },
     { nome: 'Ederson',      num: 12, pos: 'GOL' },
-  ];
+  ],
+};
+
+let copaTabAtual = 'jogo';
+let copaAutoTimer = null;
+const COPA_TABS = ['jogo', 'grupo', 'jogos', 'fotos'];
+
+// Mapeamento de nomes de times
+const teamNameMap = {
+  'Brazil': 'Brasil',
+  'Morocco': 'Marrocos',
+  'Scotland': 'Escócia',
+  'Haiti': 'Haiti'
+};
+
+function normalizeTeamName(name) {
+  return teamNameMap[name] || name;
+}
+
+/* ── Busca todos os dados da API via proxy ─────────────────────── */
+async function copaCarregarDados() {
+  try {
+    // 1. Buscar standings (tabela do grupo) via proxy
+    const standingsRes = await fetch('/api/copa');
+    if (!standingsRes.ok) throw new Error(`HTTP ${standingsRes.status}`);
+    const standingsData = await standingsRes.json();
+    
+    // Pega o grupo do Brasil
+    const grupos = standingsData.standings || [];
+    const grupoBrasil = grupos.find(g =>
+      g.type === 'TOTAL' &&
+      g.table && g.table.some(t => t.team.name === 'Brazil')
+    );
+
+    if (grupoBrasil && grupoBrasil.table) {
+      COPA.grupo = grupoBrasil.table.map(t => ({
+        nome: normalizeTeamName(t.team.name),
+        j:  t.playedGames,
+        v:  t.won,
+        e:  t.draw,
+        d:  t.lost,
+        gp: t.goalsFor,
+        gc: t.goalsAgainst,
+        p:  t.points,
+      }));
+    }
+
+    // 2. Buscar jogos do Brasil via proxy
+    const matchesRes = await fetch('/api/copa-matches');
+    if (matchesRes.ok) {
+      const matchesData = await matchesRes.json();
+      
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      
+      COPA.jogos = (matchesData.matches || [])
+        .filter(m => m.stage === 'GROUP_STAGE')
+        .map(m => {
+          const dt = new Date(m.utcDate);
+          // Converte para horário de Brasília (UTC-3)
+          const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+          const dia = dtBR.getDate();
+          const mes = meses[dtBR.getMonth()];
+          const hora = `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`;
+
+          const braCasa = m.homeTeam.name === 'Brazil';
+          const adversario = braCasa ? m.awayTeam.name : m.homeTeam.name;
+          const advNome = normalizeTeamName(adversario);
+
+          // "hoje" = mesmo dia calendario em Brasília
+          const hoje = new Date();
+          const hojeStr = `${hoje.getFullYear()}-${hoje.getMonth()}-${hoje.getDate()}`;
+          const jogoStr = `${dtBR.getFullYear()}-${dtBR.getMonth()}-${dtBR.getDate()}`;
+
+          return {
+            data: `${dia} ${mes}`,
+            hora: hora,
+            casa: braCasa ? 'Brasil' : advNome,
+            fora: braCasa ? advNome : 'Brasil',
+            local: m.venue || '—',
+            status: m.status, // SCHEDULED, IN_PLAY, FINISHED
+            golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
+            golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
+            hoje: hojeStr === jogoStr,
+            matchId: m.id,
+          };
+        });
+    }
+
+    // Renderiza tudo com dados frescos
+    copaMudarAba(copaTabAtual);
+
+  } catch (e) {
+    console.warn('Copa API erro:', e);
+    // Mostra mensagem de erro na interface
+    const errorDiv = document.getElementById('copa-error');
+    if (errorDiv) errorDiv.style.display = 'block';
+  }
+}
+
+function copaRenderGrupo() {
+  const tbody = document.getElementById('grupo-tbody');
+  if (!tbody) return;
+  // Ordena por pontos → saldo de gols
+  const sorted = [...COPA.grupo].sort((a, b) => (b.p - a.p) || ((b.gp - b.gc) - (a.gp - a.gc)));
+  tbody.innerHTML = sorted.map((s, i) => `
+    <tr class="${s.nome === 'Brasil' ? 'brasil-row' : ''}">
+      <td><span class="pos-num">${i + 1}</span> ${s.nome}</td>
+      <td>${s.j}</td>
+      <td><strong>${s.p}</strong></td>
+      <td>${s.gp - s.gc >= 0 ? '+' : ''}${s.gp - s.gc}</td>
+    </tr>`).join('');
+}
+
+function copaRenderJogos() {
+  const container = document.getElementById('jogos-lista');
+  if (!container) return;
+  
+  if (!COPA.jogos.length) {
+    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px">Carregando jogos...</div>';
+    return;
+  }
+  
+  container.innerHTML = COPA.jogos.map(jogo => `
+    <div class="jogo-item" style="
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <div style="font-size: 0.55rem; color: rgba(255,255,255,0.5); min-width: 60px;">${jogo.data} ${jogo.hora}</div>
+      <div style="flex: 1; text-align: center; font-weight: 600; font-size: 0.55rem;">${jogo.casa} vs ${jogo.fora}</div>
+      <div style="min-width: 40px; text-align: right; font-weight: 700; font-size: 0.55rem;">
+        ${jogo.golBra !== undefined && jogo.golBra !== null ? `${jogo.golBra}-${jogo.golAdv}` : '—'}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Render: Jogo de hoje / próximo ─────────────────── */
+function copaRenderJogo() {
+  // Jogo de hoje ou o próximo agendado
+  const jogo = COPA.jogos.find(j => j.hoje) || COPA.jogos.find(j => j.status === 'SCHEDULED');
+
+  if (!jogo) {
+    const statusEl = document.getElementById('placar-status');
+    if (statusEl) statusEl.textContent = 'Fase de grupos concluída';
+    const golBraEl = document.getElementById('gol-bra');
+    const golMarEl = document.getElementById('gol-mar');
+    if (golBraEl) golBraEl.textContent = '—';
+    if (golMarEl) golMarEl.textContent = '—';
+    return;
+  }
+
+  // Atualiza adversário no HTML
+  const advNome = jogo.casa === 'Brasil' ? jogo.fora : jogo.casa;
+  const advEl = document.querySelector('.placar-time:last-child .placar-nome');
+  const advGol = document.getElementById('gol-mar');
+  if (advEl) advEl.textContent = advNome;
+
+  // Placar
+  const golBra = jogo.golBra ?? '–';
+  const golAdv = jogo.golAdv ?? '–';
+  const golBraEl = document.getElementById('gol-bra');
+  if (golBraEl) golBraEl.textContent = golBra;
+  if (advGol) advGol.textContent = golAdv;
+
+  // Status
+  const statusTexto = jogo.status === 'IN_PLAY' ? 'AO VIVO'
+                    : jogo.status === 'FINISHED' ? 'FIM'
+                    : jogo.status === 'PAUSED' ? 'INTERVALO'
+                    : jogo.hora;
+
+  const statusEl = document.getElementById('placar-status');
+  if (statusEl) statusEl.textContent = statusTexto;
+  
+  const localEl = document.getElementById('placar-local');
+  if (localEl) localEl.textContent = jogo.local;
+
+  const badge = document.getElementById('jogo-live-badge');
+  if (badge) badge.style.display = (jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') ? 'inline-flex' : 'none';
+
+  // Convocados
+  const esc = document.getElementById('esc-nomes');
+  if (esc) {
+    esc.innerHTML = COPA.convocados
+      .map(j => `<span class="esc-chip">${j.nome}</span>`).join('');
+  }
+}
+
+function copaRenderFotos() {
+  const grid = document.getElementById('fotos-grid');
+  const cap = document.getElementById('fotos-caption');
+  if (!grid) return;
 
   const COR_POS = {
     GOL: '#f59b3c', ZAG: '#60a5fa', LAT: '#60a5fa',
@@ -649,7 +684,7 @@ function copaRenderFotos() {
   };
 
   grid.style.cssText = 'display:grid; grid-template-columns:repeat(3,1fr); gap:0.3rem;';
-  grid.innerHTML = convocados.map(j => `
+  grid.innerHTML = COPA.convocados.map(j => `
     <div style="
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.07);
@@ -672,66 +707,9 @@ function copaRenderFotos() {
       </div>
     </div>`).join('');
 
-  cap.textContent = 'Convocados — Copa do Mundo 2026';
+  if (cap) cap.textContent = 'Convocados — Copa do Mundo 2026';
 }
 
-async function copaRenderJogo() {
-  const jogo = COPA.jogos.find(j => j.hoje);
-  if (!jogo) return;
-
-  const agora    = new Date();
-  const horaJogo = new Date();
-  horaJogo.setHours(19, 0, 0, 0);
-  const aoVivo = agora >= horaJogo && agora < new Date(horaJogo.getTime() + 120*60000);
-  const antes  = agora < horaJogo;
-
-  // Escalação chips (sempre)
-  const esc = document.getElementById('esc-nomes');
-  if (esc) esc.innerHTML = COPA.convocados
-    .map(n => `<span class="esc-chip">${n}</span>`).join('');
-
-  // Tenta buscar placar real
-  try {
-    const res  = await fetch('https://api.football-data.org/v4/competitions/WC/matches?season=2026&status=IN_PLAY,FINISHED,SCHEDULED', {
-      headers: { 'X-Auth-Token': 'SEU_TOKEN_AQUI' }
-    });
-    const data = await res.json();
-
-    // Procura o jogo Brasil x Marrocos
-    const partida = (data.matches || []).find(m =>
-      (m.homeTeam.name.includes('Brazil') || m.awayTeam.name.includes('Brazil')) &&
-      (m.homeTeam.name.includes('Morocco') || m.awayTeam.name.includes('Morocco'))
-    );
-
-    if (partida) {
-      const braCasa = partida.homeTeam.name.includes('Brazil');
-      const golBra  = braCasa ? partida.score.fullTime.home : partida.score.fullTime.away;
-      const golMar  = braCasa ? partida.score.fullTime.away : partida.score.fullTime.home;
-      const status  = partida.status; // SCHEDULED, IN_PLAY, FINISHED
-
-      document.getElementById('gol-bra').textContent = golBra ?? '–';
-      document.getElementById('gol-mar').textContent = golMar ?? '–';
-
-      const statusTexto = status === 'IN_PLAY' ? 'AO VIVO'
-                        : status === 'FINISHED' ? 'FIM'
-                        : jogo.hora;
-
-      document.getElementById('placar-status').textContent = statusTexto;
-      document.getElementById('jogo-live-badge').style.display = status === 'IN_PLAY' ? 'inline' : 'none';
-      return;
-    }
-  } catch (_) {
-    // API indisponível — cai no fallback abaixo
-  }
-
-  // Fallback sem API
-  document.getElementById('gol-bra').textContent = '–';
-  document.getElementById('gol-mar').textContent = '–';
-  document.getElementById('placar-status').textContent = antes ? jogo.hora : (aoVivo ? 'AO VIVO' : 'FIM');
-  document.getElementById('jogo-live-badge').style.display = aoVivo ? 'inline' : 'none';
-}
-
- 
 function copaMudarAba(tab) {
   copaTabAtual = tab;
   document.querySelectorAll('.copa-tab').forEach(b => {
@@ -740,10 +718,10 @@ function copaMudarAba(tab) {
   document.querySelectorAll('.copa-panel').forEach(p => {
     p.classList.toggle('ativo', p.id === 'tab-' + tab);
   });
-  if (tab === 'jogo')   copaRenderJogo();
-  if (tab === 'grupo')  copaRenderGrupo();
-  if (tab === 'jogos')  copaRenderJogos();
-  if (tab === 'fotos')  copaRenderFotos();
+  if (tab === 'jogo') copaRenderJogo();
+  if (tab === 'grupo') copaRenderGrupo();
+  if (tab === 'jogos') copaRenderJogos();
+  if (tab === 'fotos') copaRenderFotos();
 }
 
 function copaIniciar() {
@@ -758,7 +736,7 @@ function copaIniciar() {
   // Carrega dados da API imediatamente
   copaCarregarDados();
 
-  // Atualiza a cada 60s (placar ao vivo) e a cada 5min (tabela)
+  // Atualiza a cada 60s (placar ao vivo)
   setInterval(copaCarregarDados, 60 * 1000);
 
   copaIniciarRotacao();
@@ -773,7 +751,11 @@ function copaIniciarRotacao() {
 }
 
 // Inicializa quando o DOM estiver pronto
-window.addEventListener('load', copaIniciar);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', copaIniciar);
+} else {
+  copaIniciar();
+}
 
 /* ══════════════════════════════════════════════════════
    CARREGAR DADOS DO APPS SCRIPT
@@ -792,19 +774,23 @@ async function carregarDados() {
     renderizarDestaques(data);
     resetTimer();
 
-    document.getElementById('loader-overlay').classList.add('oculto');
+    const loader = document.getElementById('loader-overlay');
+    if (loader) loader.classList.add('oculto');
 
     if (timer) clearInterval(timer);
     timer = setInterval(trocarSlide, INTERVALO_MS);
 
   } catch (e) {
     console.error('Erro ao carregar dados:', e);
-    document.getElementById('loader-overlay').innerHTML = `
-      <div style="text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">⚠️</div>
-        <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;
-          color:rgba(255,255,255,0.35)">Sem conexão com a planilha</div>
-      </div>`;
+    const loader = document.getElementById('loader-overlay');
+    if (loader) {
+      loader.innerHTML = `
+        <div style="text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+          <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;
+            color:rgba(255,255,255,0.35)">Sem conexão com a planilha</div>
+        </div>`;
+    }
   }
 }
 
@@ -825,6 +811,7 @@ setInterval(async () => {
     }
   } catch (_) { }
 }, 5 * 60 * 1000);
+
 // Forçar reflow ao redimensionar a tela
 window.addEventListener('resize', () => {
   setTimeout(() => {
