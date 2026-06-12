@@ -34,7 +34,7 @@ body {
   position:absolute; inset:0; z-index:0;
   background:
     radial-gradient(ellipse at 68% 50%, #1f0e00 0%, #0D0A06 55%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='60' height='60' view='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 #background {
@@ -335,12 +335,21 @@ body {
   text-shadow: 0 0 8px rgba(232,112,10,0.5);
 }
 
-#destaques-box, #weather-box {
+#destaques-box {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 1rem;
   padding: 0.8rem 1rem;
   backdrop-filter: blur(12px);
+  height: 18rem;          /* ← altura fixa */
+  overflow: hidden;       /* ← não vaza */
+  display: flex;
+  flex-direction: column;
+}
+
+#dest-lista {
+  flex: 1;
+  overflow: hidden;
 }
 
 #dest-titulo {
@@ -375,43 +384,230 @@ body {
 
 .dest-cat { font-size: 0.55rem; color: rgba(255,255,255,0.3); }
 
-/* Clima */
-#weather-header {
+/* ════════════════════════════════
+   COPA DO MUNDO 2026
+════════════════════════════════ */
+#copa-box {
+  background: rgba(10,30,10,0.55);
+  border: 1px solid rgba(255,215,0,0.18);
+  border-radius: 1rem;
+  padding: 0.7rem 0.9rem;
+  backdrop-filter: blur(12px);
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
 }
 
-#weather-cidade, #weather-atualizando { font-size: 0.55rem; color: rgba(255,255,255,0.4); }
-
-#weather-principal {
+#copa-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
 }
 
-#weather-temp {
-  font-family: var(--fonte-titulo);
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: white;
+#copa-flag  { font-size: 1.2rem; }
+#copa-trofeu { font-size: 1rem; margin-left: auto; }
+
+#copa-titulo {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #FFD700;
 }
 
-#weather-temp sup { font-size: 0.9rem; }
+#copa-subtitulo {
+  font-size: 0.5rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+}
 
-#weather-icone { font-size: 2rem; }
-
-#weather-cond { font-size: 0.65rem; color: rgba(255,255,255,0.5); }
-
-#weather-extras {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+#copa-tabs {
+  display: flex;
   gap: 0.3rem;
-  margin-top: 0.5rem;
 }
 
-.w-item-label { font-size: 0.5rem; }
-.w-item-val { font-size: 0.7rem; font-weight: 600; }
+.copa-tab {
+  flex: 1;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 0.25rem 0;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.25s;
+}
+
+.copa-tab.ativo {
+  background: rgba(255,215,0,0.15);
+  border-color: rgba(255,215,0,0.5);
+  color: #FFD700;
+}
+
+.copa-panel { display: none; }
+.copa-panel.ativo { display: block; }
+
+/* Placar */
+#placar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.placar-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.placar-bandeira { font-size: 1.8rem; }
+.placar-nome     { font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+
+.placar-gol {
+  font-family: var(--fonte-titulo);
+  font-size: 2rem;
+  font-weight: 900;
+  color: #FFD700;
+  line-height: 1;
+}
+
+#placar-meio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+#placar-status { font-size: 0.9rem; font-weight: 800; color: white; }
+#placar-local  { font-size: 0.45rem; color: rgba(255,255,255,0.35); text-align: center; }
+
+#jogo-info {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+}
+
+.jogo-tag {
+  font-size: 0.45rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4);
+}
+
+.jogo-tag-ao-vivo {
+  border-color: rgba(255,60,60,0.6);
+  color: #ff6060;
+  animation: pisca 1s infinite;
+}
+
+@keyframes pisca { 50% { opacity: 0.4; } }
+
+#escalacao-mini {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 0.4rem;
+}
+
+.esc-label {
+  font-size: 0.45rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+  margin-bottom: 0.3rem;
+}
+
+#esc-nomes { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.esc-chip {
+  font-size: 0.45rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 8px;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.25);
+  color: rgba(255,215,0,0.8);
+}
+
+/* Tabela do grupo */
+#grupo-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.55rem;
+}
+
+#grupo-tabela th {
+  color: rgba(255,215,0,0.6);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: left;
+  padding: 0.2rem 0.3rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+#grupo-tabela td {
+  padding: 0.35rem 0.3rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+}
+
+#grupo-tabela tr.brasil-row td { color: #FFD700; font-weight: 700; }
+
+.pos-num { font-weight: 800; color: rgba(255,255,255,0.35); width: 1rem; }
+
+#grupo-nota {
+  font-size: 0.42rem;
+  color: rgba(255,255,255,0.2);
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+/* Próximos jogos */
+.jogo-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.jogo-card-data  { font-size: 0.5rem; color: rgba(255,215,0,0.7); font-weight: 700; min-width: 2.5rem; }
+.jogo-card-times { font-size: 0.55rem; font-weight: 600; color: rgba(255,255,255,0.8); flex: 1; }
+.jogo-card-local { font-size: 0.42rem; color: rgba(255,255,255,0.3); text-align: right; }
+
+/* Fotos / emojis */
+#fotos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.foto-slot {
+  aspect-ratio: 4/3;
+  border-radius: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+#fotos-caption {
+  font-size: 0.48rem;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  letter-spacing: 1px;
+}
 
 /* Timer */
 #timer-bar {
