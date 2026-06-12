@@ -703,97 +703,182 @@ function copaRenderFotos() {
   if (cap) cap.textContent = 'Convocados — Copa do Mundo 2026';
 }
 
-/* ── Carregar Dados da API ─────────────────── */
+/* ── Carregar Dados da API via PROXY ─────────────────── */
 async function copaCarregarDados() {
-  console.log('Carregando dados da Copa...');
+  console.log('Carregando dados da Copa via proxy...');
   
   try {
-    // Busca classificação
+    // Busca classificação via proxy
     const standingsRes = await fetch('/api/copa');
-    if (standingsRes.ok) {
-      const standingsData = await standingsRes.json();
-      console.log('Classificação recebida');
-      
-      // Processa os dados da classificação
-      if (standingsData.standings && standingsData.standings[0]?.table) {
-        COPA.grupo = standingsData.standings[0].table.map(item => ({
-          id: item.team.id,
-          nome: item.team.name === 'Brazil' ? 'Brasil' :
-                item.team.name === 'Morocco' ? 'Marrocos' :
-                item.team.name === 'Scotland' ? 'Escócia' :
-                item.team.name === 'Haiti' ? 'Haiti' : item.team.name,
-          j: item.playedGames,
-          v: item.won,
-          e: item.draw,
-          d: item.lost,
-          gp: item.goalsFor,
-          gc: item.goalsAgainst,
-          p: item.points,
-        }));
-        
-        console.log('Times carregados:', COPA.grupo.length);
-      }
-    } else {
-      console.error('Erro ao carregar classificação:', standingsRes.status);
+    
+    if (!standingsRes.ok) {
+      console.error('Erro no proxy /api/copa:', standingsRes.status);
+      carregarDadosEstaticos();
+      return;
     }
     
-    // Busca jogos do Brasil
-    const matchesRes = await fetch('/api/copa-matches');
-    if (matchesRes.ok) {
-      const matchesData = await matchesRes.json();
-      console.log('Jogos recebidos');
-      
-      if (matchesData.matches) {
-        const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        
-        COPA.jogos = matchesData.matches
-          .filter(m => {
-            // Filtra jogos do Brasil na fase de grupos
-            const isBrazilGame = (m.homeTeam?.id === 764 || m.awayTeam?.id === 764);
-            const isGroupStage = m.stage === 'GROUP_STAGE';
-            return isBrazilGame && isGroupStage;
-          })
-          .map(m => {
-            const dt = new Date(m.utcDate);
-            const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-            const braCasa = m.homeTeam?.id === 764;
-            const adversario = braCasa ? m.awayTeam : m.homeTeam;
-            
-            let advNome = adversario?.name || 'Adversário';
-            if (advNome === 'Morocco') advNome = 'Marrocos';
-            if (advNome === 'Scotland') advNome = 'Escócia';
-            if (advNome === 'Haiti') advNome = 'Haiti';
-            
-            return {
-              data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
-              hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
-              dataHora: dtBR,
-              casa: braCasa ? 'Brasil' : advNome,
-              fora: braCasa ? advNome : 'Brasil',
-              local: m.venue || 'Estádio do Maracanã - Rio de Janeiro/RJ',
-              status: m.status,
-              golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
-              golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
-            };
-          });
-        
-        // Ordena jogos por data
-        COPA.jogos.sort((a, b) => a.dataHora - b.dataHora);
-        console.log('Jogos do Brasil carregados:', COPA.jogos.length);
-        COPA.jogos.forEach(j => {
-          console.log(`  ${j.data} ${j.hora}: ${j.casa} vs ${j.fora} (${j.status})`);
-        });
+    const standingsData = await standingsRes.json();
+    console.log('Classificação recebida via proxy');
+    
+    // Encontra o Brasil e seu grupo
+    let brasilId = null;
+    let timesGrupo = [];
+    
+    if (standingsData.standings) {
+      // Procura em todos os grupos
+      for (const standing of standingsData.standings) {
+        const brasilTeam = standing.table?.find(t => t.team.name === 'Brazil');
+        if (brasilTeam) {
+          brasilId = brasilTeam.team.id;
+          console.log('Brasil encontrado! ID:', brasilId);
+          
+          // Pega os times do mesmo grupo (todos na mesma tabela)
+          timesGrupo = standing.table.map(item => ({
+            id: item.team.id,
+            nome: item.team.name === 'Brazil' ? 'Brasil' :
+                  item.team.name === 'Morocco' ? 'Marrocos' :
+                  item.team.name === 'Scotland' ? 'Escócia' :
+                  item.team.name === 'Haiti' ? 'Haiti' : item.team.name,
+            j: item.playedGames,
+            v: item.won,
+            e: item.draw,
+            d: item.lost,
+            gp: item.goalsFor,
+            gc: item.goalsAgainst,
+            p: item.points,
+          }));
+          break;
+        }
       }
+      
+      COPA.grupo = timesGrupo;
+      console.log('Times do grupo do Brasil:', COPA.grupo.length);
+      COPA.grupo.forEach(t => console.log(`  ${t.nome}: ${t.p} pontos`));
+    }
+    
+    // Busca jogos do Brasil via proxy
+    const matchesRes = await fetch('/api/copa-matches');
+    
+    if (!matchesRes.ok) {
+      console.error('Erro no proxy /api/copa-matches:', matchesRes.status);
+      carregarDadosEstaticos();
+      copaMudarAba(copaTabAtual);
+      return;
+    }
+    
+    const matchesData = await matchesRes.json();
+    console.log('Jogos recebidos via proxy');
+    
+    if (matchesData.matches && matchesData.matches.length > 0) {
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      
+      COPA.jogos = matchesData.matches
+        .filter(m => m.stage === 'GROUP_STAGE')
+        .map(m => {
+          const dt = new Date(m.utcDate);
+          const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+          const braCasa = m.homeTeam.id === 764; // ID do Brasil
+          const adversario = braCasa ? m.awayTeam : m.homeTeam;
+          
+          let advNome = adversario.name;
+          if (advNome === 'Morocco') advNome = 'Marrocos';
+          if (advNome === 'Scotland') advNome = 'Escócia';
+          if (advNome === 'Haiti') advNome = 'Haiti';
+          
+          // Determina o placar
+          let golBra = null;
+          let golAdv = null;
+          
+          if (m.score && m.score.fullTime) {
+            if (braCasa) {
+              golBra = m.score.fullTime.home;
+              golAdv = m.score.fullTime.away;
+            } else {
+              golBra = m.score.fullTime.away;
+              golAdv = m.score.fullTime.home;
+            }
+          }
+          
+          return {
+            data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
+            hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
+            dataHora: dtBR,
+            casa: braCasa ? 'Brasil' : advNome,
+            fora: braCasa ? advNome : 'Brasil',
+            local: m.venue || 'Estádio do Maracanã',
+            status: m.status,
+            golBra: golBra,
+            golAdv: golAdv,
+          };
+        });
+      
+      // Ordena jogos por data
+      COPA.jogos.sort((a, b) => a.dataHora - b.dataHora);
+      console.log(`Jogos do Brasil carregados: ${COPA.jogos.length}`);
+      COPA.jogos.forEach(j => {
+        console.log(`  ${j.data} ${j.hora}: ${j.casa} vs ${j.fora} (${j.status})`);
+      });
     } else {
-      console.error('Erro ao carregar jogos:', matchesRes.status);
+      console.log('Nenhum jogo encontrado para o Brasil');
+      carregarDadosEstaticos();
     }
     
   } catch (error) {
     console.error('Erro ao carregar dados da Copa:', error);
+    carregarDadosEstaticos();
   }
   
   // Atualiza a interface
   copaMudarAba(copaTabAtual);
+}
+
+// Função de fallback com dados estáticos
+function carregarDadosEstaticos() {
+  console.log('Usando dados estáticos (fallback)');
+  
+  // Dados estáticos dos jogos do Brasil na Copa 2026
+  COPA.jogos = [
+    {
+      data: '14 Jun',
+      hora: '16:00',
+      dataHora: new Date(2026, 5, 14, 16, 0),
+      casa: 'Brasil',
+      fora: 'Marrocos',
+      local: 'Estádio do Maracanã - Rio de Janeiro/RJ',
+      status: 'SCHEDULED',
+      golBra: null,
+      golAdv: null
+    },
+    {
+      data: '18 Jun',
+      hora: '16:00',
+      dataHora: new Date(2026, 5, 18, 16, 0),
+      casa: 'Brasil',
+      fora: 'Escócia',
+      local: 'Estádio do Maracanã - Rio de Janeiro/RJ',
+      status: 'SCHEDULED',
+      golBra: null,
+      golAdv: null
+    },
+    {
+      data: '22 Jun',
+      hora: '16:00',
+      dataHora: new Date(2026, 5, 22, 16, 0),
+      casa: 'Brasil',
+      fora: 'Haiti',
+      local: 'Estádio do Maracanã - Rio de Janeiro/RJ',
+      status: 'SCHEDULED',
+      golBra: null,
+      golAdv: null
+    }
+  ];
+  
+  COPA.grupo = [
+    { id: 764, nome: 'Brasil', j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, p: 0 },
+    { id: 815, nome: 'Marrocos', j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, p: 0 },
+    { id: 8873, nome: 'Escócia', j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, p: 0 },
+    { id: 836, nome: 'Haiti', j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, p: 0 }
+  ];
 }
 
 /* ── Mudar Aba ─────────────────── */
