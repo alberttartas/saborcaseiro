@@ -502,34 +502,43 @@ function normalizeTeamName(name) {
 
 // Função para obter o próximo jogo do Brasil
 function getProximoJogo() {
-  const agora = new Date();
-  
-  // Filtra apenas jogos futuros (SCHEDULED) ou em andamento
-  const jogosFuturos = COPA.jogos.filter(jogo => 
-    jogo.status === 'SCHEDULED' || jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED'
-  );
-  
-  if (jogosFuturos.length === 0) {
+  if (!COPA.jogos || COPA.jogos.length === 0) {
     return null;
   }
   
-  // Se houver jogo em andamento, mostra ele primeiro
-  const jogoAoVivo = jogosFuturos.find(jogo => jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED');
+  const agora = new Date();
+  
+  // FILTRA jogos com status SCHEDULED (agendados) ou IN_PLAY
+  const jogosFuturos = COPA.jogos.filter(jogo => {
+    // Se tem dataHora e é no futuro ou está em andamento
+    if (!jogo.dataHora) return false;
+    
+    // Inclui jogos agendados, ao vivo ou em intervalo
+    return jogo.status === 'SCHEDULED' || 
+           jogo.status === 'IN_PLAY' || 
+           jogo.status === 'PAUSED';
+  });
+  
+  if (jogosFuturos.length === 0) {
+    console.log('Nenhum jogo futuro encontrado');
+    return null;
+  }
+  
+  // Verifica se há jogo ao vivo
+  const jogoAoVivo = jogosFuturos.find(jogo => 
+    jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED'
+  );
   if (jogoAoVivo) {
     return jogoAoVivo;
   }
   
-  // Ordena por data e pega o próximo
-  jogosFuturos.sort((a, b) => {
-    // Converte as strings de data para comparação
-    const dataA = a.dataHora || new Date(0);
-    const dataB = b.dataHora || new Date(0);
-    return dataA - dataB;
-  });
+  // Ordena por data e pega o PRIMEIRO (mais próximo)
+  jogosFuturos.sort((a, b) => a.dataHora - b.dataHora);
+  const proximo = jogosFuturos[0];
   
-  return jogosFuturos[0];
+  console.log('Próximo jogo encontrado:', proximo);
+  return proximo;
 }
-
 // Função para formatar a data do jogo
 function formatarDataJogo(dataObj) {
   if (!dataObj) return '';
@@ -636,84 +645,69 @@ function copaRenderJogo() {
   }
 }
 
-/* ── Buscar dados da API e processar datas ─────────────────── */
-async function copaCarregarDados() {
-  try {
-    const [standingsRes, matchesRes] = await Promise.allSettled([
-      fetch('/api/copa').then(r => r.ok ? r.json() : null),
-      fetch('/api/copa-matches').then(r => r.ok ? r.json() : null)
-    ]);
-
-    // Processa standings (tabela do grupo)
-    if (standingsRes.status === 'fulfilled' && standingsRes.value) {
-      const grupos = standingsRes.value.standings || [];
-      const grupoBrasil = grupos.find(g =>
-        g.type === 'TOTAL' && g.table?.some(t => t.team.name === 'Brazil')
-      );
+// Processa jogos do Brasil
+if (matchesRes.status === 'fulfilled' && matchesRes.value?.matches) {
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  
+  COPA.jogos = matchesRes.value.matches
+    .filter(m => {
+      // Filtra apenas jogos do Brasil na fase de grupos
+      const isBrazilGame = m.homeTeam.id === 764 || m.awayTeam.id === 764;
+      const isGroupStage = m.stage === 'GROUP_STAGE';
+      return isBrazilGame && isGroupStage;
+    })
+    .map(m => {
+      const dt = new Date(m.utcDate);
+      const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+      const braCasa = m.homeTeam.id === 764;
+      const adversario = braCasa ? m.awayTeam : m.homeTeam;
       
-      if (grupoBrasil?.table) {
-        COPA.grupo = grupoBrasil.table.map(t => ({
-          nome: normalizeTeamName(t.team.name),
-          j: t.playedGames,
-          v: t.won,
-          e: t.draw,
-          d: t.lost,
-          gp: t.goalsFor,
-          gc: t.goalsAgainst,
-          p: t.points,
-        }));
-      }
-    }
-
-    // Processa jogos
-    if (matchesRes.status === 'fulfilled' && matchesRes.value?.matches) {
-      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      // Normaliza o nome do adversário
+      let advNome = adversario.name;
+      if (advNome === 'Morocco') advNome = 'Marrocos';
+      if (advNome === 'Scotland') advNome = 'Escócia';
+      if (advNome === 'Haiti') advNome = 'Haiti';
       
-      COPA.jogos = matchesRes.value.matches
-        .filter(m => m.stage === 'GROUP_STAGE')
-        .map(m => {
-          const dt = new Date(m.utcDate);
-          const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-          const braCasa = m.homeTeam.name === 'Brazil';
-          const adversario = braCasa ? m.awayTeam.name : m.homeTeam.name;
-          
-          return {
-            data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
-            hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
-            dataHora: dtBR, // Guarda o objeto Date para ordenação
-            casa: braCasa ? 'Brasil' : normalizeTeamName(adversario),
-            fora: braCasa ? normalizeTeamName(adversario) : 'Brasil',
-            local: m.venue || 'Estádio do Maracanã',
-            status: m.status,
-            golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
-            golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
-          };
-        });
-      
-      // Ordena jogos por data
-      COPA.jogos.sort((a, b) => (a.dataHora || 0) - (b.dataHora || 0));
-    }
-
-    // Renderiza a aba atual
-    copaMudarAba(copaTabAtual);
-
-  } catch (e) {
-    console.warn('Erro ao carregar dados da Copa:', e);
-    copaMudarAba(copaTabAtual);
-  }
+      return {
+        data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
+        hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
+        dataHora: dtBR,
+        casa: braCasa ? 'Brasil' : advNome,
+        fora: braCasa ? advNome : 'Brasil',
+        local: m.venue || 'Estádio do Maracanã - Rio de Janeiro/RJ',
+        status: m.status, // SCHEDULED, IN_PLAY, FINISHED, PAUSED
+        golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
+        golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
+      };
+    });
+  
+  // Ordena os jogos por data
+  COPA.jogos.sort((a, b) => a.dataHora - b.dataHora);
+  
+  console.log('Jogos do Brasil carregados:', COPA.jogos.length);
+  COPA.jogos.forEach(j => {
+    console.log(`${j.data} ${j.hora}: ${j.casa} vs ${j.fora} (${j.status})`);
+  });
 }
 
 function copaRenderGrupo() {
   const tbody = document.getElementById('grupo-tbody');
   if (!tbody) return;
   
-  const sorted = [...COPA.grupo].sort((a, b) => (b.p - a.p) || ((b.gp - b.gc) - (a.gp - a.gc)));
+  // Times do grupo do Brasil (IDs: 764 Brasil, 815 Marrocos, 8873 Escócia, 836 Haiti)
+  const timesGrupo = COPA.grupo.filter(time => 
+    [764, 815, 8873, 836].includes(time.id)
+  );
+  
+  // Ordena por pontos
+  const sorted = [...timesGrupo].sort((a, b) => (b.p - a.p) || ((b.gp - b.gc) - (a.gp - a.gc)));
+  
   tbody.innerHTML = sorted.map((s, i) => `
     <tr class="${s.nome === 'Brasil' ? 'brasil-row' : ''}">
       <td><span class="pos-num">${i + 1}</span> ${s.nome}</td>
       <td>${s.j}</td>
       <td><strong>${s.p}</strong></td>
-      <td>${s.gp - s.gc >= 0 ? '+' : ''}${s.gp - s.gc}</td>
+      <td>${(s.gp - s.gc) >= 0 ? '+' : ''}${s.gp - s.gc}</td>
     </tr>`).join('');
 }
 
