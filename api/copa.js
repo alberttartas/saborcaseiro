@@ -2,8 +2,7 @@ export default async function handler(req, res) {
 
   const token = process.env.FOOTBALL_TOKEN;
 
-  const response = await fetch(
-    'https://api.football-data.org/v4/competitions/WC/standings?season=2026',
+  const response = await fetch('/api/copa'),
     {
       headers: {
         'X-Auth-Token': token
