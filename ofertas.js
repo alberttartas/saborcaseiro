@@ -579,24 +579,7 @@ async function copaRenderJogo() {
   document.getElementById('jogo-live-badge').style.display = aoVivo ? 'inline' : 'none';
 }
 
-  const agora   = new Date();
-  const horaJogo = new Date();
-  horaJogo.setHours(19, 0, 0, 0); // 19h horário local
-
-  const aoVivo  = agora >= horaJogo && agora < new Date(horaJogo.getTime() + 120*60000);
-  const antes   = agora < horaJogo;
-
-  document.getElementById('gol-bra').textContent = antes ? '–' : '?';
-  document.getElementById('gol-mar').textContent = antes ? '–' : '?';
-  document.getElementById('placar-status').textContent = antes ? '19:00' : (aoVivo ? 'AO VIVO' : 'FIM');
-  document.getElementById('jogo-live-badge').style.display = aoVivo ? 'inline' : 'none';
-
-  // Escalação chips
-  const esc = document.getElementById('esc-nomes');
-  if (esc) esc.innerHTML = COPA.convocados
-    .map(n => `<span class="esc-chip">${n}</span>`).join('');
-}
-
+ 
 function copaMudarAba(tab) {
   copaTabAtual = tab;
   document.querySelectorAll('.copa-tab').forEach(b => {
