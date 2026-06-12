@@ -34,7 +34,7 @@ const IMAGENS = {
   'Dindins Gourmet':    'assets/dindin-gourmet.webp',
   'Suco Natural':       'assets/sucos.webp',
   'Canja':              'assets/canja.webp',
-  'Sopa de Carne':      'assets/caldo-de-carne.webp',
+  'Sopa de Carne':      'assets/sopa-de-carne.webp',
 };
 
 function getImagem(nome) {
