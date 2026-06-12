@@ -564,9 +564,6 @@ async function copaCarregarDados() {
   }
 }
 
-let copaTabAtual = 'jogo';
-let copaAutoTimer = null;
-const COPA_TABS = ['jogo','grupo','jogos','fotos'];
 
 function copaRenderGrupo() {
   const tbody = document.getElementById('grupo-tbody');
