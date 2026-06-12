@@ -135,11 +135,7 @@ function construirSlides(dados) {
     imagem:    getImagem('Dindin'),
   }] : [];
 
-  /* Intercalar: prato → não-prato → prato → não-prato */
-  const naoProtos = [...slidesSob, ...slidesSuco, ...slideDindins];
-  const resultado = [];
-  const maxLen    = Math.max(slidesPratos.length, naoProtos.length);
-
+ 
   for (let i = 0; i < maxLen; i++) {
     if (i < slidesPratos.length) resultado.push(slidesPratos[i]);
     if (i < naoProtos.length)    resultado.push(naoProtos[i]);
