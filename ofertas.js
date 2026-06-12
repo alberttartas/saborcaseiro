@@ -461,29 +461,108 @@ setInterval(atualizarHora, 1000);
 atualizarHora();
 
 /* ══════════════════════════════════════════════════════
-   COPA DO MUNDO 2026 — Widget
+   COPA DO MUNDO 2026 — Dados via football-data.org
 ══════════════════════════════════════════════════════ */
 
+const FOOTBALL_API_TOKEN = 'b6ce09dc56fc47cb99f9749acca05033';
+const FOOTBALL_API_BASE  = 'https://api.football-data.org/v4';
+
+// Dados locais — preenchidos automaticamente pela API
 const COPA = {
-  grupo: [
-    { nome: 'Brasil',   band: '🇧🇷', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
-    { nome: 'Marrocos', band: '🇲🇦', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
-    { nome: 'Escócia',  band: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
-    { nome: 'Haiti',    band: '🇭🇹', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
-  ],
-  jogos: [
-    { data:'13 Jun', hora:'19:00', casa:'Brasil',   fora:'Marrocos', local:'MetLife · NY',    rodada:1, hoje:true  },
-    { data:'19 Jun', hora:'21:30', casa:'Brasil',   fora:'Haiti',    local:'Lincoln · Fila.', rodada:2, hoje:false },
-    { data:'24 Jun', hora:'19:00', casa:'Escócia',  fora:'Brasil',   local:'Hard Rock · MIA', rodada:3, hoje:false },
-  ],
-  convocados: ['Vini Jr.','Raphinha','Endrick','Neymar','Rodrygo','Paquetá','Casemiro','Bruno G.','Marquinhos','Alisson'],
-  fotos: [
-    { emoji:'⚽', caption:'Vinicius Jr. em treino' },
-    { emoji:'🟡', caption:'Camisa Canarinho 2026' },
-    { emoji:'🏟️', caption:'MetLife Stadium, NY' },
-    { emoji:'🙌', caption:'Torcida Brasileira' },
-  ],
+  grupo: [],
+  jogos: [],
+  convocados: ['Alisson','Marquinhos','Casemiro','Vini Jr.','Neymar','Raphinha',
+               'Endrick','Bruno G.','Paquetá','Rodrygo','Bremer','Ederson'],
 };
+
+let copaTabAtual = 'jogo';
+let copaAutoTimer = null;
+const COPA_TABS = ['jogo','grupo','jogos','fotos'];
+
+/* ── Busca todos os dados da API ─────────────────────── */
+async function copaCarregarDados() {
+  try {
+    // 1. Standings (tabela do grupo)
+    const resStand = await fetch(`${FOOTBALL_API_BASE}/competitions/WC/standings?season=2026`, {
+      headers: { 'X-Auth-Token': FOOTBALL_API_TOKEN }
+    });
+    const dataStand = await resStand.json();
+
+    // Pega o grupo do Brasil
+    const grupos = dataStand.standings || [];
+    const grupoBrasil = grupos.find(g =>
+      g.type === 'TOTAL' &&
+      g.table.some(t => t.team.name === 'Brazil')
+    );
+
+    if (grupoBrasil) {
+      COPA.grupo = grupoBrasil.table.map(t => ({
+        nome: t.team.name === 'Brazil'   ? 'Brasil'
+            : t.team.name === 'Morocco'  ? 'Marrocos'
+            : t.team.name === 'Scotland' ? 'Escócia'
+            : t.team.name === 'Haiti'    ? 'Haiti'
+            : t.team.name,
+        j:  t.playedGames,
+        v:  t.won,
+        e:  t.draw,
+        d:  t.lost,
+        gp: t.goalsFor,
+        gc: t.goalsAgainst,
+        p:  t.points,
+      }));
+    }
+
+    // 2. Jogos do Brasil
+    const resMat = await fetch(`${FOOTBALL_API_BASE}/teams/759/matches?competitions=WC&season=2026`, {
+      headers: { 'X-Auth-Token': FOOTBALL_API_TOKEN }
+    });
+    const dataMat = await resMat.json();
+
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+    COPA.jogos = (dataMat.matches || [])
+      .filter(m => m.stage === 'GROUP_STAGE')
+      .map(m => {
+        const dt     = new Date(m.utcDate);
+        // Converte para horário de Brasília (UTC-3)
+        const dtBR   = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+        const dia    = dtBR.getDate();
+        const mes    = meses[dtBR.getMonth()];
+        const hora   = `${String(dtBR.getHours()).padStart(2,'0')}:${String(dtBR.getMinutes()).padStart(2,'0')}`;
+
+        const braCasa = m.homeTeam.name === 'Brazil';
+        const adversario = braCasa ? m.awayTeam.name : m.homeTeam.name;
+        const advNome = adversario === 'Morocco'  ? 'Marrocos'
+                      : adversario === 'Scotland' ? 'Escócia'
+                      : adversario === 'Haiti'    ? 'Haiti'
+                      : adversario;
+
+        // "hoje" = mesmo dia calendario em Brasília
+        const hoje = new Date();
+        const hojeStr = `${hoje.getFullYear()}-${hoje.getMonth()}-${hoje.getDate()}`;
+        const jogoStr = `${dtBR.getFullYear()}-${dtBR.getMonth()}-${dtBR.getDate()}`;
+
+        return {
+          data:   `${dia} ${mes}`,
+          hora:   hora,
+          casa:   braCasa ? 'Brasil' : advNome,
+          fora:   braCasa ? advNome  : 'Brasil',
+          local:  m.venue || '—',
+          status: m.status,                       // SCHEDULED, IN_PLAY, FINISHED
+          golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
+          golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
+          hoje:   hojeStr === jogoStr,
+          matchId: m.id,
+        };
+      });
+
+    // Renderiza tudo com dados frescos
+    copaMudarAba(copaTabAtual);
+
+  } catch (e) {
+    console.warn('Copa API erro:', e);
+  }
+}
 
 let copaTabAtual = 'jogo';
 let copaAutoTimer = null;
@@ -503,24 +582,100 @@ function copaRenderGrupo() {
     </tr>`).join('');
 }
 
-function copaRenderJogos() {
-  const lista = document.getElementById('jogos-lista');
-  if (!lista) return;
-  lista.innerHTML = COPA.jogos.map(j => `
-    <div class="jogo-card${j.hoje?' jogo-card-hoje':''}">
-      <div class="jogo-card-data">${j.data}<br>${j.hora}</div>
-      <div class="jogo-card-times">🇧🇷 ${j.casa} <span style="color:rgba(255,255,255,0.3)">×</span> ${j.fora}</div>
-      <div class="jogo-card-local">${j.local}</div>
-    </div>`).join('');
+/* ── Render: Jogo de hoje / próximo ─────────────────── */
+async function copaRenderJogo() {
+  // Jogo de hoje ou o próximo agendado
+  const jogo = COPA.jogos.find(j => j.hoje)
+            || COPA.jogos.find(j => j.status === 'SCHEDULED');
+
+  if (!jogo) {
+    document.getElementById('placar-status').textContent = 'Fase de grupos concluída';
+    document.getElementById('gol-bra').textContent = '—';
+    document.getElementById('gol-mar').textContent = '—';
+    return;
+  }
+
+  // Atualiza adversário no HTML (pode mudar a cada jogo)
+  const advNome = jogo.casa === 'Brasil' ? jogo.fora : jogo.casa;
+  const advEl   = document.querySelector('.placar-time:last-child .placar-nome');
+  const advGol  = document.getElementById('gol-mar');
+  if (advEl) advEl.textContent = advNome;
+
+  // Placar
+  const golBra = jogo.golBra ?? '–';
+  const golAdv = jogo.golAdv ?? '–';
+  document.getElementById('gol-bra').textContent = golBra;
+  if (advGol) advGol.textContent = golAdv;
+
+  // Status
+  const statusTexto = jogo.status === 'IN_PLAY'  ? 'AO VIVO'
+                    : jogo.status === 'FINISHED'  ? 'FIM'
+                    : jogo.status === 'PAUSED'    ? 'INTERVALO'
+                    : jogo.hora;
+
+  document.getElementById('placar-status').textContent = statusTexto;
+  document.getElementById('placar-local').textContent  = jogo.local;
+
+  const badge = document.getElementById('jogo-live-badge');
+  if (badge) badge.style.display =
+    (jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') ? 'inline' : 'none';
+
+  // Convocados
+  const esc = document.getElementById('esc-nomes');
+  if (esc) esc.innerHTML = COPA.convocados
+    .map(n => `<span class="esc-chip">${n}</span>`).join('');
 }
 
 function copaRenderFotos() {
   const grid = document.getElementById('fotos-grid');
   const cap  = document.getElementById('fotos-caption');
   if (!grid) return;
-  grid.innerHTML = COPA.fotos.map(f => `
-    <div class="foto-slot">${f.emoji}</div>`).join('');
-  cap.textContent = '📸 Seleção Brasileira — Copa do Mundo 2026';
+
+  const convocados = [
+    { nome: 'Alisson',      num: 1,  pos: 'GOL' },
+    { nome: 'Marquinhos',   num: 4,  pos: 'ZAG' },
+    { nome: 'Casemiro',     num: 5,  pos: 'VOL' },
+    { nome: 'Vini Jr.',     num: 7,  pos: 'ATA' },
+    { nome: 'Neymar',       num: 10, pos: 'MEI' },
+    { nome: 'Raphinha',     num: 11, pos: 'ATA' },
+    { nome: 'Endrick',      num: 9,  pos: 'ATA' },
+    { nome: 'Bruno G.',     num: 8,  pos: 'VOL' },
+    { nome: 'Paquetá',      num: 10, pos: 'MEI' },
+    { nome: 'Rodrygo',      num: 11, pos: 'ATA' },
+    { nome: 'Bremer',       num: 3,  pos: 'ZAG' },
+    { nome: 'Ederson',      num: 12, pos: 'GOL' },
+  ];
+
+  const COR_POS = {
+    GOL: '#f59b3c', ZAG: '#60a5fa', LAT: '#60a5fa',
+    VOL: '#4ade80', MEI: '#4ade80', ATA: '#f472b6',
+  };
+
+  grid.style.cssText = 'display:grid; grid-template-columns:repeat(3,1fr); gap:0.3rem;';
+  grid.innerHTML = convocados.map(j => `
+    <div style="
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 0.4rem;
+      padding: 0.3rem 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    ">
+      <span style="
+        font-size: 0.55rem;
+        font-weight: 900;
+        color: #FFD700;
+        min-width: 1rem;
+        text-align: center;
+      ">${j.num}</span>
+      <div>
+        <div style="font-size:0.5rem; font-weight:700; color:rgba(255,255,255,0.85); line-height:1.2">${j.nome}</div>
+        <div style="font-size:0.38rem; font-weight:700; color:${COR_POS[j.pos] || '#fff'}; letter-spacing:1px">${j.pos}</div>
+      </div>
+    </div>`).join('');
+
+  cap.textContent = 'Convocados — Copa do Mundo 2026';
 }
 
 async function copaRenderJogo() {
@@ -595,19 +750,20 @@ function copaMudarAba(tab) {
 }
 
 function copaIniciar() {
-  // Bind manual nos botões
   document.querySelectorAll('.copa-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       clearInterval(copaAutoTimer);
       copaMudarAba(btn.dataset.tab);
-      // retoma rotação após 20s de inatividade
       setTimeout(copaIniciarRotacao, 20000);
     });
   });
-  copaRenderJogo();
-  copaRenderGrupo();
-  copaRenderJogos();
-  copaRenderFotos();
+
+  // Carrega dados da API imediatamente
+  copaCarregarDados();
+
+  // Atualiza a cada 60s (placar ao vivo) e a cada 5min (tabela)
+  setInterval(copaCarregarDados, 60 * 1000);
+
   copaIniciarRotacao();
 }
 
