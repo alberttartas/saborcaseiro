@@ -35,6 +35,7 @@ const IMAGENS = {
   'Suco Natural':       'assets/sucos.webp',
   'Canja':              'assets/canja.webp',
   'Sopa de Carne':      'assets/sopa-de-carne.webp',
+  'Pratinho':           'assets/pratinho.webp',
 };
 
 function getImagem(nome) {
