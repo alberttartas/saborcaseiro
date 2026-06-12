@@ -461,54 +461,132 @@ setInterval(atualizarHora, 1000);
 atualizarHora();
 
 /* ══════════════════════════════════════════════════════
-   CLIMA — Open-Meteo (Fortaleza)
+   COPA DO MUNDO 2026 — Widget
 ══════════════════════════════════════════════════════ */
-const WMO_ICONE = {
-  0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
-  45: '🌫️', 48: '🌫️',
-  51: '🌦️', 53: '🌦️', 55: '🌧️',
-  61: '🌧️', 63: '🌧️', 65: '🌧️',
-  71: '❄️', 73: '❄️', 75: '❄️',
-  80: '🌦️', 81: '🌧️', 82: '⛈️',
-  95: '⛈️', 96: '⛈️', 99: '⛈️'
+
+const COPA = {
+  grupo: [
+    { nome: 'Brasil',   band: '🇧🇷', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
+    { nome: 'Marrocos', band: '🇲🇦', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
+    { nome: 'Escócia',  band: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
+    { nome: 'Haiti',    band: '🇭🇹', j:0, v:0, e:0, d:0, gp:0, gc:0, p:0 },
+  ],
+  jogos: [
+    { data:'13 Jun', hora:'19:00', casa:'Brasil',   fora:'Marrocos', local:'MetLife · NY',    rodada:1, hoje:true  },
+    { data:'19 Jun', hora:'21:30', casa:'Brasil',   fora:'Haiti',    local:'Lincoln · Fila.', rodada:2, hoje:false },
+    { data:'24 Jun', hora:'19:00', casa:'Escócia',  fora:'Brasil',   local:'Hard Rock · MIA', rodada:3, hoje:false },
+  ],
+  convocados: ['Vini Jr.','Raphinha','Endrick','Neymar','Rodrygo','Paquetá','Casemiro','Bruno G.','Marquinhos','Alisson'],
+  fotos: [
+    { emoji:'⚽', caption:'Vinicius Jr. em treino' },
+    { emoji:'🟡', caption:'Camisa Canarinho 2026' },
+    { emoji:'🏟️', caption:'MetLife Stadium, NY' },
+    { emoji:'🙌', caption:'Torcida Brasileira' },
+  ],
 };
 
-const WMO_DESC = {
-  0: 'Céu limpo', 1: 'Levemente nublado', 2: 'Parcialmente nublado', 3: 'Nublado',
-  45: 'Neblina', 48: 'Neblina c/ geada',
-  51: 'Garoa leve', 53: 'Garoa moderada', 55: 'Garoa forte',
-  61: 'Chuva leve', 63: 'Chuva moderada', 65: 'Chuva forte',
-  80: 'Pancadas leves', 81: 'Pancadas moder.', 82: 'Pancadas fortes',
-  95: 'Tempestade', 96: 'Tempestade c/ granizo', 99: 'Tempestade forte'
-};
+let copaTabAtual = 'jogo';
+let copaAutoTimer = null;
+const COPA_TABS = ['jogo','grupo','jogos','fotos'];
 
-async function buscarClima() {
-  try {
-    const res = await fetch(
-      'https://api.open-meteo.com/v1/forecast' +
-      '?latitude=-3.7172&longitude=-38.5433' +
-      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m' +
-      '&timezone=America%2FFortaleza&wind_speed_unit=kmh'
-    );
-    const data = await res.json();
-    const c = data.current;
-    const code = c.weather_code;
-
-    document.getElementById('weather-temp').innerHTML = Math.round(c.temperature_2m) + '<sup>°C</sup>';
-    document.getElementById('weather-icone').textContent = WMO_ICONE[code] || '🌡️';
-    document.getElementById('weather-cond').textContent = WMO_DESC[code] || 'Tempo variável';
-    document.getElementById('w-hum').textContent = c.relative_humidity_2m + '%';
-    document.getElementById('w-feel').textContent = Math.round(c.apparent_temperature) + '°';
-    document.getElementById('w-wind').textContent = Math.round(c.wind_speed_10m) + ' km/h';
-    document.getElementById('weather-atualizando').textContent = 'ao vivo';
-  } catch (_) {
-    document.getElementById('weather-cond').textContent = 'Indisponível';
-    document.getElementById('weather-atualizando').textContent = 'sem conexão';
-  }
+function copaRenderGrupo() {
+  const tbody = document.getElementById('grupo-tbody');
+  if (!tbody) return;
+  // Ordena por pontos → saldo de gols
+  const sorted = [...COPA.grupo].sort((a,b) => (b.p - a.p) || ((b.gp-b.gc)-(a.gp-a.gc)));
+  tbody.innerHTML = sorted.map((s,i) => `
+    <tr class="${s.nome==='Brasil'?'brasil-row':''}">
+      <td><span class="pos-num">${i+1}</span> ${s.band} ${s.nome}</td>
+      <td>${s.j}</td>
+      <td><strong>${s.p}</strong></td>
+      <td>${s.gp-s.gc >= 0 ? '+':''}${s.gp-s.gc}</td>
+    </tr>`).join('');
 }
 
-buscarClima();
-setInterval(buscarClima, 10 * 60 * 1000);
+function copaRenderJogos() {
+  const lista = document.getElementById('jogos-lista');
+  if (!lista) return;
+  lista.innerHTML = COPA.jogos.map(j => `
+    <div class="jogo-card${j.hoje?' jogo-card-hoje':''}">
+      <div class="jogo-card-data">${j.data}<br>${j.hora}</div>
+      <div class="jogo-card-times">🇧🇷 ${j.casa} <span style="color:rgba(255,255,255,0.3)">×</span> ${j.fora}</div>
+      <div class="jogo-card-local">${j.local}</div>
+    </div>`).join('');
+}
+
+function copaRenderFotos() {
+  const grid = document.getElementById('fotos-grid');
+  const cap  = document.getElementById('fotos-caption');
+  if (!grid) return;
+  grid.innerHTML = COPA.fotos.map(f => `
+    <div class="foto-slot">${f.emoji}</div>`).join('');
+  cap.textContent = '📸 Seleção Brasileira — Copa do Mundo 2026';
+}
+
+function copaRenderJogo() {
+  // Placar (estático por enquanto — pode integrar API depois)
+  const jogo = COPA.jogos.find(j => j.hoje);
+  if (!jogo) return;
+
+  const agora   = new Date();
+  const horaJogo = new Date();
+  horaJogo.setHours(19, 0, 0, 0); // 19h horário local
+
+  const aoVivo  = agora >= horaJogo && agora < new Date(horaJogo.getTime() + 120*60000);
+  const antes   = agora < horaJogo;
+
+  document.getElementById('gol-bra').textContent = antes ? '–' : '?';
+  document.getElementById('gol-mar').textContent = antes ? '–' : '?';
+  document.getElementById('placar-status').textContent = antes ? '19:00' : (aoVivo ? 'AO VIVO' : 'FIM');
+  document.getElementById('jogo-live-badge').style.display = aoVivo ? 'inline' : 'none';
+
+  // Escalação chips
+  const esc = document.getElementById('esc-nomes');
+  if (esc) esc.innerHTML = COPA.convocados
+    .map(n => `<span class="esc-chip">${n}</span>`).join('');
+}
+
+function copaMudarAba(tab) {
+  copaTabAtual = tab;
+  document.querySelectorAll('.copa-tab').forEach(b => {
+    b.classList.toggle('ativo', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('.copa-panel').forEach(p => {
+    p.classList.toggle('ativo', p.id === 'tab-' + tab);
+  });
+  if (tab === 'jogo')   copaRenderJogo();
+  if (tab === 'grupo')  copaRenderGrupo();
+  if (tab === 'jogos')  copaRenderJogos();
+  if (tab === 'fotos')  copaRenderFotos();
+}
+
+function copaIniciar() {
+  // Bind manual nos botões
+  document.querySelectorAll('.copa-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      clearInterval(copaAutoTimer);
+      copaMudarAba(btn.dataset.tab);
+      // retoma rotação após 20s de inatividade
+      setTimeout(copaIniciarRotacao, 20000);
+    });
+  });
+  copaRenderJogo();
+  copaRenderGrupo();
+  copaRenderJogos();
+  copaRenderFotos();
+  copaIniciarRotacao();
+}
+
+function copaIniciarRotacao() {
+  clearInterval(copaAutoTimer);
+  copaAutoTimer = setInterval(() => {
+    const cur = COPA_TABS.indexOf(copaTabAtual);
+    copaMudarAba(COPA_TABS[(cur + 1) % COPA_TABS.length]);
+  }, 10000); // rotaciona a cada 10s
+}
+
+// Inicializa quando o DOM estiver pronto
+window.addEventListener('load', copaIniciar);
 
 /* ══════════════════════════════════════════════════════
    CARREGAR DADOS DO APPS SCRIPT
