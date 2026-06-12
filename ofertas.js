@@ -57,12 +57,6 @@ let ultimosDados = null;
 let espetinhoPage = 0;       // página atual dos espetinhos (para alternar)
 const ESPETINHOS_POR_PAGINA = 8;  // mostrar 8 espetinhos por vez
 
-/* ══════════════════════════════════════════════════════
-   CONSTRUIR SLIDES
-   Sequência: prato → sobremesa/suco → prato → ...
-   chips = saboresPrincipais (máx 5)
-   badges = saboresTodos (todos)
-══════════════════════════════════════════════════════ */
 function construirSlides(dados) {
 
   // Filtra apenas pratos com categoria "Prato" (não inclui espetinhos)
@@ -126,7 +120,7 @@ function construirSlides(dados) {
     imagem:    getImagem('Suco Natural'),
   }));
 
-  
+  /* Dindins - valor vindo da planilha */
   const valorDindin = dindins.length > 0 && dindins[0].valor ? Number(dindins[0].valor) : 3;
 
   const slideDindins = dindins.length ? [{
@@ -140,11 +134,6 @@ function construirSlides(dados) {
     tags:      [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: `R$ ${valorDindin.toFixed(2).replace('.',',')} un.` }],
     imagem:    getImagem('Dindin'),
   }] : [];
-
-  /* Intercalar: prato → não-prato → prato → não-prato */
-  const naoProtos = [...slidesSob, ...slidesSuco, ...slideDindins];
-  const resultado = [];
-  const maxLen    = Math.max(slidesPratos.length, naoProtos.length);
 
   /* Intercalar: prato → não-prato → prato → não-prato */
   const naoProtos = [...slidesSob, ...slidesSuco, ...slideDindins];
