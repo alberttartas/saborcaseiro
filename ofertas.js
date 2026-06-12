@@ -36,6 +36,9 @@ const IMAGENS = {
   'Canja':              'assets/canja.webp',
   'Sopa de Carne':      'assets/sopa-de-carne.webp',
   'Pratinho':           'assets/pratinho.webp',
+  'Batata Frita':       'assets/batata.webp',
+ 'Macaxeira Frita':     'assets/macaxeira.webp',
+   
 };
 
 function getImagem(nome) {
