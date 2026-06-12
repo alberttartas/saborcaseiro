@@ -523,10 +523,61 @@ function copaRenderFotos() {
   cap.textContent = '📸 Seleção Brasileira — Copa do Mundo 2026';
 }
 
-function copaRenderJogo() {
-  // Placar (estático por enquanto — pode integrar API depois)
+async function copaRenderJogo() {
   const jogo = COPA.jogos.find(j => j.hoje);
   if (!jogo) return;
+
+  const agora    = new Date();
+  const horaJogo = new Date();
+  horaJogo.setHours(19, 0, 0, 0);
+  const aoVivo = agora >= horaJogo && agora < new Date(horaJogo.getTime() + 120*60000);
+  const antes  = agora < horaJogo;
+
+  // Escalação chips (sempre)
+  const esc = document.getElementById('esc-nomes');
+  if (esc) esc.innerHTML = COPA.convocados
+    .map(n => `<span class="esc-chip">${n}</span>`).join('');
+
+  // Tenta buscar placar real
+  try {
+    const res  = await fetch('https://api.football-data.org/v4/competitions/WC/matches?season=2026&status=IN_PLAY,FINISHED,SCHEDULED', {
+      headers: { 'X-Auth-Token': 'SEU_TOKEN_AQUI' }
+    });
+    const data = await res.json();
+
+    // Procura o jogo Brasil x Marrocos
+    const partida = (data.matches || []).find(m =>
+      (m.homeTeam.name.includes('Brazil') || m.awayTeam.name.includes('Brazil')) &&
+      (m.homeTeam.name.includes('Morocco') || m.awayTeam.name.includes('Morocco'))
+    );
+
+    if (partida) {
+      const braCasa = partida.homeTeam.name.includes('Brazil');
+      const golBra  = braCasa ? partida.score.fullTime.home : partida.score.fullTime.away;
+      const golMar  = braCasa ? partida.score.fullTime.away : partida.score.fullTime.home;
+      const status  = partida.status; // SCHEDULED, IN_PLAY, FINISHED
+
+      document.getElementById('gol-bra').textContent = golBra ?? '–';
+      document.getElementById('gol-mar').textContent = golMar ?? '–';
+
+      const statusTexto = status === 'IN_PLAY' ? 'AO VIVO'
+                        : status === 'FINISHED' ? 'FIM'
+                        : jogo.hora;
+
+      document.getElementById('placar-status').textContent = statusTexto;
+      document.getElementById('jogo-live-badge').style.display = status === 'IN_PLAY' ? 'inline' : 'none';
+      return;
+    }
+  } catch (_) {
+    // API indisponível — cai no fallback abaixo
+  }
+
+  // Fallback sem API
+  document.getElementById('gol-bra').textContent = '–';
+  document.getElementById('gol-mar').textContent = '–';
+  document.getElementById('placar-status').textContent = antes ? jogo.hora : (aoVivo ? 'AO VIVO' : 'FIM');
+  document.getElementById('jogo-live-badge').style.display = aoVivo ? 'inline' : 'none';
+}
 
   const agora   = new Date();
   const horaJogo = new Date();
