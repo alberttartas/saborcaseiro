@@ -126,18 +126,20 @@ function construirSlides(dados) {
     imagem:    getImagem('Suco Natural'),
   }));
 
-  /* Dindins */
-  const slideDindins = dindins.length ? [{
-    tipo:      'dindin',
-    nome:      'Dindins Gourmet',
-    categoria: 'Gelados Artesanais',
-    descricao: null,
-    saboresPrincipais: dindins.slice(0, 5).map(d => d.nome),
-    saboresTodos:      dindins.map(d => d.nome),
-    preco:     DINDIN_VALOR,
-    tags:      [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }],
-    imagem:    getImagem('Dindin'),
-  }] : [];
+  
+const valorDindin = dindins.length > 0 && dindins[0].valor ? Number(dindins[0].valor) : 3;
+
+const slideDindins = dindins.length ? [{
+  tipo:      'dindin',
+  nome:      'Dindins Gourmet',
+  categoria: 'Gelados Artesanais',
+  descricao: null,
+  saboresPrincipais: dindins.slice(0, 5).map(d => d.nome),
+  saboresTodos:      dindins.map(d => d.nome),
+  preco:     valorDindin,   // ← valor vindo da planilha
+  tags:      [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: `R$ ${valorDindin.toFixed(2).replace('.',',')} un.` }],
+  imagem:    getImagem('Dindin'),
+}]
 
   /* Intercalar: prato → não-prato → prato → não-prato */
   const naoProtos = [...slidesSob, ...slidesSuco, ...slideDindins];
