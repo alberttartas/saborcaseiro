@@ -462,7 +462,7 @@ setInterval(atualizarHora, 1000);
 atualizarHora();
 
 /* ══════════════════════════════════════════════════════
-   COPA DO MUNDO 2026 — Versão Corrigida com Próximo Jogo
+   COPA DO MUNDO 2026 — Código Corrigido
 ══════════════════════════════════════════════════════ */
 
 const COPA = {
@@ -488,32 +488,15 @@ let copaTabAtual = 'jogo';
 let copaAutoTimer = null;
 const COPA_TABS = ['jogo', 'grupo', 'jogos', 'fotos'];
 
-// Mapeamento de times
-const teamNameMap = {
-  'Brazil': 'Brasil',
-  'Morocco': 'Marrocos',
-  'Scotland': 'Escócia',
-  'Haiti': 'Haiti'
-};
-
-function normalizeTeamName(name) {
-  return teamNameMap[name] || name;
-}
-
 // Função para obter o próximo jogo do Brasil
 function getProximoJogo() {
   if (!COPA.jogos || COPA.jogos.length === 0) {
+    console.log('Nenhum jogo carregado ainda');
     return null;
   }
   
-  const agora = new Date();
-  
-  // FILTRA jogos com status SCHEDULED (agendados) ou IN_PLAY
+  // Filtra jogos agendados ou em andamento
   const jogosFuturos = COPA.jogos.filter(jogo => {
-    // Se tem dataHora e é no futuro ou está em andamento
-    if (!jogo.dataHora) return false;
-    
-    // Inclui jogos agendados, ao vivo ou em intervalo
     return jogo.status === 'SCHEDULED' || 
            jogo.status === 'IN_PLAY' || 
            jogo.status === 'PAUSED';
@@ -532,16 +515,17 @@ function getProximoJogo() {
     return jogoAoVivo;
   }
   
-  // Ordena por data e pega o PRIMEIRO (mais próximo)
+  // Ordena por data e pega o próximo
   jogosFuturos.sort((a, b) => a.dataHora - b.dataHora);
   const proximo = jogosFuturos[0];
   
-  console.log('Próximo jogo encontrado:', proximo);
+  console.log('Próximo jogo:', proximo?.casa, 'vs', proximo?.fora, '-', proximo?.dataHora);
   return proximo;
 }
+
 // Função para formatar a data do jogo
 function formatarDataJogo(dataObj) {
-  if (!dataObj) return '';
+  if (!dataObj || isNaN(dataObj.getTime())) return '';
   
   const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
@@ -556,52 +540,53 @@ function formatarDataJogo(dataObj) {
   return `${diaSemana}, ${dia} de ${mes} às ${hora}:${minuto}`;
 }
 
-/* ── Render: Próximo Jogo (sem escalação) ─────────────────── */
+function getBandeira(pais) {
+  const bandeiras = {
+    'Brasil': '🇧🇷',
+    'Marrocos': '🇲🇦',
+    'Escócia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'Haiti': '🇭🇹'
+  };
+  return bandeiras[pais] || '🏳️';
+}
+
+/* ── Render: Próximo Jogo ─────────────────── */
 function copaRenderJogo() {
   const proximoJogo = getProximoJogo();
   
   // Elementos do DOM
-  const advNomeEl = document.querySelector('.placar-time:last-child .placar-nome');
+  const placarStatus = document.getElementById('placar-status');
+  const placarLocal = document.getElementById('placar-local');
+  const placarData = document.getElementById('placar-data');
   const golBraEl = document.getElementById('gol-bra');
-  const golAdvEl = document.getElementById('gol-mar');
-  const statusEl = document.getElementById('placar-status');
-  const localEl = document.getElementById('placar-local');
-  const badgeEl = document.getElementById('jogo-live-badge');
-  const dataJogoEl = document.getElementById('jogo-data');
-  const escNomesEl = document.getElementById('esc-nomes');
-  
-  // Esconde a escalação (pois já aparece na aba "Seleção")
-  if (escNomesEl) {
-    escNomesEl.style.display = 'none';
-  }
-  
-  // Esconde ou remove o título "Escalação"
-  const tituloEscalacao = document.querySelector('.esc-title');
-  if (tituloEscalacao) {
-    tituloEscalacao.style.display = 'none';
-  }
+  const golMarEl = document.getElementById('gol-mar');
+  const jogoLiveBadge = document.getElementById('jogo-live-badge');
+  const advNomeEl = document.querySelector('.placar-time:last-child .placar-nome');
+  const advBandeiraEl = document.querySelector('.placar-time:last-child .placar-bandeira');
   
   if (!proximoJogo) {
-    // Se não há próximo jogo (fase de grupos concluída)
-    if (statusEl) statusEl.textContent = 'Fase de Grupos Concluída';
+    if (placarStatus) placarStatus.textContent = 'Aguardando dados';
+    if (placarLocal) placarLocal.textContent = 'Carregando...';
+    if (placarData) placarData.textContent = '';
     if (golBraEl) golBraEl.textContent = '—';
-    if (golAdvEl) golAdvEl.textContent = '—';
-    if (localEl) localEl.textContent = 'Aguardando próxima fase';
-    if (dataJogoEl) dataJogoEl.textContent = '';
-    if (badgeEl) badgeEl.style.display = 'none';
+    if (golMarEl) golMarEl.textContent = '—';
+    if (jogoLiveBadge) jogoLiveBadge.style.display = 'none';
+    if (advNomeEl) advNomeEl.textContent = 'A definir';
+    if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
     return;
   }
   
-  // Atualiza nome do adversário
+  // Atualiza adversário
   const advNome = proximoJogo.casa === 'Brasil' ? proximoJogo.fora : proximoJogo.casa;
   if (advNomeEl) advNomeEl.textContent = advNome;
+  if (advBandeiraEl) advBandeiraEl.textContent = getBandeira(advNome);
   
   // Atualiza placar
-  const golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '–';
-  const golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '–';
+  const golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '—';
+  const golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '—';
   
   if (golBraEl) golBraEl.textContent = golBra;
-  if (golAdvEl) golAdvEl.textContent = golAdv;
+  if (golMarEl) golMarEl.textContent = golAdv;
   
   // Atualiza status
   let statusTexto = '';
@@ -617,86 +602,35 @@ function copaRenderJogo() {
     statusTexto = 'FIM DE JOGO';
     showBadge = false;
   } else {
-    // Para jogos futuros, mostra a data e hora
-    statusTexto = '';
+    statusTexto = 'PRÓXIMO JOGO';
     showBadge = false;
   }
   
-  if (statusEl) statusEl.textContent = statusTexto;
-  if (badgeEl) badgeEl.style.display = showBadge ? 'inline-flex' : 'none';
+  if (placarStatus) placarStatus.textContent = statusTexto;
+  if (jogoLiveBadge) jogoLiveBadge.style.display = showBadge ? 'inline-flex' : 'none';
   
   // Atualiza local
-  if (localEl) localEl.textContent = proximoJogo.local || 'Estádio do Maracanã';
+  if (placarLocal) placarLocal.textContent = proximoJogo.local || 'Estádio do Maracanã';
   
-  // Atualiza data e hora do jogo (apenas se não for AO VIVO)
-  if (dataJogoEl && proximoJogo.status !== 'IN_PLAY' && proximoJogo.status !== 'PAUSED') {
-    if (proximoJogo.dataHora) {
-      dataJogoEl.textContent = formatarDataJogo(proximoJogo.dataHora);
-      dataJogoEl.style.display = 'block';
-    } else if (proximoJogo.data && proximoJogo.hora) {
-      // Fallback para o formato antigo
-      dataJogoEl.textContent = `${proximoJogo.data} às ${proximoJogo.hora}`;
-      dataJogoEl.style.display = 'block';
-    } else {
-      dataJogoEl.style.display = 'none';
-    }
-  } else if (dataJogoEl) {
-    dataJogoEl.style.display = 'none';
+  // Atualiza data
+  if (placarData && proximoJogo.dataHora) {
+    placarData.textContent = formatarDataJogo(proximoJogo.dataHora);
   }
 }
 
-// Processa jogos do Brasil
-if (matchesRes.status === 'fulfilled' && matchesRes.value?.matches) {
-  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  
-  COPA.jogos = matchesRes.value.matches
-    .filter(m => {
-      // Filtra apenas jogos do Brasil na fase de grupos
-      const isBrazilGame = m.homeTeam.id === 764 || m.awayTeam.id === 764;
-      const isGroupStage = m.stage === 'GROUP_STAGE';
-      return isBrazilGame && isGroupStage;
-    })
-    .map(m => {
-      const dt = new Date(m.utcDate);
-      const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-      const braCasa = m.homeTeam.id === 764;
-      const adversario = braCasa ? m.awayTeam : m.homeTeam;
-      
-      // Normaliza o nome do adversário
-      let advNome = adversario.name;
-      if (advNome === 'Morocco') advNome = 'Marrocos';
-      if (advNome === 'Scotland') advNome = 'Escócia';
-      if (advNome === 'Haiti') advNome = 'Haiti';
-      
-      return {
-        data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
-        hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
-        dataHora: dtBR,
-        casa: braCasa ? 'Brasil' : advNome,
-        fora: braCasa ? advNome : 'Brasil',
-        local: m.venue || 'Estádio do Maracanã - Rio de Janeiro/RJ',
-        status: m.status, // SCHEDULED, IN_PLAY, FINISHED, PAUSED
-        golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
-        golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
-      };
-    });
-  
-  // Ordena os jogos por data
-  COPA.jogos.sort((a, b) => a.dataHora - b.dataHora);
-  
-  console.log('Jogos do Brasil carregados:', COPA.jogos.length);
-  COPA.jogos.forEach(j => {
-    console.log(`${j.data} ${j.hora}: ${j.casa} vs ${j.fora} (${j.status})`);
-  });
-}
-
+/* ── Render: Tabela do Grupo ─────────────────── */
 function copaRenderGrupo() {
   const tbody = document.getElementById('grupo-tbody');
   if (!tbody) return;
   
-  // Times do grupo do Brasil (IDs: 764 Brasil, 815 Marrocos, 8873 Escócia, 836 Haiti)
+  if (!COPA.grupo.length) {
+    tbody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
+    return;
+  }
+  
+  // Filtra apenas os times do grupo do Brasil (IDs: 764, 815, 8873, 836)
   const timesGrupo = COPA.grupo.filter(time => 
-    [764, 815, 8873, 836].includes(time.id)
+    time.id === 764 || time.id === 815 || time.id === 8873 || time.id === 836
   );
   
   // Ordena por pontos
@@ -711,6 +645,7 @@ function copaRenderGrupo() {
     </tr>`).join('');
 }
 
+/* ── Render: Lista de Jogos ─────────────────── */
 function copaRenderJogos() {
   const container = document.getElementById('jogos-lista');
   if (!container) return;
@@ -723,19 +658,11 @@ function copaRenderJogos() {
   container.innerHTML = COPA.jogos.map(jogo => {
     const isFinished = jogo.status === 'FINISHED';
     const isLive = jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED';
-    const statusText = isLive ? '🟢 AO VIVO' : (isFinished ? '✓ FINALIZADO' : '📅 AGENDADO');
+    const statusText = isLive ? '🔴 AO VIVO' : (isFinished ? '✓ FINALIZADO' : '📅 AGENDADO');
     const statusColor = isLive ? '#f59b3c' : (isFinished ? '#4ade80' : 'rgba(255,255,255,0.3)');
     
     return `
-      <div class="jogo-item" style="
-        background: rgba(255,255,255,0.03);
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin-bottom: 0.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      ">
+      <div class="jogo-item" style="background: rgba(255,255,255,0.03); border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
         <div style="font-size: 0.55rem; color: rgba(255,255,255,0.5); min-width: 70px;">
           ${jogo.data} ${jogo.hora}
         </div>
@@ -753,6 +680,7 @@ function copaRenderJogos() {
   }).join('');
 }
 
+/* ── Render: Fotos/Convocação ─────────────────── */
 function copaRenderFotos() {
   const grid = document.getElementById('fotos-grid');
   const cap = document.getElementById('fotos-caption');
@@ -763,82 +691,159 @@ function copaRenderFotos() {
     VOL: '#4ade80', MEI: '#4ade80', ATA: '#f472b6',
   };
 
-  grid.style.cssText = 'display:grid; grid-template-columns:repeat(3,1fr); gap:0.3rem;';
   grid.innerHTML = COPA.convocados.map(j => `
-    <div style="
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 0.4rem;
-      padding: 0.3rem 0.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    ">
-      <span style="
-        font-size: 0.55rem;
-        font-weight: 900;
-        color: #FFD700;
-        min-width: 1rem;
-        text-align: center;
-      ">${j.num}</span>
+    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 0.4rem; padding: 0.3rem 0.4rem; display: flex; align-items: center; gap: 0.3rem;">
+      <span style="font-size: 0.55rem; font-weight: 900; color: #FFD700; min-width: 1rem; text-align: center;">${j.num}</span>
       <div>
         <div style="font-size:0.5rem; font-weight:700; color:rgba(255,255,255,0.85); line-height:1.2">${j.nome}</div>
-        <div style="font-size:0.38rem; font-weight:700; color:${COR_POS[j.pos] || '#fff'}; letter-spacing:1px">${j.pos}</div>
+        <div style="font-size:0.38rem; font-weight:700; color:${COR_POS[j.pos]}; letter-spacing:1px">${j.pos}</div>
       </div>
     </div>`).join('');
 
   if (cap) cap.textContent = 'Convocados — Copa do Mundo 2026';
 }
 
+/* ── Carregar Dados da API ─────────────────── */
+async function copaCarregarDados() {
+  console.log('Carregando dados da Copa...');
+  
+  try {
+    // Busca classificação
+    const standingsRes = await fetch('/api/copa');
+    if (standingsRes.ok) {
+      const standingsData = await standingsRes.json();
+      console.log('Classificação recebida');
+      
+      // Processa os dados da classificação
+      if (standingsData.standings && standingsData.standings[0]?.table) {
+        COPA.grupo = standingsData.standings[0].table.map(item => ({
+          id: item.team.id,
+          nome: item.team.name === 'Brazil' ? 'Brasil' :
+                item.team.name === 'Morocco' ? 'Marrocos' :
+                item.team.name === 'Scotland' ? 'Escócia' :
+                item.team.name === 'Haiti' ? 'Haiti' : item.team.name,
+          j: item.playedGames,
+          v: item.won,
+          e: item.draw,
+          d: item.lost,
+          gp: item.goalsFor,
+          gc: item.goalsAgainst,
+          p: item.points,
+        }));
+        
+        console.log('Times carregados:', COPA.grupo.length);
+      }
+    } else {
+      console.error('Erro ao carregar classificação:', standingsRes.status);
+    }
+    
+    // Busca jogos do Brasil
+    const matchesRes = await fetch('/api/copa-matches');
+    if (matchesRes.ok) {
+      const matchesData = await matchesRes.json();
+      console.log('Jogos recebidos');
+      
+      if (matchesData.matches) {
+        const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        
+        COPA.jogos = matchesData.matches
+          .filter(m => {
+            // Filtra jogos do Brasil na fase de grupos
+            const isBrazilGame = (m.homeTeam?.id === 764 || m.awayTeam?.id === 764);
+            const isGroupStage = m.stage === 'GROUP_STAGE';
+            return isBrazilGame && isGroupStage;
+          })
+          .map(m => {
+            const dt = new Date(m.utcDate);
+            const dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+            const braCasa = m.homeTeam?.id === 764;
+            const adversario = braCasa ? m.awayTeam : m.homeTeam;
+            
+            let advNome = adversario?.name || 'Adversário';
+            if (advNome === 'Morocco') advNome = 'Marrocos';
+            if (advNome === 'Scotland') advNome = 'Escócia';
+            if (advNome === 'Haiti') advNome = 'Haiti';
+            
+            return {
+              data: `${dtBR.getDate()} ${meses[dtBR.getMonth()]}`,
+              hora: `${String(dtBR.getHours()).padStart(2, '0')}:${String(dtBR.getMinutes()).padStart(2, '0')}`,
+              dataHora: dtBR,
+              casa: braCasa ? 'Brasil' : advNome,
+              fora: braCasa ? advNome : 'Brasil',
+              local: m.venue || 'Estádio do Maracanã - Rio de Janeiro/RJ',
+              status: m.status,
+              golBra: braCasa ? m.score?.fullTime?.home : m.score?.fullTime?.away,
+              golAdv: braCasa ? m.score?.fullTime?.away : m.score?.fullTime?.home,
+            };
+          });
+        
+        // Ordena jogos por data
+        COPA.jogos.sort((a, b) => a.dataHora - b.dataHora);
+        console.log('Jogos do Brasil carregados:', COPA.jogos.length);
+        COPA.jogos.forEach(j => {
+          console.log(`  ${j.data} ${j.hora}: ${j.casa} vs ${j.fora} (${j.status})`);
+        });
+      }
+    } else {
+      console.error('Erro ao carregar jogos:', matchesRes.status);
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar dados da Copa:', error);
+  }
+  
+  // Atualiza a interface
+  copaMudarAba(copaTabAtual);
+}
+
+/* ── Mudar Aba ─────────────────── */
 function copaMudarAba(tab) {
   copaTabAtual = tab;
   
-  document.querySelectorAll('.copa-tab').forEach(b => {
-    b.classList.toggle('ativo', b.dataset.tab === tab);
+  document.querySelectorAll('.copa-tab').forEach(btn => {
+    btn.classList.toggle('ativo', btn.dataset.tab === tab);
   });
   
-  document.querySelectorAll('.copa-panel').forEach(p => {
-    p.classList.toggle('ativo', p.id === 'tab-' + tab);
+  document.querySelectorAll('.copa-panel').forEach(panel => {
+    panel.classList.toggle('ativo', panel.id === `tab-${tab}`);
   });
   
-  // Mostra/esconde a escalação baseado na aba atual
-  const escalacaoSection = document.querySelector('.escalacao-section');
-  if (escalacaoSection) {
-    escalacaoSection.style.display = tab === 'fotos' ? 'block' : 'none';
-  }
-  
+  // Renderiza o conteúdo da aba
   if (tab === 'jogo') copaRenderJogo();
   if (tab === 'grupo') copaRenderGrupo();
   if (tab === 'jogos') copaRenderJogos();
   if (tab === 'fotos') copaRenderFotos();
 }
 
+/* ── Iniciar Rotação Automática ─────────────────── */
+function copaIniciarRotacao() {
+  if (copaAutoTimer) clearInterval(copaAutoTimer);
+  copaAutoTimer = setInterval(() => {
+    const curIndex = COPA_TABS.indexOf(copaTabAtual);
+    const nextIndex = (curIndex + 1) % COPA_TABS.length;
+    copaMudarAba(COPA_TABS[nextIndex]);
+  }, 10000);
+}
+
+/* ── Inicializar Copa ─────────────────── */
 function copaIniciar() {
-  // Configurar tabs
+  // Configurar eventos das abas
   document.querySelectorAll('.copa-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      clearInterval(copaAutoTimer);
+      if (copaAutoTimer) clearInterval(copaAutoTimer);
       copaMudarAba(btn.dataset.tab);
       setTimeout(copaIniciarRotacao, 20000);
     });
   });
-
-  // Carrega dados
+  
+  // Carregar dados
   copaCarregarDados();
   
-  // Atualiza a cada 60 segundos
-  setInterval(copaCarregarDados, 60 * 1000);
+  // Atualizar a cada 60 segundos
+  setInterval(copaCarregarDados, 60000);
   
-  // Inicia rotação automática
+  // Iniciar rotação
   copaIniciarRotacao();
-}
-
-function copaIniciarRotacao() {
-  clearInterval(copaAutoTimer);
-  copaAutoTimer = setInterval(() => {
-    const cur = COPA_TABS.indexOf(copaTabAtual);
-    copaMudarAba(COPA_TABS[(cur + 1) % COPA_TABS.length]);
-  }, 10000);
 }
 
 // Inicializar quando o DOM estiver pronto
