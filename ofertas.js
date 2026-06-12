@@ -489,37 +489,43 @@ let copaAutoTimer = null;
 const COPA_TABS = ['jogo', 'grupo', 'jogos', 'fotos'];
 
 // Função para obter o próximo jogo do Brasil
+// Função para obter o próximo jogo do Brasil
 function getProximoJogo() {
   if (!COPA.jogos || COPA.jogos.length === 0) {
     console.log('Nenhum jogo carregado ainda');
     return null;
   }
   
-  // Filtra jogos agendados ou em andamento
+  const agora = new Date();
+  console.log('Data atual:', agora);
+  
+  // Filtra jogos que ainda não aconteceram (status TIMED, SCHEDULED, IN_PLAY, PAUSED)
   const jogosFuturos = COPA.jogos.filter(jogo => {
-    return jogo.status === 'SCHEDULED' || 
-           jogo.status === 'IN_PLAY' || 
-           jogo.status === 'PAUSED';
+    // Inclui jogos com status TIMED (agendados)
+    if (jogo.status === 'TIMED') return true;
+    if (jogo.status === 'SCHEDULED') return true;
+    if (jogo.status === 'IN_PLAY') return true;
+    if (jogo.status === 'PAUSED') return true;
+    
+    // Se tem data e é no futuro, inclui (fallback)
+    if (jogo.dataHora && jogo.dataHora > agora) return true;
+    
+    return false;
   });
+  
+  console.log('Jogos futuros encontrados:', jogosFuturos.length);
   
   if (jogosFuturos.length === 0) {
     console.log('Nenhum jogo futuro encontrado');
     return null;
   }
   
-  // Verifica se há jogo ao vivo
-  const jogoAoVivo = jogosFuturos.find(jogo => 
-    jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED'
-  );
-  if (jogoAoVivo) {
-    return jogoAoVivo;
-  }
-  
-  // Ordena por data e pega o próximo
+  // Ordena por data (do mais próximo para o mais distante)
   jogosFuturos.sort((a, b) => a.dataHora - b.dataHora);
   const proximo = jogosFuturos[0];
   
-  console.log('Próximo jogo:', proximo?.casa, 'vs', proximo?.fora, '-', proximo?.dataHora);
+  console.log('PRÓXIMO JOGO:', proximo.casa, 'vs', proximo.fora, 'em', proximo.dataHora);
+  
   return proximo;
 }
 
@@ -656,15 +662,25 @@ function copaRenderJogos() {
   }
   
   container.innerHTML = COPA.jogos.map(jogo => {
+    // Corrigido para incluir TIMED como agendado
     const isFinished = jogo.status === 'FINISHED';
     const isLive = jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED';
+    const isScheduled = jogo.status === 'TIMED' || jogo.status === 'SCHEDULED';
     const statusText = isLive ? '🔴 AO VIVO' : (isFinished ? '✓ FINALIZADO' : '📅 AGENDADO');
-    const statusColor = isLive ? '#f59b3c' : (isFinished ? '#4ade80' : 'rgba(255,255,255,0.3)');
+    const statusColor = isLive ? '#f59b3c' : (isFinished ? '#4ade80' : 'rgba(255,255,255,0.5)');
+    
+    // Formata a data de forma legível
+    const dataFormatada = jogo.dataHora ? jogo.dataHora.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : jogo.data;
     
     return `
       <div class="jogo-item" style="background: rgba(255,255,255,0.03); border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-size: 0.55rem; color: rgba(255,255,255,0.5); min-width: 70px;">
-          ${jogo.data} ${jogo.hora}
+        <div style="font-size: 0.55rem; color: rgba(255,255,255,0.5); min-width: 100px;">
+          ${dataFormatada}
         </div>
         <div style="flex: 1; text-align: center; font-weight: 600; font-size: 0.55rem;">
           ${jogo.casa} vs ${jogo.fora}
