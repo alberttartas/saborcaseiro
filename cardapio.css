@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — cardapio.css (TV otimizado)
+   LM SABOR CASEIRO — cardapio.css (FONTES VISÍVEIS)
    Layout em 3 colunas: Prato | Cardápio do Dia | Copa 2026
 ══════════════════════════════════════════════════════ */
 
@@ -16,7 +16,7 @@
 
 /* ESCALA GLOBAL: tudo baseado na largura da tela */
 html {
-  font-size: calc(0.8vw + 0.8vh);
+  font-size: calc(0.9vw + 0.9vh);
 }
 
 body {
@@ -40,7 +40,7 @@ body {
 #background {
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; 
-  filter: brightness(0.60) saturate(0.95) contrast(0.95); /* Fundo mais visível */
+  filter: brightness(0.60) saturate(0.95) contrast(0.95);
   z-index:0;
 }
 
@@ -113,38 +113,40 @@ body {
    COLUNA 1 — PRATO
 ════════════════════════════════ */
 #left {
-  flex: 1.2 1 0; /* Aumentei um pouco para dar mais espaço */
+  flex: 1.2 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Logo - REDUZIDO */
+/* Logo */
 #logo-area {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.3rem; /* Reduzido */
+  gap: 0.8rem;
+  margin-bottom: 0.3rem;
 }
 
 #logo-img {
-  width: 2.4rem; /* Reduzido */
-  height: 2.4rem; /* Reduzido */
+  width: 3rem;
+  height: 3rem;
   object-fit: contain;
   filter: drop-shadow(0 0 0.4rem rgba(232,112,10,0.35));
 }
 
 #brand-nome {
   font-family: var(--fonte-titulo);
-  font-size: 0.85rem; /* Reduzido */
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--creme);
+  text-shadow: 0 0 20px rgba(232,112,10,0.15);
 }
 
 #brand-slogan {
-  font-size: 0.45rem; /* Reduzido */
+  font-size: 0.55rem;
   letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
 }
 
 /* Imagem do prato */
@@ -153,7 +155,7 @@ body {
   width: 65%;
   max-width: 20rem;
   aspect-ratio: 1 / 1;
-  margin: 0 auto 0.6rem; /* Reduzido */
+  margin: 0 auto 0.6rem;
 }
 
 #slide-container {
@@ -183,7 +185,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.2rem;
+  gap: 0.3rem;
   opacity: 0;
   transition: opacity 0.5s;
 }
@@ -191,13 +193,13 @@ body {
 .slide-badges.ativo { opacity: 1; }
 
 .badge {
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  padding: 0.15rem 0.5rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 12px;
-  background: rgba(13,10,6,0.8);
-  border: 1px solid rgba(255,255,255,0.13);
-  color: rgba(255,255,255,0.75);
+  background: rgba(13,10,6,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
   backdrop-filter: blur(4px);
   white-space: nowrap;
 }
@@ -206,105 +208,165 @@ body {
   position: absolute;
   top: 0.2rem;
   right: 0.2rem;
-  font-size: 0.5rem;
-  color: rgba(255,255,255,0.3);
-  background: rgba(13,10,6,0.5);
-  padding: 0.1rem 0.4rem;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.4);
+  background: rgba(13,10,6,0.6);
+  padding: 0.1rem 0.5rem;
   border-radius: 8px;
   z-index: 2;
+  font-weight: 600;
 }
 
-/* Área de texto do prato - REDUZIDO */
+/* Área de texto do prato */
 #dish-area {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
 }
 
 #dish-categoria {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin-bottom: 0.2rem;
 }
 
-#cat-linha { width: 1.5rem; height: 2px; background: var(--laranja); }
-#cat-texto { font-size: 0.5rem; font-weight: 700; letter-spacing: 2px; color: var(--laranja-claro); }
+#cat-linha { width: 2rem; height: 2px; background: var(--laranja); }
+#cat-texto { 
+  font-size: 0.65rem; 
+  font-weight: 700; 
+  letter-spacing: 3px; 
+  color: var(--laranja-claro);
+  text-shadow: 0 0 10px rgba(232,112,10,0.2);
+}
 
 #nome {
   font-family: var(--fonte-titulo);
-  font-size: 1.6rem; /* Reduzido */
+  font-size: 2rem;
   font-weight: 900;
   line-height: 1.05;
   color: var(--creme);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
 
 #separador {
   display: flex;
-  gap: 0.6rem;
-  margin: 0.3rem 0;
+  gap: 0.8rem;
+  margin: 0.4rem 0;
 }
 
-#sep-bolinha { width: 0.3rem; height: 0.3rem; background: var(--laranja); border-radius: 50%; }
-#sep-linha { width: 2.5rem; height: 1px; background: linear-gradient(to right, var(--laranja), transparent); }
+#sep-bolinha { width: 0.4rem; height: 0.4rem; background: var(--laranja); border-radius: 50%; }
+#sep-linha { width: 3rem; height: 1px; background: linear-gradient(to right, var(--laranja), transparent); }
 
 #dish-desc {
-  font-size: 0.65rem;
-  line-height: 1.4;
-  color: rgba(255,255,255,0.7);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.75);
   max-width: 95%;
 }
+
+/* PRECO SEPARADO DOS SABORES */
+.preco-destaque {
+  display: block;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  background: rgba(232,112,10,0.15);
+  border: 1px solid rgba(232,112,10,0.25);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--laranja-claro);
+  text-shadow: 0 0 20px rgba(232,112,10,0.2);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.preco-destaque span {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+}
+
+/* Sabores principais - mais visíveis */
+.sabores-principais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.2rem 0;
+}
+
+.chip-principal {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.5px;
+}
+
+.chip-principal.cor-0 { border-color: #F59B3C; color: #F59B3C; background: rgba(245,155,60,0.12); }
+.chip-principal.cor-1 { border-color: #60A5FA; color: #60A5FA; background: rgba(96,165,250,0.12); }
+.chip-principal.cor-2 { border-color: #34D399; color: #34D399; background: rgba(52,211,153,0.12); }
+.chip-principal.cor-3 { border-color: #F472B6; color: #F472B6; background: rgba(244,114,182,0.12); }
+.chip-principal.cor-4 { border-color: #A78BFA; color: #A78BFA; background: rgba(167,139,250,0.12); }
 
 /* Tags */
 #dish-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.3rem;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
 }
 
 .tag {
-  font-size: 0.48rem;
+  font-size: 0.55rem;
   font-weight: 600;
   letter-spacing: 1px;
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.8rem;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.13);
   background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
 }
 
-.tag-destaque { border-color: var(--laranja); color: var(--laranja-claro); background: rgba(232,112,10,0.1); }
+.tag-destaque { 
+  border-color: var(--laranja); 
+  color: var(--laranja-claro); 
+  background: rgba(232,112,10,0.12);
+  text-shadow: 0 0 10px rgba(232,112,10,0.15);
+}
 
-/* Progresso - REDUZIDO */
+/* Progresso */
 #progress-wrap {
-  margin-top: 0.3rem;
+  margin-top: 0.5rem;
 }
 
 #prox-info {
   display: flex;
-  gap: 0.4rem;
-  font-size: 0.5rem;
+  gap: 0.5rem;
+  font-size: 0.6rem;
   margin-bottom: 0.3rem;
 }
 
 #prox-label { color: rgba(255,255,255,0.4); letter-spacing: 2px; }
 #prox-seta { color: var(--laranja); }
-#prox-nome { color: rgba(255,255,255,0.6); }
+#prox-nome { color: rgba(255,255,255,0.65); }
 
 #progress-dots {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .dot {
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
 }
 
-.dot.ativo { background: var(--laranja); width: 1.2rem; border-radius: 4px; }
+.dot.ativo { background: var(--laranja); width: 1.5rem; border-radius: 4px; }
 
 /* ════════════════════════════════
    COLUNA 2 — CARDÁPIO DO DIA
@@ -314,40 +376,40 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem; /* Reduzido */
+  gap: 0.6rem;
 }
 
 #datetime-box {
   text-align: center;
-  background: rgba(0,0,0,0.25); /* Mais transparente */
-  padding: 0.3rem 0.8rem; /* Reduzido */
+  background: rgba(0,0,0,0.25);
+  padding: 0.4rem 1rem;
   border-radius: 0.8rem;
   backdrop-filter: blur(8px);
 }
 
 #date {
-  font-size: 0.5rem; /* Reduzido */
+  font-size: 0.6rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
   letter-spacing: 1px;
 }
 
 #clock {
   font-family: var(--fonte-titulo);
-  font-size: 2rem; /* Reduzido */
+  font-size: 2.4rem;
   font-weight: 900;
   color: var(--laranja);
   line-height: 1;
-  text-shadow: 0 0 8px rgba(232,112,10,0.5);
+  text-shadow: 0 0 20px rgba(232,112,10,0.4);
 }
 
 #destaques-box {
   flex: 1 1 0;
   min-height: 0;
-  background: rgba(255,255,255,0.03); /* Mais transparente */
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 0.8rem;
-  padding: 0.6rem 0.8rem;
+  padding: 0.8rem 1rem;
   backdrop-filter: blur(8px);
   overflow: hidden;
   display: flex;
@@ -355,11 +417,11 @@ body {
 }
 
 #dest-titulo {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 2px;
-  color: rgba(255,255,255,0.4);
-  margin-bottom: 0.4rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
@@ -370,42 +432,46 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .dest-item {
   flex: 1 1 44%;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.5rem;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 0.5rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .dest-dot {
-  width: 0.3rem;
-  height: 0.3rem;
+  width: 0.4rem;
+  height: 0.4rem;
   border-radius: 50%;
   background: var(--laranja);
   flex-shrink: 0;
 }
 
 .dest-nome {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.8);
   flex: 1;
 }
 
-.dest-cat { font-size: 0.45rem; color: rgba(255,255,255,0.25); }
+.dest-cat { 
+  font-size: 0.5rem; 
+  color: rgba(255,255,255,0.3);
+  font-weight: 500;
+}
 
 /* ════════════════════════════════
-   COLUNA 3 — COPA DO MUNDO 2026 (AUMENTADO)
+   COLUNA 3 — COPA DO MUNDO 2026
 ════════════════════════════════ */
 #right {
-  flex: 1.3 1 0; /* Aumentei o flex para dar mais espaço */
+  flex: 1.3 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -414,43 +480,44 @@ body {
 }
 
 #copa-box {
-  flex: 0 0 auto; 
+  flex: 0 0 auto;
   min-height: 0;
-  background: rgba(10,30,10,0.40); /* Mais transparente */
+  background: rgba(10,30,10,0.40);
   border: 1px solid rgba(255,215,0,0.15);
   border-radius: 0.8rem;
-  padding: 0.3rem 0.5rem;
+  padding: 0.4rem 0.6rem;
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   overflow: hidden;
-  }
+}
 
-/* CABEÇALHO DA COPA - REDUZIDO */
+/* CABEÇALHO DA COPA */
 #copa-header {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
-#copa-flag  { font-size: 0.9rem; }
+#copa-flag  { font-size: 1.1rem; }
 
 #copa-titulo-wrap {
   flex: 1;
 }
 
 #copa-titulo {
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: #FFD700;
-  line-height: 1.1;
+  line-height: 1.2;
+  text-shadow: 0 0 20px rgba(255,215,0,0.15);
 }
 
 #copa-subtitulo {
-  font-size: 0.4rem;
-  color: rgba(255,255,255,0.35);
+  font-size: 0.45rem;
+  color: rgba(255,255,255,0.4);
   letter-spacing: 1px;
 }
 
@@ -461,35 +528,35 @@ body {
   gap: 0.1rem;
 }
 
-#copa-trofeu { font-size: 0.8rem; }
+#copa-trofeu { font-size: 0.9rem; }
 
 #copa-countdown {
-  font-size: 0.4rem;
+  font-size: 0.45rem;
   font-weight: 700;
-  color: rgba(255,215,0,0.75);
+  color: rgba(255,215,0,0.8);
   background: rgba(255,215,0,0.08);
   border: 1px solid rgba(255,215,0,0.15);
   border-radius: 6px;
-  padding: 0.05rem 0.35rem;
+  padding: 0.05rem 0.4rem;
   white-space: nowrap;
 }
 
-/* TABS - REDUZIDAS */
+/* TABS */
 #copa-tabs {
   display: flex;
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
 
 .copa-tab {
   flex: 1;
-  font-size: 0.4rem;
+  font-size: 0.45rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  padding: 0.15rem 0;
+  padding: 0.2rem 0;
   border-radius: 4px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.03);
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.4);
   cursor: pointer;
   text-transform: uppercase;
   transition: all 0.25s;
@@ -502,7 +569,7 @@ body {
 }
 
 #copa-content {
-  flex: 0 0 auto; /* Altura fixa */
+  flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
 }
@@ -510,7 +577,7 @@ body {
 .copa-panel { display: none; height: 100%; }
 .copa-panel.ativo { display: flex; flex-direction: column; }
 
-/* Placar - REDUZIDO */
+/* Placar */
 #placar-wrap {
   display: flex;
   align-items: center;
@@ -526,15 +593,21 @@ body {
   flex: 1;
 }
 
-.placar-bandeira { font-size: 1.3rem; }
-.placar-nome     { font-size: 0.45rem; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; }
+.placar-bandeira { font-size: 1.5rem; }
+.placar-nome     { 
+  font-size: 0.5rem; 
+  font-weight: 700; 
+  color: rgba(255,255,255,0.8); 
+  letter-spacing: 0.5px;
+}
 
 .placar-gol {
   font-family: var(--fonte-titulo);
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
   color: #FFD700;
   line-height: 1;
+  text-shadow: 0 0 20px rgba(255,215,0,0.2);
 }
 
 #placar-meio {
@@ -544,9 +617,14 @@ body {
   gap: 0.1rem;
 }
 
-#placar-status { font-size: 0.65rem; font-weight: 800; color: white; }
-#placar-local  { font-size: 0.38rem; color: rgba(255,255,255,0.35); text-align: center; }
-.placar-data   { font-size: 0.38rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+#placar-status { 
+  font-size: 0.7rem; 
+  font-weight: 800; 
+  color: white;
+  text-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+#placar-local  { font-size: 0.42rem; color: rgba(255,255,255,0.4); text-align: center; }
+.placar-data   { font-size: 0.42rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
 
 #jogo-info {
   display: flex;
@@ -557,13 +635,13 @@ body {
 }
 
 .jogo-tag {
-  font-size: 0.38rem;
+  font-size: 0.42rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  padding: 0.1rem 0.4rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 6px;
   border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.5);
 }
 
 .jogo-tag-ao-vivo {
@@ -574,7 +652,7 @@ body {
 
 @keyframes pisca { 50% { opacity: 0.4; } }
 
-/* Estádio / cidade / transmissão - REDUZIDO */
+/* Estádio / cidade / transmissão */
 #jogo-extra {
   margin-top: 0.2rem;
   padding-top: 0.3rem;
@@ -585,20 +663,20 @@ body {
 }
 
 .jogo-extra-item {
-  font-size: 0.42rem;
+  font-size: 0.48rem;
   color: rgba(255,255,255,0.5);
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
 
-.jogo-extra-item span { color: rgba(255,255,255,0.7); font-weight: 600; }
+.jogo-extra-item span { color: rgba(255,255,255,0.75); font-weight: 600; }
 
-/* Tabela do grupo - REDUZIDA */
+/* Tabela do grupo */
 #grupo-tabela {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.42rem;
+  font-size: 0.48rem;
 }
 
 #grupo-tabela th {
@@ -613,9 +691,9 @@ body {
 #grupo-tabela th:nth-child(2) { text-align: left; }
 
 #grupo-tabela td {
-  padding: 0.25rem 0.15rem;
+  padding: 0.3rem 0.15rem;
   border-bottom: 1px solid rgba(255,255,255,0.03);
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.7);
   text-align: center;
 }
 
@@ -626,13 +704,13 @@ body {
 .pos-num { font-weight: 800; color: rgba(255,255,255,0.3); }
 
 #grupo-nota {
-  font-size: 0.35rem;
+  font-size: 0.38rem;
   color: rgba(255,255,255,0.2);
   margin-top: 0.2rem;
   text-align: center;
 }
 
-/* Próximos jogos - REDUZIDO */
+/* Próximos jogos */
 #jogos-lista { overflow-y: auto; flex: 1; }
 
 .jogo-card {
@@ -643,15 +721,15 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.03);
 }
 
-.jogo-card-data  { font-size: 0.4rem; color: rgba(255,215,0,0.6); font-weight: 700; min-width: 2rem; }
-.jogo-card-times { font-size: 0.45rem; font-weight: 600; color: rgba(255,255,255,0.75); flex: 1; }
-.jogo-card-local { font-size: 0.35rem; color: rgba(255,255,255,0.25); text-align: right; }
+.jogo-card-data  { font-size: 0.45rem; color: rgba(255,215,0,0.6); font-weight: 700; min-width: 2rem; }
+.jogo-card-times { font-size: 0.5rem; font-weight: 600; color: rgba(255,255,255,0.8); flex: 1; }
+.jogo-card-local { font-size: 0.38rem; color: rgba(255,255,255,0.25); text-align: right; }
 
-/* Seleção / convocados - REDUZIDO */
+/* Seleção / convocados */
 #fotos-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.25rem;
+  gap: 0.3rem;
   margin-bottom: 0.2rem;
 }
 
@@ -667,30 +745,26 @@ body {
 }
 
 #fotos-caption {
-  font-size: 0.38rem;
+  font-size: 0.42rem;
   color: rgba(255,255,255,0.25);
   text-align: center;
   letter-spacing: 0.5px;
 }
 
-/* ── SLIDE DE FOTOS DA COPA (TAMANHO FIXO E MAIOR) ── */
+/* ── SLIDE DE FOTOS DA COPA ── */
 #copa-fotos-slide {
-  flex: 0 0 auto;           /* NÃO CRESCE - tamanho fixo */
-  height: 220px;            /* ALTURA FIXA MAIOR */
-  min-height: 220px;        /* GARANTE A ALTURA MÍNIMA */
-  max-height: 220px;        /* GARANTE A ALTURA MÁXIMA */
+  flex: 1 1 auto;
+  min-height: 120px;
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
   border: 1px solid rgba(255,215,0,0.15);
   background: rgba(0,0,0,0.30);
-  margin-top: 0.3rem;
 }
 
 #cfs-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 .cfs-img {
@@ -701,15 +775,56 @@ body {
   object-fit: cover;
   opacity: 0;
   transition: opacity 1s ease;
-  z-index: 1;
 }
 
-.cfs-img.ativo {
-  opacity: 1;
+.cfs-img.ativo { opacity: 1; }
+
+#copa-fotos-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+#cfs-label {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 0.4rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.85);
+  z-index: 2;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+#cfs-dots {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
   z-index: 2;
 }
 
-/* Fallback para imagens que não carregam */
+.cfs-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.30);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.cfs-dot.ativo { background: #FFD700; width: 0.9rem; border-radius: 2px; }
+
+.cfs-dot:hover {
+  background: rgba(255,215,0,0.5);
+  transform: scale(1.2);
+}
+
+/* Slides da Copa - para imagens e DIVs */
 .cfs-slide {
   position: absolute;
   inset: 0;
@@ -728,74 +843,6 @@ body {
 .cfs-slide.ativo {
   opacity: 1;
   z-index: 2;
-}
-
-.cfs-img-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  opacity: 0;
-  transition: opacity 1s ease;
-  z-index: 1;
-}
-
-.cfs-img-fallback.ativo {
-  opacity: 1;
-  z-index: 2;
-}
-
-#copa-fotos-slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 3;
-}
-
-#cfs-label {
-  position: absolute;
-  left: 0.7rem;
-  bottom: 0.4rem;
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.85);
-  z-index: 4;
-  text-shadow: 0 0 10px rgba(0,0,0,0.8);
-}
-
-#cfs-dots {
-  position: absolute;
-  right: 0.6rem;
-  bottom: 0.5rem;
-  display: flex;
-  gap: 0.25rem;
-  z-index: 4;
-}
-
-.cfs-dot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.30);
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.cfs-dot.ativo {
-  background: #FFD700;
-  width: 1rem;
-  border-radius: 3px;
-}
-
-.cfs-dot:hover {
-  background: rgba(255,215,0,0.5);
-  transform: scale(1.2);
 }
 
 /* Timer */
@@ -839,14 +886,16 @@ body {
 /* Ajustes para telas menores */
 @media (max-width: 1400px) {
   #ui { gap: 1.2rem; padding: 2.2% 2.2%; }
-  #nome { font-size: 1.3rem; }
-  #clock { font-size: 1.6rem; }
+  #nome { font-size: 1.5rem; }
+  #clock { font-size: 2rem; }
   #dish-image-wrap { width: 55%; }
-  .badge { font-size: 0.4rem; padding: 0.1rem 0.4rem; }
-  #grupo-tabela { font-size: 0.38rem; }
+  .badge { font-size: 0.5rem; padding: 0.1rem 0.5rem; }
+  #grupo-tabela { font-size: 0.42rem; }
   #copa-fotos-slide { min-height: 90px; }
-  #logo-img { width: 2rem; height: 2rem; }
-  #brand-nome { font-size: 0.7rem; }
+  #logo-img { width: 2.4rem; height: 2.4rem; }
+  #brand-nome { font-size: 0.9rem; }
+  .chip-principal { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
+  .preco-destaque { font-size: 0.9rem; padding: 0.2rem 0.6rem; }
 }
 
 /* Ajustes para telas muito pequenas */
@@ -854,40 +903,9 @@ body {
   #ui { gap: 0.8rem; padding: 1.5% 1.5%; }
   #right { flex: 1 1 0; }
   #copa-fotos-slide { min-height: 70px; }
-  .placar-gol { font-size: 1.2rem; }
-  .placar-bandeira { font-size: 1rem; }
-}
-
-/* Slides da Copa - para imagens E divs */
-.cfs-slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.cfs-slide.ativo {
-  opacity: 1;
-}
-
-/* Para as imagens (se ainda quiser usar) */
-.cfs-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.cfs-img.ativo {
-  opacity: 1;
+  .placar-gol { font-size: 1.4rem; }
+  .placar-bandeira { font-size: 1.2rem; }
+  #nome { font-size: 1.2rem; }
+  .chip-principal { font-size: 0.5rem; padding: 0.15rem 0.5rem; }
+  .preco-destaque { font-size: 0.7rem; }
 }
