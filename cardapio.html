@@ -25,21 +25,23 @@
 <div id="overlay-bottom"></div>
 <div id="grain"></div>
 
-<!-- PAINEL CENTRAL -->
-<div id="slide-container">
-  <div id="slide-num">01 / --</div>
-</div>
-
-<!-- UI PRINCIPAL -->
+<!-- UI PRINCIPAL (3 colunas: prato | cardápio do dia | copa) -->
 <div id="ui">
 
-  <!-- ESQUERDA -->
+  <!-- COLUNA 1 — PRATO (imagem em cima do nome) -->
   <div id="left">
     <div id="logo-area">
       <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
       <div id="logo-texto">
         <div id="brand-nome">LM Sabor Caseiro</div>
         <div id="brand-slogan">Comida feita com amor</div>
+      </div>
+    </div>
+
+    <!-- imagem do prato, agora acima do nome -->
+    <div id="dish-image-wrap">
+      <div id="slide-container">
+        <div id="slide-num">01 / --</div>
       </div>
     </div>
 
@@ -69,21 +71,22 @@
     </div>
   </div>
 
-  <!-- DIREITA -->
-  <div id="right">
-
+  <!-- COLUNA 2 — CARDÁPIO DO DIA -->
+  <div id="centro">
     <div id="datetime-box">
       <div id="date"></div>
       <div id="clock">--:--</div>
     </div>
 
-    <!-- DESTAQUES DO DIA -->
     <div id="destaques-box">
-      <div id="dest-titulo">✦ No cardápio hoje</div>
+      <div id="dest-titulo">✦ Cardápio de Hoje</div>
       <div id="dest-lista"></div>
     </div>
+  </div>
 
-    <!-- COPA DO MUNDO 2026 -->
+  <!-- COLUNA 3 — COPA DO MUNDO 2026 -->
+  <div id="right">
+
     <div id="copa-box">
 
       <div id="copa-header">
@@ -92,7 +95,10 @@
           <div id="copa-titulo">COPA DO MUNDO 2026</div>
           <div id="copa-subtitulo">Grupo C · Brasil</div>
         </div>
-        <div id="copa-trofeu">🏆</div>
+        <div id="copa-header-right">
+          <div id="copa-trofeu">🏆</div>
+          <div id="copa-countdown" data-kickoff="">—</div>
+        </div>
       </div>
 
       <div id="copa-tabs">
@@ -104,7 +110,7 @@
 
       <div id="copa-content">
 
-        <!-- ABA: PRÓXIMO JOGO (sem escalação) -->
+        <!-- ABA: PRÓXIMO JOGO (placar + estádio/transmissão) -->
         <div class="copa-panel ativo" id="tab-jogo">
           <div id="placar-wrap">
             <div class="placar-time">
@@ -115,7 +121,7 @@
             <div id="placar-meio">
               <div id="placar-status">Próximo Jogo</div>
               <div id="placar-local">A definir</div>
-              <div id="placar-data" style="font-size: 0.45rem; color: rgba(255,255,255,0.4); margin-top: 4px;"></div>
+              <div id="placar-data" class="placar-data"></div>
             </div>
             <div class="placar-time">
               <div class="placar-bandeira">🏳️</div>
@@ -123,18 +129,24 @@
               <div class="placar-gol" id="gol-mar">–</div>
             </div>
           </div>
+
           <div id="jogo-info">
             <span class="jogo-tag">Grupo C</span>
             <span class="jogo-tag jogo-tag-ao-vivo" id="jogo-live-badge" style="display:none">🔴 AO VIVO</span>
           </div>
-          <!-- ESCALAÇÃO REMOVIDA DA PRIMEIRA ABA -->
+
+          <div id="jogo-extra">
+            <div class="jogo-extra-item">🏟️ <span id="copa-estadio">Estádio a definir</span></div>
+            <div class="jogo-extra-item">📍 <span id="copa-cidade">Cidade a definir</span></div>
+            <div class="jogo-extra-item">📺 <span id="copa-transmissao">Transmissão a definir</span></div>
+          </div>
         </div>
 
-        <!-- ABA: GRUPO C -->
+        <!-- ABA: GRUPO C (tabela completa) -->
         <div class="copa-panel" id="tab-grupo">
           <table id="grupo-tabela">
             <thead>
-              <tr><th>Seleção</th><th>J</th><th>P</th><th>SG</th></tr>
+              <tr><th>#</th><th>Seleção</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>P</th></tr>
             </thead>
             <tbody id="grupo-tbody"></tbody>
           </table>
@@ -146,7 +158,7 @@
           <div id="jogos-lista"></div>
         </div>
 
-        <!-- ABA: SELEÇÃO (escalação completa) -->
+        <!-- ABA: SELEÇÃO (convocados) -->
         <div class="copa-panel" id="tab-fotos">
           <div id="fotos-grid"></div>
           <div id="fotos-caption"></div>
@@ -154,6 +166,19 @@
 
       </div><!-- /copa-content -->
     </div><!-- /copa-box -->
+
+    <!-- SLIDE DE FOTOS DA COPA (fixo, sempre visível) -->
+    <div id="copa-fotos-slide">
+      <div id="cfs-track">
+        <img class="cfs-img" src="https://esportesmais.com.br/wp-content/uploads/2026/05/Brasil-na-Copa-do-Mundo-2026-768x512.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
+        <img class="cfs-img" src="assets/copa/foto2.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
+        <img class="cfs-img" src="assets/copa/foto3.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
+        <img class="cfs-img" src="https://aventurasnahistoria.com.br/wp-content/uploads/personagem/1970_copa_pele_abraco.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
+      </div>
+      <div id="cfs-dots"></div>
+      <div id="cfs-label">📷 Copa do Mundo 2026</div>
+    </div>
+
   </div><!-- /right -->
 </div><!-- /ui -->
 
@@ -161,5 +186,6 @@
 <div id="timer-bar"><div id="timer-fill"></div></div>
 
 <script src="ofertas.js"></script>
+<script src="copa-slide.js"></script>
 </body>
 </html>
