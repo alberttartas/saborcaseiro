@@ -1,101 +1,141 @@
-/* ── SLIDE DE FOTOS DA COPA ── */
-#copa-fotos-slide {
-  flex: 1 1 auto;
-  min-height: 120px;
-  position: relative;
-  border-radius: 0.8rem;
-  overflow: hidden;
-  border: 1px solid rgba(255,215,0,0.15);
-  background: rgba(0,0,0,0.30);
-}
+// copa-slide.js — Slide automático de fotos da Copa do Mundo 2026
 
-#cfs-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
+(function() {
+  'use strict';
 
-.cfs-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-  z-index: 1;
-}
+  const INTERVALO_MS = 5000;
+  const TRANSICAO_MS = 1000;
 
-.cfs-img.ativo {
-  opacity: 1;
-  z-index: 2;
-}
+  let slides = [];
+  let dots = [];
+  let indiceAtual = 0;
+  let intervalo = null;
+  let transicaoAtiva = false;
 
-/* Fallback para imagens que não carregam */
-.cfs-img-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  opacity: 0;
-  transition: opacity 1s ease;
-  z-index: 1;
-}
+  function init() {
+    const track = document.getElementById('cfs-track');
+    if (!track) return;
 
-.cfs-img-fallback.ativo {
-  opacity: 1;
-  z-index: 2;
-}
+    // Captura todos os slides (pode ser img ou div)
+    slides = Array.from(track.children);
+    
+    const dotsContainer = document.getElementById('cfs-dots');
+    if (dotsContainer) {
+      dots = Array.from(dotsContainer.querySelectorAll('.cfs-dot'));
+    }
 
-#copa-fotos-slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 3;
-}
+    if (slides.length === 0) return;
 
-#cfs-label {
-  position: absolute;
-  left: 0.7rem;
-  bottom: 0.4rem;
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.85);
-  z-index: 4;
-  text-shadow: 0 0 10px rgba(0,0,0,0.8);
-}
+    // Esconde todos exceto o primeiro
+    slides.forEach((slide, i) => {
+      if (i === 0) {
+        slide.classList.add('ativo');
+      } else {
+        slide.classList.remove('ativo');
+      }
+    });
 
-#cfs-dots {
-  position: absolute;
-  right: 0.6rem;
-  bottom: 0.5rem;
-  display: flex;
-  gap: 0.25rem;
-  z-index: 4;
-}
+    atualizarDots(0);
+    iniciarSlide();
 
-.cfs-dot {
-  width: 0.3rem;
-  height: 0.3rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.30);
-  transition: all 0.3s;
-  cursor: pointer;
-}
+    const container = document.getElementById('copa-fotos-slide');
+    if (container) {
+      container.addEventListener('mouseenter', pausarSlide);
+      container.addEventListener('mouseleave', retomarSlide);
+    }
 
-.cfs-dot.ativo {
-  background: #FFD700;
-  width: 0.8rem;
-  border-radius: 2px;
-}
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        pausarSlide();
+      } else {
+        retomarSlide();
+      }
+    });
+  }
 
-.cfs-dot:hover {
-  background: rgba(255,215,0,0.5);
-  transform: scale(1.2);
-}
+  function proximaImagem() {
+    if (transicaoAtiva || slides.length === 0) return;
+    
+    transicaoAtiva = true;
+    const proximo = (indiceAtual + 1) % slides.length;
+
+    slides[indiceAtual].classList.remove('ativo');
+    slides[proximo].classList.add('ativo');
+
+    atualizarDots(proximo);
+    indiceAtual = proximo;
+
+    setTimeout(() => {
+      transicaoAtiva = false;
+    }, TRANSICAO_MS);
+  }
+
+  function irParaImagem(indice) {
+    if (indice === indiceAtual || transicaoAtiva || slides.length === 0) return;
+    if (indice < 0 || indice >= slides.length) return;
+
+    transicaoAtiva = true;
+    slides[indiceAtual].classList.remove('ativo');
+    slides[indice].classList.add('ativo');
+    atualizarDots(indice);
+    indiceAtual = indice;
+
+    setTimeout(() => {
+      transicaoAtiva = false;
+    }, TRANSICAO_MS);
+  }
+
+  function atualizarDots(indice) {
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('ativo', i === indice);
+    });
+  }
+
+  function iniciarSlide() {
+    if (intervalo) {
+      clearInterval(intervalo);
+      intervalo = null;
+    }
+    intervalo = setInterval(proximaImagem, INTERVALO_MS);
+  }
+
+  function pausarSlide() {
+    if (intervalo) {
+      clearInterval(intervalo);
+      intervalo = null;
+    }
+  }
+
+  function retomarSlide() {
+    if (!intervalo) {
+      iniciarSlide();
+    }
+  }
+
+  function reiniciarSlide() {
+    pausarSlide();
+    indiceAtual = 0;
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('ativo', i === 0);
+    });
+    atualizarDots(0);
+    iniciarSlide();
+  }
+
+  // Exporta para uso externo
+  window.copaSlide = {
+    iniciar: iniciarSlide,
+    pausar: pausarSlide,
+    retomar: retomarSlide,
+    reiniciar: reiniciarSlide,
+    proximo: proximaImagem,
+    irPara: irParaImagem
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
