@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — ofertas.js (VERSÃO CORRIGIDA)
-   Sem template literals problemáticos e com dados da Copa atualizados
+   LM SABOR CASEIRO — ofertas.js (VERSÃO API)
+   Dados dinâmicos via API | Slide tamanho fixo
 ══════════════════════════════════════════════════════ */
 
 (function() {
@@ -65,79 +65,11 @@
   var espetinhoPage = 0;
 
   // ============================================================
-  // DADOS ESTÁTICOS
-  // ============================================================
-  var DADOS_ESTATICOS = {
-    cardapio: [
-      { nome: 'Baião Cremoso', categoria: 'Prato', disponivel: true },
-      { nome: 'Arroz de Camarão', categoria: 'Prato', disponivel: true },
-      { nome: 'Caranguejo', categoria: 'Prato', disponivel: true },
-      { nome: 'Espetinhos', categoria: 'Espetinho', disponivel: true },
-      { nome: 'Sopa Caseira', categoria: 'Prato', disponivel: true },
-    ],
-    sobremesas: [
-      { nome: 'Mousse de Maracujá', categoria: 'Mousse', quantidade: 10, valor: 8.50 },
-      { nome: 'Mousse de Chocolate', categoria: 'Mousse', quantidade: 8, valor: 8.50 },
-      { nome: 'Cone Trufado', categoria: 'Cones Trufados', quantidade: 6, valor: 7.00 },
-      { nome: 'Delícia de Abacaxi', categoria: 'Delícia de Abacaxi', quantidade: 5, valor: 9.00 },
-    ],
-    sucos: [
-      { nome: 'Laranja', categoria: 'Sucos', quantidade: 20, valor: 5.00 },
-      { nome: 'Limão', categoria: 'Sucos', quantidade: 15, valor: 5.00 },
-      { nome: 'Abacaxi', categoria: 'Sucos', quantidade: 12, valor: 6.00 },
-    ],
-    dindins: [
-      { nome: 'Chocolate', quantidade: 20, valor: 6.00 },
-      { nome: 'Morango', quantidade: 15, valor: 6.00 },
-      { nome: 'Coco', quantidade: 10, valor: 6.00 },
-    ]
-  };
-
-  // ============================================================
-  // COPA DO MUNDO 2026 - DADOS CORRIGIDOS
+  // COPA DO MUNDO 2026 - DADOS DA API
   // ============================================================
   var copaDados = {
-    grupo: [
-      { id: 764, nome: 'Brasil', j: 2, v: 1, e: 1, d: 0, gp: 4, gc: 1, p: 4 },
-      { id: 815, nome: 'Marrocos', j: 2, v: 1, e: 1, d: 0, gp: 3, gc: 2, p: 4 },
-      { id: 8873, nome: 'Escócia', j: 2, v: 0, e: 1, d: 1, gp: 1, gc: 3, p: 1 },
-      { id: 836, nome: 'Haiti', j: 2, v: 0, e: 1, d: 1, gp: 1, gc: 3, p: 1 }
-    ],
-    jogos: [
-      { 
-        data: '14 Jun', 
-        hora: '16:00', 
-        dataHora: new Date(2026, 5, 14, 16, 0), 
-        casa: 'Brasil', 
-        fora: 'Marrocos', 
-        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
-        status: 'FINISHED', 
-        golBra: 1, 
-        golAdv: 1 
-      },
-      { 
-        data: '18 Jun', 
-        hora: '16:00', 
-        dataHora: new Date(2026, 5, 18, 16, 0), 
-        casa: 'Brasil', 
-        fora: 'Escócia', 
-        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
-        status: 'FINISHED', 
-        golBra: 3, 
-        golAdv: 0 
-      },
-      { 
-        data: '22 Jun', 
-        hora: '16:00', 
-        dataHora: new Date(2026, 5, 22, 16, 0), 
-        casa: 'Brasil', 
-        fora: 'Haiti', 
-        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
-        status: 'SCHEDULED', 
-        golBra: null, 
-        golAdv: null 
-      }
-    ],
+    grupo: [],
+    jogos: [],
     convocados: [
       { nome: 'Alisson', num: 1, pos: 'GOL' },
       { nome: 'Ederson', num: 12, pos: 'GOL' },
@@ -677,8 +609,21 @@
   atualizarHora();
 
   // ============================================================
-  // COPA DO MUNDO 2026
+  // COPA DO MUNDO 2026 - API
   // ============================================================
+  
+  // Mapeamento de nomes dos times
+  var NOMES_TIMES = {
+    'Brazil': 'Brasil',
+    'Morocco': 'Marrocos',
+    'Scotland': 'Escócia',
+    'Haiti': 'Haiti'
+  };
+
+  function getNomeTime(nome) {
+    return NOMES_TIMES[nome] || nome;
+  }
+
   function getProximoJogo() {
     if (!copaDados.jogos || copaDados.jogos.length === 0) return null;
 
@@ -686,6 +631,7 @@
     var jogosFuturos = [];
     for (var i = 0; i < copaDados.jogos.length; i++) {
       var jogo = copaDados.jogos[i];
+      // Inclui jogos agendados, ao vivo ou com data no futuro
       if (jogo.status === 'TIMED' || jogo.status === 'SCHEDULED' || jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') {
         jogosFuturos.push(jogo);
       } else if (jogo.dataHora && jogo.dataHora > agora) {
@@ -738,8 +684,16 @@
     if (advNomeEl) advNomeEl.textContent = advNome;
     if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
 
+    // Se o jogo já aconteceu, mostra o placar
     var golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '—';
     var golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '—';
+    
+    // Se for jogo agendado, mostra "—" no placar
+    if (proximoJogo.status === 'SCHEDULED' || proximoJogo.status === 'TIMED') {
+      golBra = '—';
+      golAdv = '—';
+    }
+    
     if (golBraEl) golBraEl.textContent = golBra;
     if (golMarEl) golMarEl.textContent = golAdv;
 
@@ -748,6 +702,7 @@
     if (proximoJogo.status === 'IN_PLAY') { statusTexto = 'AO VIVO'; showBadge = true; }
     else if (proximoJogo.status === 'PAUSED') { statusTexto = 'INTERVALO'; showBadge = true; }
     else if (proximoJogo.status === 'FINISHED') { statusTexto = 'FIM DE JOGO'; showBadge = false; }
+    else if (proximoJogo.status === 'SCHEDULED' || proximoJogo.status === 'TIMED') { statusTexto = 'PRÓXIMO JOGO'; showBadge = false; }
     else { statusTexto = 'PRÓXIMO JOGO'; showBadge = false; }
 
     if (placarStatus) placarStatus.textContent = statusTexto;
@@ -762,28 +717,33 @@
     var tbody = document.getElementById('grupo-tbody');
     if (!tbody) return;
 
-    if (!copaDados.grupo.length) {
+    if (!copaDados.grupo || copaDados.grupo.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Carregando classificação...</td></tr>';
       return;
     }
 
+    // Ordena por pontos (decrescente) e depois saldo de gols
     var sorted = copaDados.grupo.slice().sort(function(a, b) {
-      return (b.p - a.p) || ((b.gp - b.gc) - (a.gp - a.gc));
+      if (b.p !== a.p) return b.p - a.p;
+      var sgA = (a.gp || 0) - (a.gc || 0);
+      var sgB = (b.gp || 0) - (b.gc || 0);
+      return sgB - sgA;
     });
 
     var html = '';
     for (var i = 0; i < sorted.length; i++) {
       var s = sorted[i];
       var rowClass = (s.nome === 'Brasil') ? 'brasil-row' : '';
+      var sg = (s.gp || 0) - (s.gc || 0);
       html += '<tr class="' + rowClass + '">';
       html += '<td>' + (i + 1) + '</td>';
       html += '<td>' + s.nome + '</td>';
-      html += '<td>' + s.j + '</td>';
-      html += '<td>' + s.v + '</td>';
-      html += '<td>' + s.e + '</td>';
-      html += '<td>' + s.d + '</td>';
-      html += '<td>' + (s.gp - s.gc) + '</td>';
-      html += '<td><strong>' + s.p + '</strong></td>';
+      html += '<td>' + (s.j || 0) + '</td>';
+      html += '<td>' + (s.v || 0) + '</td>';
+      html += '<td>' + (s.e || 0) + '</td>';
+      html += '<td>' + (s.d || 0) + '</td>';
+      html += '<td>' + sg + '</td>';
+      html += '<td><strong>' + (s.p || 0) + '</strong></td>';
       html += '</tr>';
     }
     tbody.innerHTML = html;
@@ -793,7 +753,7 @@
     var container = document.getElementById('jogos-lista');
     if (!container) return;
 
-    if (!copaDados.jogos.length) {
+    if (!copaDados.jogos || copaDados.jogos.length === 0) {
       container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px">Carregando jogos...</div>';
       return;
     }
@@ -803,12 +763,22 @@
       var jogo = copaDados.jogos[i];
       var isFinished = jogo.status === 'FINISHED';
       var isLive = jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED';
-      var statusText = isLive ? '🔴 AO VIVO' : (isFinished ? '✓ FINALIZADO' : '📅 AGENDADO');
+      var statusText = isLive ? 'AO VIVO' : (isFinished ? 'FINALIZADO' : 'AGENDADO');
       var statusColor = isLive ? '#f59b3c' : (isFinished ? '#4ade80' : 'rgba(255,255,255,0.5)');
-      var dataFormatada = jogo.dataHora ? jogo.dataHora.toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-      }) : jogo.data;
-      var placar = (jogo.golBra !== null && jogo.golBra !== undefined) ? jogo.golBra + '-' + jogo.golAdv : '—';
+      
+      var dataFormatada = '';
+      if (jogo.dataHora) {
+        dataFormatada = jogo.dataHora.toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        });
+      } else if (jogo.data) {
+        dataFormatada = jogo.data;
+      }
+      
+      var placar = '—';
+      if (isFinished && jogo.golBra !== null && jogo.golBra !== undefined) {
+        placar = jogo.golBra + '-' + jogo.golAdv;
+      }
 
       html += '<div class="jogo-item" style="background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:0.5rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">';
       html += '<div style="font-size:0.55rem;color:rgba(255,255,255,0.5);min-width:100px;">' + dataFormatada + '</div>';
@@ -899,6 +869,118 @@
   }
 
   // ============================================================
+  // CARREGAR DADOS DA API
+  // ============================================================
+  
+  // Função para buscar dados da Copa
+  function carregarDadosCopa() {
+    // Buscar classificação
+    fetch('https://api.football-data.org/v4/competitions/WC/standings', {
+      headers: {
+        'X-Auth-Token': 'sua_api_key_aqui' // Você precisa de uma API key
+      }
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        console.warn('Erro ao buscar classificação:', res.status);
+        return null;
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      if (data && data.standings) {
+        // Procura o grupo do Brasil
+        for (var i = 0; i < data.standings.length; i++) {
+          var standing = data.standings[i];
+          if (standing.group && standing.group.indexOf('C') !== -1) {
+            var grupo = [];
+            for (var j = 0; j < standing.table.length; j++) {
+              var team = standing.table[j];
+              grupo.push({
+                id: team.team.id,
+                nome: getNomeTime(team.team.name),
+                j: team.playedGames || 0,
+                v: team.won || 0,
+                e: team.draw || 0,
+                d: team.lost || 0,
+                gp: team.goalsFor || 0,
+                gc: team.goalsAgainst || 0,
+                p: team.points || 0
+              });
+            }
+            copaDados.grupo = grupo;
+            break;
+          }
+        }
+      }
+      // Atualiza UI
+      copaRenderGrupo();
+      copaRenderJogo();
+    })
+    .catch(function(err) {
+      console.warn('Erro ao buscar classificação:', err);
+    });
+
+    // Buscar jogos do Brasil
+    fetch('https://api.football-data.org/v4/teams/764/matches?competitions=WC', {
+      headers: {
+        'X-Auth-Token': 'sua_api_key_aqui'
+      }
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        console.warn('Erro ao buscar jogos:', res.status);
+        return null;
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      if (data && data.matches) {
+        var jogos = [];
+        for (var i = 0; i < data.matches.length; i++) {
+          var m = data.matches[i];
+          var dt = new Date(m.utcDate);
+          var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+          var braCasa = m.homeTeam.id === 764;
+          var adversario = braCasa ? m.awayTeam : m.homeTeam;
+          
+          var golBra = null;
+          var golAdv = null;
+          if (m.score && m.score.fullTime) {
+            if (braCasa) {
+              golBra = m.score.fullTime.home;
+              golAdv = m.score.fullTime.away;
+            } else {
+              golBra = m.score.fullTime.away;
+              golAdv = m.score.fullTime.home;
+            }
+          }
+          
+          jogos.push({
+            data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+            hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            dataHora: dtBR,
+            casa: braCasa ? 'Brasil' : getNomeTime(adversario.name),
+            fora: braCasa ? getNomeTime(adversario.name) : 'Brasil',
+            local: m.venue || 'Estádio do Maracanã',
+            status: m.status,
+            golBra: golBra,
+            golAdv: golAdv
+          });
+        }
+        jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
+        copaDados.jogos = jogos;
+      }
+      // Atualiza UI
+      copaRenderJogos();
+      copaRenderJogo();
+    })
+    .catch(function(err) {
+      console.warn('Erro ao buscar jogos:', err);
+    });
+  }
+
+  // ============================================================
   // CARREGAR DADOS PRINCIPAIS
   // ============================================================
   function carregarDados() {
@@ -924,29 +1006,14 @@
           timer = setInterval(trocarSlide, INTERVALO_MS);
         })
         .catch(function(e) {
-          console.log('Usando dados estáticos (fallback)');
-          usarDadosEstaticos();
+          console.warn('Erro ao carregar dados do cardápio:', e);
+          // Tenta novamente em 30 segundos
+          setTimeout(carregarDados, 30000);
         });
     } catch (e) {
-      console.log('Erro ao carregar dados, usando fallback');
-      usarDadosEstaticos();
+      console.warn('Erro ao carregar dados:', e);
+      setTimeout(carregarDados, 30000);
     }
-  }
-
-  function usarDadosEstaticos() {
-    slides = construirSlides(DADOS_ESTATICOS);
-    idx = 0;
-    renderizarSlidesDom();
-    preencherTexto();
-    setTimeout(function() { setAtivo(true); }, 80);
-    renderizarDestaques(DADOS_ESTATICOS);
-    resetTimer();
-
-    var loader = document.getElementById('loader-overlay');
-    if (loader) loader.classList.add('oculto');
-
-    if (timer) clearInterval(timer);
-    timer = setInterval(trocarSlide, INTERVALO_MS);
   }
 
   // ============================================================
@@ -955,6 +1022,10 @@
   document.addEventListener('DOMContentLoaded', function() {
     copaIniciar();
     carregarDados();
+    carregarDadosCopa();
+    
+    // Atualiza dados da Copa a cada 5 minutos
+    setInterval(carregarDadosCopa, 5 * 60 * 1000);
   });
 
 })();
