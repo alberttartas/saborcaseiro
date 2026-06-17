@@ -675,8 +675,8 @@ body {
 
 /* ── SLIDE DE FOTOS DA COPA (AUMENTADO) ── */
 #copa-fotos-slide {
-  flex: 1 1 auto; /* Ocupa o espaço restante */
-  min-height: 120px; /* Altura mínima */
+  flex: 0 0 auto; /* Ocupa o espaço restante */
+  min-height: 180px; /* Altura mínima */
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
