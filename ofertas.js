@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — ofertas.js (VERSÃO API)
-   Dados dinâmicos via API | Slide tamanho fixo
+   LM SABOR CASEIRO — ofertas.js (BACKEND)
+   Dados via API do backend | Slide tamanho fixo
 ══════════════════════════════════════════════════════ */
 
 (function() {
@@ -65,7 +65,7 @@
   var espetinhoPage = 0;
 
   // ============================================================
-  // COPA DO MUNDO 2026 - DADOS DA API
+  // COPA DO MUNDO 2026 - DADOS DO BACKEND
   // ============================================================
   var copaDados = {
     grupo: [],
@@ -609,21 +609,9 @@
   atualizarHora();
 
   // ============================================================
-  // COPA DO MUNDO 2026 - API
+  // COPA DO MUNDO 2026 - BACKEND
   // ============================================================
   
-  // Mapeamento de nomes dos times
-  var NOMES_TIMES = {
-    'Brazil': 'Brasil',
-    'Morocco': 'Marrocos',
-    'Scotland': 'Escócia',
-    'Haiti': 'Haiti'
-  };
-
-  function getNomeTime(nome) {
-    return NOMES_TIMES[nome] || nome;
-  }
-
   function getProximoJogo() {
     if (!copaDados.jogos || copaDados.jogos.length === 0) return null;
 
@@ -631,7 +619,6 @@
     var jogosFuturos = [];
     for (var i = 0; i < copaDados.jogos.length; i++) {
       var jogo = copaDados.jogos[i];
-      // Inclui jogos agendados, ao vivo ou com data no futuro
       if (jogo.status === 'TIMED' || jogo.status === 'SCHEDULED' || jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') {
         jogosFuturos.push(jogo);
       } else if (jogo.dataHora && jogo.dataHora > agora) {
@@ -684,11 +671,9 @@
     if (advNomeEl) advNomeEl.textContent = advNome;
     if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
 
-    // Se o jogo já aconteceu, mostra o placar
     var golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '—';
     var golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '—';
     
-    // Se for jogo agendado, mostra "—" no placar
     if (proximoJogo.status === 'SCHEDULED' || proximoJogo.status === 'TIMED') {
       golBra = '—';
       golAdv = '—';
@@ -722,7 +707,6 @@
       return;
     }
 
-    // Ordena por pontos (decrescente) e depois saldo de gols
     var sorted = copaDados.grupo.slice().sort(function(a, b) {
       if (b.p !== a.p) return b.p - a.p;
       var sgA = (a.gp || 0) - (a.gc || 0);
@@ -869,119 +853,117 @@
   }
 
   // ============================================================
-  // CARREGAR DADOS DA API
+  // CARREGAR DADOS DO BACKEND
   // ============================================================
   
-  // Função para buscar dados da Copa
   function carregarDadosCopa() {
-    // Buscar classificação
-    fetch('https://api.football-data.org/v4/competitions/WC/standings', {
-      headers: {
-        'X-Auth-Token': 'sua_api_key_aqui' // Você precisa de uma API key
-      }
-    })
-    .then(function(res) {
-      if (!res.ok) {
-        console.warn('Erro ao buscar classificação:', res.status);
-        return null;
-      }
-      return res.json();
-    })
-    .then(function(data) {
-      if (data && data.standings) {
-        // Procura o grupo do Brasil
-        for (var i = 0; i < data.standings.length; i++) {
-          var standing = data.standings[i];
-          if (standing.group && standing.group.indexOf('C') !== -1) {
-            var grupo = [];
-            for (var j = 0; j < standing.table.length; j++) {
-              var team = standing.table[j];
-              grupo.push({
-                id: team.team.id,
-                nome: getNomeTime(team.team.name),
-                j: team.playedGames || 0,
-                v: team.won || 0,
-                e: team.draw || 0,
-                d: team.lost || 0,
-                gp: team.goalsFor || 0,
-                gc: team.goalsAgainst || 0,
-                p: team.points || 0
-              });
-            }
-            copaDados.grupo = grupo;
-            break;
-          }
+    // Busca classificação
+    fetch('/api/copa')
+      .then(function(res) {
+        if (!res.ok) {
+          console.warn('Erro ao buscar classificação:', res.status);
+          return null;
         }
-      }
-      // Atualiza UI
-      copaRenderGrupo();
-      copaRenderJogo();
-    })
-    .catch(function(err) {
-      console.warn('Erro ao buscar classificação:', err);
-    });
+        return res.json();
+      })
+      .then(function(data) {
+        if (data && data.standings) {
+          var grupo = [];
+          for (var i = 0; i < data.standings.length; i++) {
+            var standing = data.standings[i];
+            if (standing.group && standing.group.indexOf('C') !== -1) {
+              for (var j = 0; j < standing.table.length; j++) {
+                var team = standing.table[j];
+                var nome = team.team.name;
+                if (nome === 'Brazil') nome = 'Brasil';
+                else if (nome === 'Morocco') nome = 'Marrocos';
+                else if (nome === 'Scotland') nome = 'Escócia';
+                else if (nome === 'Haiti') nome = 'Haiti';
+                grupo.push({
+                  id: team.team.id,
+                  nome: nome,
+                  j: team.playedGames || 0,
+                  v: team.won || 0,
+                  e: team.draw || 0,
+                  d: team.lost || 0,
+                  gp: team.goalsFor || 0,
+                  gc: team.goalsAgainst || 0,
+                  p: team.points || 0
+                });
+              }
+              break;
+            }
+          }
+          copaDados.grupo = grupo;
+          copaRenderGrupo();
+          copaRenderJogo();
+        }
+      })
+      .catch(function(err) {
+        console.warn('Erro ao buscar classificação:', err);
+      });
 
-    // Buscar jogos do Brasil
-    fetch('https://api.football-data.org/v4/teams/764/matches?competitions=WC', {
-      headers: {
-        'X-Auth-Token': 'sua_api_key_aqui'
-      }
-    })
-    .then(function(res) {
-      if (!res.ok) {
-        console.warn('Erro ao buscar jogos:', res.status);
-        return null;
-      }
-      return res.json();
-    })
-    .then(function(data) {
-      if (data && data.matches) {
-        var jogos = [];
-        for (var i = 0; i < data.matches.length; i++) {
-          var m = data.matches[i];
-          var dt = new Date(m.utcDate);
-          var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-          var braCasa = m.homeTeam.id === 764;
-          var adversario = braCasa ? m.awayTeam : m.homeTeam;
-          
-          var golBra = null;
-          var golAdv = null;
-          if (m.score && m.score.fullTime) {
-            if (braCasa) {
-              golBra = m.score.fullTime.home;
-              golAdv = m.score.fullTime.away;
-            } else {
-              golBra = m.score.fullTime.away;
-              golAdv = m.score.fullTime.home;
-            }
-          }
-          
-          jogos.push({
-            data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-            hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-            dataHora: dtBR,
-            casa: braCasa ? 'Brasil' : getNomeTime(adversario.name),
-            fora: braCasa ? getNomeTime(adversario.name) : 'Brasil',
-            local: m.venue || 'Estádio do Maracanã',
-            status: m.status,
-            golBra: golBra,
-            golAdv: golAdv
-          });
+    // Busca jogos
+    fetch('/api/copa-matches')
+      .then(function(res) {
+        if (!res.ok) {
+          console.warn('Erro ao buscar jogos:', res.status);
+          return null;
         }
-        jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
-        copaDados.jogos = jogos;
-      }
-      // Atualiza UI
-      copaRenderJogos();
-      copaRenderJogo();
-    })
-    .catch(function(err) {
-      console.warn('Erro ao buscar jogos:', err);
-    });
+        return res.json();
+      })
+      .then(function(data) {
+        if (data && data.matches) {
+          var jogos = [];
+          for (var i = 0; i < data.matches.length; i++) {
+            var m = data.matches[i];
+            var dt = new Date(m.utcDate);
+            var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+            var braCasa = m.homeTeam.id === 764;
+            var adversario = braCasa ? m.awayTeam : m.homeTeam;
+            
+            var nomeAdv = adversario.name;
+            if (nomeAdv === 'Morocco') nomeAdv = 'Marrocos';
+            else if (nomeAdv === 'Scotland') nomeAdv = 'Escócia';
+            else if (nomeAdv === 'Haiti') nomeAdv = 'Haiti';
+            
+            var golBra = null;
+            var golAdv = null;
+            if (m.score && m.score.fullTime) {
+              if (braCasa) {
+                golBra = m.score.fullTime.home;
+                golAdv = m.score.fullTime.away;
+              } else {
+                golBra = m.score.fullTime.away;
+                golAdv = m.score.fullTime.home;
+              }
+            }
+            
+            jogos.push({
+              data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+              hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+              dataHora: dtBR,
+              casa: braCasa ? 'Brasil' : nomeAdv,
+              fora: braCasa ? nomeAdv : 'Brasil',
+              local: m.venue || 'Estádio do Maracanã',
+              status: m.status,
+              golBra: golBra,
+              golAdv: golAdv
+            });
+          }
+          jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
+          copaDados.jogos = jogos;
+          copaRenderJogos();
+          copaRenderJogo();
+        }
+      })
+      .catch(function(err) {
+        console.warn('Erro ao buscar jogos:', err);
+      });
   }
 
   // ============================================================
-  // CARREGAR DADOS PRINCIPAIS
+  // CARREGAR DADOS DO CARDÁPIO
   // ============================================================
   function carregarDados() {
     try {
@@ -1007,7 +989,6 @@
         })
         .catch(function(e) {
           console.warn('Erro ao carregar dados do cardápio:', e);
-          // Tenta novamente em 30 segundos
           setTimeout(carregarDados, 30000);
         });
     } catch (e) {
@@ -1024,7 +1005,6 @@
     carregarDados();
     carregarDadosCopa();
     
-    // Atualiza dados da Copa a cada 5 minutos
     setInterval(carregarDadosCopa, 5 * 60 * 1000);
   });
 
