@@ -799,3 +799,37 @@ body {
   .placar-gol { font-size: 1.2rem; }
   .placar-bandeira { font-size: 1rem; }
 }
+
+/* Slides da Copa - para imagens E divs */
+.cfs-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cfs-slide.ativo {
+  opacity: 1;
+}
+
+/* Para as imagens (se ainda quiser usar) */
+.cfs-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.cfs-img.ativo {
+  opacity: 1;
+}
