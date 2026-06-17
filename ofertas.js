@@ -853,114 +853,143 @@
   }
 
   // ============================================================
-  // CARREGAR DADOS DO BACKEND
-  // ============================================================
+// CARREGAR DADOS DO BACKEND
+// ============================================================
   
-  function carregarDadosCopa() {
-    // Busca classificação
-    fetch('/api/copa')
-      .then(function(res) {
-        if (!res.ok) {
-          console.warn('Erro ao buscar classificação:', res.status);
-          return null;
-        }
-        return res.json();
-      })
-      .then(function(data) {
-        if (data && data.standings) {
-          var grupo = [];
-          for (var i = 0; i < data.standings.length; i++) {
-            var standing = data.standings[i];
-            if (standing.group && standing.group.indexOf('C') !== -1) {
-              for (var j = 0; j < standing.table.length; j++) {
-                var team = standing.table[j];
-                var nome = team.team.name;
-                if (nome === 'Brazil') nome = 'Brasil';
-                else if (nome === 'Morocco') nome = 'Marrocos';
-                else if (nome === 'Scotland') nome = 'Escócia';
-                else if (nome === 'Haiti') nome = 'Haiti';
-                grupo.push({
-                  id: team.team.id,
-                  nome: nome,
-                  j: team.playedGames || 0,
-                  v: team.won || 0,
-                  e: team.draw || 0,
-                  d: team.lost || 0,
-                  gp: team.goalsFor || 0,
-                  gc: team.goalsAgainst || 0,
-                  p: team.points || 0
-                });
+function carregarDadosCopa() {
+  console.log('Carregando dados da Copa via backend...');
+  
+  // Busca classificação - USANDO SEU BACKEND
+  fetch('/api/copa')
+    .then(function(res) {
+      if (!res.ok) {
+        console.warn('Erro ao buscar classificação:', res.status);
+        return null;
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      console.log('Classificação recebida do backend');
+      if (data && data.standings) {
+        var grupo = [];
+        // Procura o grupo do Brasil
+        for (var i = 0; i < data.standings.length; i++) {
+          var standing = data.standings[i];
+          // Verifica se é o grupo C ou se contém Brasil
+          var temBrasil = false;
+          if (standing.table) {
+            for (var t = 0; t < standing.table.length; t++) {
+              if (standing.table[t].team.name === 'Brazil') {
+                temBrasil = true;
+                break;
               }
-              break;
             }
           }
+          
+          if (temBrasil || (standing.group && standing.group.indexOf('C') !== -1)) {
+            for (var j = 0; j < standing.table.length; j++) {
+              var team = standing.table[j];
+              var nome = team.team.name;
+              if (nome === 'Brazil') nome = 'Brasil';
+              else if (nome === 'Morocco') nome = 'Marrocos';
+              else if (nome === 'Scotland') nome = 'Escócia';
+              else if (nome === 'Haiti') nome = 'Haiti';
+              grupo.push({
+                id: team.team.id,
+                nome: nome,
+                j: team.playedGames || 0,
+                v: team.won || 0,
+                e: team.draw || 0,
+                d: team.lost || 0,
+                gp: team.goalsFor || 0,
+                gc: team.goalsAgainst || 0,
+                p: team.points || 0
+              });
+            }
+            break;
+          }
+        }
+        if (grupo.length > 0) {
           copaDados.grupo = grupo;
           copaRenderGrupo();
           copaRenderJogo();
+          console.log('Grupo atualizado:', grupo);
         }
-      })
-      .catch(function(err) {
-        console.warn('Erro ao buscar classificação:', err);
-      });
+      }
+    })
+    .catch(function(err) {
+      console.warn('Erro ao buscar classificação:', err);
+    });
 
-    // Busca jogos
-    fetch('/api/copa-matches')
-      .then(function(res) {
-        if (!res.ok) {
-          console.warn('Erro ao buscar jogos:', res.status);
-          return null;
-        }
-        return res.json();
-      })
-      .then(function(data) {
-        if (data && data.matches) {
-          var jogos = [];
-          for (var i = 0; i < data.matches.length; i++) {
-            var m = data.matches[i];
-            var dt = new Date(m.utcDate);
-            var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-            var braCasa = m.homeTeam.id === 764;
-            var adversario = braCasa ? m.awayTeam : m.homeTeam;
-            
-            var nomeAdv = adversario.name;
-            if (nomeAdv === 'Morocco') nomeAdv = 'Marrocos';
-            else if (nomeAdv === 'Scotland') nomeAdv = 'Escócia';
-            else if (nomeAdv === 'Haiti') nomeAdv = 'Haiti';
-            
-            var golBra = null;
-            var golAdv = null;
-            if (m.score && m.score.fullTime) {
-              if (braCasa) {
-                golBra = m.score.fullTime.home;
-                golAdv = m.score.fullTime.away;
-              } else {
-                golBra = m.score.fullTime.away;
-                golAdv = m.score.fullTime.home;
-              }
+  // Busca jogos - USANDO SEU BACKEND
+  fetch('/api/copa-matches')
+    .then(function(res) {
+      if (!res.ok) {
+        console.warn('Erro ao buscar jogos:', res.status);
+        return null;
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      console.log('Jogos recebidos do backend');
+      if (data && data.matches) {
+        var jogos = [];
+        for (var i = 0; i < data.matches.length; i++) {
+          var m = data.matches[i];
+          
+          // Verifica se é jogo do Brasil (ID 764)
+          var braCasa = m.homeTeam && m.homeTeam.id === 764;
+          var braFora = m.awayTeam && m.awayTeam.id === 764;
+          var isBrasil = braCasa || braFora;
+          
+          if (!isBrasil) continue; // Pula jogos que não são do Brasil
+          
+          var dt = new Date(m.utcDate);
+          var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+          
+          var adversario = braCasa ? m.awayTeam : m.homeTeam;
+          var nomeAdv = adversario ? adversario.name : 'Desconhecido';
+          if (nomeAdv === 'Morocco') nomeAdv = 'Marrocos';
+          else if (nomeAdv === 'Scotland') nomeAdv = 'Escócia';
+          else if (nomeAdv === 'Haiti') nomeAdv = 'Haiti';
+          
+          var golBra = null;
+          var golAdv = null;
+          if (m.score && m.score.fullTime) {
+            if (braCasa) {
+              golBra = m.score.fullTime.home;
+              golAdv = m.score.fullTime.away;
+            } else if (braFora) {
+              golBra = m.score.fullTime.away;
+              golAdv = m.score.fullTime.home;
             }
-            
-            jogos.push({
-              data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-              hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-              dataHora: dtBR,
-              casa: braCasa ? 'Brasil' : nomeAdv,
-              fora: braCasa ? nomeAdv : 'Brasil',
-              local: m.venue || 'Estádio do Maracanã',
-              status: m.status,
-              golBra: golBra,
-              golAdv: golAdv
-            });
           }
-          jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
+          
+          jogos.push({
+            data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+            hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            dataHora: dtBR,
+            casa: braCasa ? 'Brasil' : nomeAdv,
+            fora: braCasa ? nomeAdv : 'Brasil',
+            local: m.venue || 'Estádio do Maracanã',
+            status: m.status || 'SCHEDULED',
+            golBra: golBra,
+            golAdv: golAdv
+          });
+        }
+        jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
+        if (jogos.length > 0) {
           copaDados.jogos = jogos;
           copaRenderJogos();
           copaRenderJogo();
+          console.log('Jogos atualizados:', jogos.length);
         }
-      })
-      .catch(function(err) {
-        console.warn('Erro ao buscar jogos:', err);
-      });
-  }
+      }
+    })
+    .catch(function(err) {
+      console.warn('Erro ao buscar jogos:', err);
+    });
+}
 
   // ============================================================
   // CARREGAR DADOS DO CARDÁPIO
