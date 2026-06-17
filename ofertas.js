@@ -1,16 +1,23 @@
 /* ══════════════════════════════════════════════════════
    LM SABOR CASEIRO — ofertas.js (VERSÃO CORRIGIDA)
+   Sem template literals problemáticos e com dados da Copa atualizados
 ══════════════════════════════════════════════════════ */
 
 (function() {
   'use strict';
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycby9IwMwWkVEy3zWyjoyZ8jk5Guat3-Q4aU8aG19h_Eb-FwVYOvIAcESyasFiEXLa8DM/exec';
-  const INTERVALO_MS = 13000;
-  const DESTAQUE_INTERVALO_MS = 8000;
+  // ============================================================
+  // CONFIGURAÇÕES
+  // ============================================================
+  var API_URL = 'https://script.google.com/macros/s/AKfycby9IwMwWkVEy3zWyjoyZ8jk5Guat3-Q4aU8aG19h_Eb-FwVYOvIAcESyasFiEXLa8DM/exec';
+  var INTERVALO_MS = 13000;
+  var DESTAQUE_INTERVALO_MS = 8000;
+  var ESPETINHOS_POR_PAGINA = 8;
 
-  // Mapa de imagens
-  const IMAGENS = {
+  // ============================================================
+  // MAPA DE IMAGENS
+  // ============================================================
+  var IMAGENS = {
     'Baião Cremoso': 'assets/baiao-cremoso.webp',
     'Baião Tradicional': 'assets/baiao-tradicional.webp',
     'Arroz de Camarão': 'assets/arroz-camarao.webp',
@@ -35,27 +42,32 @@
   function getImagem(nome) {
     if (!nome) return null;
     if (IMAGENS[nome]) return IMAGENS[nome];
-    const nomeLow = nome.toLowerCase();
-    for (const [k, v] of Object.entries(IMAGENS)) {
-      if (nomeLow.includes(k.toLowerCase()) || k.toLowerCase().includes(nomeLow)) {
-        return v;
+    var nomeLow = nome.toLowerCase();
+    for (var chave in IMAGENS) {
+      if (IMAGENS.hasOwnProperty(chave)) {
+        if (nomeLow.indexOf(chave.toLowerCase()) !== -1 || chave.toLowerCase().indexOf(nomeLow) !== -1) {
+          return IMAGENS[chave];
+        }
       }
     }
     return null;
   }
 
-  // Estados
-  let slides = [];
-  let idx = 0;
-  let timer = null;
-  let destaqueTimer = null;
-  let destaqueMode = 'pratos';
-  let ultimosDados = null;
-  let espetinhoPage = 0;
-  const ESPETINHOS_POR_PAGINA = 8;
+  // ============================================================
+  // ESTADOS
+  // ============================================================
+  var slides = [];
+  var idx = 0;
+  var timer = null;
+  var destaqueTimer = null;
+  var destaqueMode = 'pratos';
+  var ultimosDados = null;
+  var espetinhoPage = 0;
 
-  // DADOS ESTÁTICOS PARA TESTE
-  const DADOS_ESTATICOS = {
+  // ============================================================
+  // DADOS ESTÁTICOS
+  // ============================================================
+  var DADOS_ESTATICOS = {
     cardapio: [
       { nome: 'Baião Cremoso', categoria: 'Prato', disponivel: true },
       { nome: 'Arroz de Camarão', categoria: 'Prato', disponivel: true },
@@ -81,20 +93,50 @@
     ]
   };
 
-  /* ══════════════════════════════════════════════════════
-     COPA DO MUNDO 2026 — DADOS ESTÁTICOS
-  ══════════════════════════════════════════════════════ */
-  const COPA_DADOS = {
+  // ============================================================
+  // COPA DO MUNDO 2026 - DADOS CORRIGIDOS
+  // ============================================================
+  var copaDados = {
     grupo: [
-      { id: 764, nome: 'Brasil', j: 3, v: 2, e: 1, d: 0, gp: 7, gc: 2, p: 7 },
-      { id: 815, nome: 'Marrocos', j: 3, v: 1, e: 1, d: 1, gp: 3, gc: 4, p: 4 },
-      { id: 8873, nome: 'Escócia', j: 3, v: 1, e: 0, d: 2, gp: 2, gc: 5, p: 3 },
-      { id: 836, nome: 'Haiti', j: 3, v: 0, e: 2, d: 1, gp: 2, gc: 3, p: 2 }
+      { id: 764, nome: 'Brasil', j: 2, v: 1, e: 1, d: 0, gp: 4, gc: 1, p: 4 },
+      { id: 815, nome: 'Marrocos', j: 2, v: 1, e: 1, d: 0, gp: 3, gc: 2, p: 4 },
+      { id: 8873, nome: 'Escócia', j: 2, v: 0, e: 1, d: 1, gp: 1, gc: 3, p: 1 },
+      { id: 836, nome: 'Haiti', j: 2, v: 0, e: 1, d: 1, gp: 1, gc: 3, p: 1 }
     ],
     jogos: [
-      { data: '14 Jun', hora: '16:00', dataHora: new Date(2026, 5, 14, 16, 0), casa: 'Brasil', fora: 'Marrocos', local: 'Estádio do Maracanã', status: 'FINISHED', golBra: 3, golAdv: 1 },
-      { data: '18 Jun', hora: '16:00', dataHora: new Date(2026, 5, 18, 16, 0), casa: 'Brasil', fora: 'Escócia', local: 'Estádio do Maracanã', status: 'FINISHED', golBra: 2, golAdv: 0 },
-      { data: '22 Jun', hora: '16:00', dataHora: new Date(2026, 5, 22, 16, 0), casa: 'Brasil', fora: 'Haiti', local: 'Estádio do Maracanã', status: 'SCHEDULED', golBra: null, golAdv: null }
+      { 
+        data: '14 Jun', 
+        hora: '16:00', 
+        dataHora: new Date(2026, 5, 14, 16, 0), 
+        casa: 'Brasil', 
+        fora: 'Marrocos', 
+        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
+        status: 'FINISHED', 
+        golBra: 1, 
+        golAdv: 1 
+      },
+      { 
+        data: '18 Jun', 
+        hora: '16:00', 
+        dataHora: new Date(2026, 5, 18, 16, 0), 
+        casa: 'Brasil', 
+        fora: 'Escócia', 
+        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
+        status: 'FINISHED', 
+        golBra: 3, 
+        golAdv: 0 
+      },
+      { 
+        data: '22 Jun', 
+        hora: '16:00', 
+        dataHora: new Date(2026, 5, 22, 16, 0), 
+        casa: 'Brasil', 
+        fora: 'Haiti', 
+        local: 'Estádio do Maracanã - Rio de Janeiro/RJ', 
+        status: 'SCHEDULED', 
+        golBra: null, 
+        golAdv: null 
+      }
     ],
     convocados: [
       { nome: 'Alisson', num: 1, pos: 'GOL' },
@@ -112,93 +154,174 @@
     ],
   };
 
-  let copaTabAtual = 'jogo';
-  let copaAutoTimer = null;
-  const COPA_TABS = ['jogo', 'grupo', 'jogos', 'fotos'];
+  var copaTabAtual = 'jogo';
+  var copaAutoTimer = null;
+  var COPA_TABS = ['jogo', 'grupo', 'jogos', 'fotos'];
 
-  /* ── CONSTRUIR SLIDES ──────────────────────────────── */
+  // ============================================================
+  // CONSTRUIR SLIDES
+  // ============================================================
   function construirSlides(dados) {
-    const pratosDisp = (dados.cardapio || [])
-      .filter(p => p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato');
-    
-    const sobremesas = (dados.sobremesas || []).filter(s => s.nome && s.quantidade > 0);
-    const sucos = (dados.sucos || []).filter(s => s.nome && s.quantidade > 0);
-    const dindins = (dados.dindins || []).filter(d => d.nome && d.quantidade > 0);
-
-    const slidesPratos = pratosDisp.map(p => ({
-      tipo: 'prato',
-      nome: p.nome,
-      categoria: p.categoria || 'Prato do Dia',
-      descricao: 'Feito com ingredientes frescos · Sabor caseiro de verdade.',
-      saboresPrincipais: null,
-      saboresTodos: null,
-      preco: null,
-      tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
-      imagem: getImagem(p.nome),
-    }));
-
-    const catsSob = {};
-    sobremesas.forEach(s => {
-      const cat = s.categoria || 'Sobremesa';
-      if (!catsSob[cat]) catsSob[cat] = [];
-      catsSob[cat].push(s);
-    });
-
-    const slidesSob = Object.entries(catsSob).map(([cat, itens]) => ({
-      tipo: 'sobremesa',
-      nome: cat,
-      categoria: 'Doces & Sobremesas',
-      descricao: null,
-      saboresPrincipais: itens.slice(0, 5).map(s => s.nome),
-      saboresTodos: itens.map(s => s.nome),
-      preco: itens[0] && itens[0].valor ? Number(itens[0].valor) : null,
-      tags: [{ texto: '🍮 Artesanal', destaque: true }, { texto: itens.length + ' Sabores' }],
-      imagem: getImagem(cat),
-    }));
-
-    const catsSuco = {};
-    sucos.forEach(s => {
-      const cat = s.categoria || 'Sucos';
-      if (!catsSuco[cat]) catsSuco[cat] = [];
-      catsSuco[cat].push(s);
-    });
-
-    const slidesSuco = Object.entries(catsSuco).map(([cat, itens]) => ({
-      tipo: 'suco',
-      nome: cat,
-      categoria: 'Sucos Naturais',
-      descricao: null,
-      saboresPrincipais: itens.slice(0, 5).map(s => s.nome),
-      saboresTodos: itens.map(s => s.nome),
-      preco: itens[0] && itens[0].valor ? Number(itens[0].valor) : null,
-      tags: [{ texto: '🥤 Natural', destaque: true }, { texto: itens.length + ' Sabores' }],
-      imagem: getImagem('Suco Natural'),
-    }));
-
-    const valorDindin = dindins.length > 0 && dindins[0].valor ? Number(dindins[0].valor) : 6;
-
-    const slideDindins = dindins.length ? [{
-      tipo: 'dindin',
-      nome: 'Dindins Gourmet',
-      categoria: 'Gelados Artesanais',
-      descricao: null,
-      saboresPrincipais: dindins.slice(0, 5).map(d => d.nome),
-      saboresTodos: dindins.map(d => d.nome),
-      preco: valorDindin,
-      tags: [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: 'R$ ' + valorDindin.toFixed(2).replace('.', ',') + ' un.' }],
-      imagem: getImagem('Dindin'),
-    }] : [];
-
-    const naoProtos = slidesSob.concat(slidesSuco).concat(slideDindins);
-    const resultado = [];
-    const maxLen = Math.max(slidesPratos.length, naoProtos.length);
-
-    for (let i = 0; i < maxLen; i++) {
-      if (i < slidesPratos.length) resultado.push(slidesPratos[i]);
-      if (i < naoProtos.length) resultado.push(naoProtos[i]);
+    var pratosDisp = [];
+    var cardapio = dados.cardapio || [];
+    for (var i = 0; i < cardapio.length; i++) {
+      var p = cardapio[i];
+      if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
+        pratosDisp.push(p);
+      }
     }
 
-    if (!resultado.length) {
+    var sobremesas = [];
+    var sobremesasData = dados.sobremesas || [];
+    for (var s = 0; s < sobremesasData.length; s++) {
+      var sob = sobremesasData[s];
+      if (sob.nome && sob.quantidade > 0) {
+        sobremesas.push(sob);
+      }
+    }
+
+    var sucos = [];
+    var sucosData = dados.sucos || [];
+    for (var su = 0; su < sucosData.length; su++) {
+      var suc = sucosData[su];
+      if (suc.nome && suc.quantidade > 0) {
+        sucos.push(suc);
+      }
+    }
+
+    var dindins = [];
+    var dindinsData = dados.dindins || [];
+    for (var d = 0; d < dindinsData.length; d++) {
+      var din = dindinsData[d];
+      if (din.nome && din.quantidade > 0) {
+        dindins.push(din);
+      }
+    }
+
+    var slidesPratos = [];
+    for (var j = 0; j < pratosDisp.length; j++) {
+      var prato = pratosDisp[j];
+      slidesPratos.push({
+        tipo: 'prato',
+        nome: prato.nome,
+        categoria: prato.categoria || 'Prato do Dia',
+        descricao: 'Feito com ingredientes frescos · Sabor caseiro de verdade.',
+        saboresPrincipais: null,
+        saboresTodos: null,
+        preco: null,
+        tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
+        imagem: getImagem(prato.nome),
+      });
+    }
+
+    var catsSob = {};
+    for (var k = 0; k < sobremesas.length; k++) {
+      var item = sobremesas[k];
+      var cat = item.categoria || 'Sobremesa';
+      if (!catsSob[cat]) catsSob[cat] = [];
+      catsSob[cat].push(item);
+    }
+
+    var slidesSob = [];
+    for (var catNome in catsSob) {
+      if (catsSob.hasOwnProperty(catNome)) {
+        var itens = catsSob[catNome];
+        var saboresPrincipais = [];
+        var saboresTodos = [];
+        for (var a = 0; a < itens.length && a < 5; a++) {
+          saboresPrincipais.push(itens[a].nome);
+        }
+        for (var b = 0; b < itens.length; b++) {
+          saboresTodos.push(itens[b].nome);
+        }
+        var preco = itens[0] && itens[0].valor ? Number(itens[0].valor) : null;
+        slidesSob.push({
+          tipo: 'sobremesa',
+          nome: catNome,
+          categoria: 'Doces & Sobremesas',
+          descricao: null,
+          saboresPrincipais: saboresPrincipais,
+          saboresTodos: saboresTodos,
+          preco: preco,
+          tags: [{ texto: '🍮 Artesanal', destaque: true }, { texto: itens.length + ' Sabores' }],
+          imagem: getImagem(catNome),
+        });
+      }
+    }
+
+    var catsSuco = {};
+    for (var m = 0; m < sucos.length; m++) {
+      var itemSuco = sucos[m];
+      var catSuco = itemSuco.categoria || 'Sucos';
+      if (!catsSuco[catSuco]) catsSuco[catSuco] = [];
+      catsSuco[catSuco].push(itemSuco);
+    }
+
+    var slidesSuco = [];
+    for (var catSucoNome in catsSuco) {
+      if (catsSuco.hasOwnProperty(catSucoNome)) {
+        var itensSuco = catsSuco[catSucoNome];
+        var saboresPrincipaisSuco = [];
+        var saboresTodosSuco = [];
+        for (var c = 0; c < itensSuco.length && c < 5; c++) {
+          saboresPrincipaisSuco.push(itensSuco[c].nome);
+        }
+        for (var e = 0; e < itensSuco.length; e++) {
+          saboresTodosSuco.push(itensSuco[e].nome);
+        }
+        var precoSuco = itensSuco[0] && itensSuco[0].valor ? Number(itensSuco[0].valor) : null;
+        slidesSuco.push({
+          tipo: 'suco',
+          nome: catSucoNome,
+          categoria: 'Sucos Naturais',
+          descricao: null,
+          saboresPrincipais: saboresPrincipaisSuco,
+          saboresTodos: saboresTodosSuco,
+          preco: precoSuco,
+          tags: [{ texto: '🥤 Natural', destaque: true }, { texto: itensSuco.length + ' Sabores' }],
+          imagem: getImagem('Suco Natural'),
+        });
+      }
+    }
+
+    var valorDindin = 6;
+    if (dindins.length > 0 && dindins[0].valor) {
+      valorDindin = Number(dindins[0].valor);
+    }
+
+    var slideDindins = [];
+    if (dindins.length > 0) {
+      var saboresPrincipaisDindin = [];
+      var saboresTodosDindin = [];
+      for (var f = 0; f < dindins.length && f < 5; f++) {
+        saboresPrincipaisDindin.push(dindins[f].nome);
+      }
+      for (var g = 0; g < dindins.length; g++) {
+        saboresTodosDindin.push(dindins[g].nome);
+      }
+      slideDindins.push({
+        tipo: 'dindin',
+        nome: 'Dindins Gourmet',
+        categoria: 'Gelados Artesanais',
+        descricao: null,
+        saboresPrincipais: saboresPrincipaisDindin,
+        saboresTodos: saboresTodosDindin,
+        preco: valorDindin,
+        tags: [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: 'R$ ' + valorDindin.toFixed(2).replace('.', ',') + ' un.' }],
+        imagem: getImagem('Dindin'),
+      });
+    }
+
+    var naoProtos = slidesSob.concat(slidesSuco).concat(slideDindins);
+    var resultado = [];
+    var maxLen = Math.max(slidesPratos.length, naoProtos.length);
+
+    for (var h = 0; h < maxLen; h++) {
+      if (h < slidesPratos.length) resultado.push(slidesPratos[h]);
+      if (h < naoProtos.length) resultado.push(naoProtos[h]);
+    }
+
+    if (resultado.length === 0) {
       resultado.push({
         tipo: 'prato',
         nome: 'LM Sabor Caseiro',
@@ -215,50 +338,68 @@
     return resultado;
   }
 
-  /* ── RENDERIZAR SLIDES ──────────────────────────────── */
+  // ============================================================
+  // RENDERIZAR SLIDES
+  // ============================================================
   function renderizarSlidesDom() {
     var container = document.getElementById('slide-container');
     if (!container) return;
-    
-    container.querySelectorAll('.slide-img, .slide-badges').forEach(function(el) { el.remove(); });
 
-    slides.forEach(function(s, i) {
+    var oldSlides = container.querySelectorAll('.slide-img, .slide-badges');
+    for (var i = 0; i < oldSlides.length; i++) {
+      oldSlides[i].remove();
+    }
+
+    for (var j = 0; j < slides.length; j++) {
+      var s = slides[j];
+
       var img = document.createElement('img');
-      img.className = 'slide-img' + (i === 0 ? ' ativo' : '');
+      img.className = 'slide-img' + (j === 0 ? ' ativo' : '');
       img.src = s.imagem || '';
       img.alt = s.nome || 'Prato';
       img.style.width = '100%';
       img.style.height = '100%';
       img.style.objectFit = 'contain';
-      
+
       img.onerror = function() {
         this.style.display = 'none';
       };
-      
-      container.insertBefore(img, document.getElementById('slide-num'));
+
+      var slideNum = document.getElementById('slide-num');
+      container.insertBefore(img, slideNum);
 
       if (s.saboresTodos && s.saboresTodos.length && s.tipo !== 'prato') {
         var bdiv = document.createElement('div');
-        bdiv.className = 'slide-badges' + (i === 0 ? ' ativo' : '');
-        bdiv.innerHTML = s.saboresTodos.map(function(sb) { return '<span class="badge">' + sb + '</span>'; }).join('');
-        container.insertBefore(bdiv, document.getElementById('slide-num'));
+        bdiv.className = 'slide-badges' + (j === 0 ? ' ativo' : '');
+        var badgesHTML = '';
+        for (var b = 0; b < s.saboresTodos.length; b++) {
+          badgesHTML += '<span class="badge">' + s.saboresTodos[b] + '</span>';
+        }
+        bdiv.innerHTML = badgesHTML;
+        container.insertBefore(bdiv, slideNum);
       }
-    });
+    }
 
     var dotsContainer = document.getElementById('progress-dots');
     if (dotsContainer) {
-      dotsContainer.innerHTML = slides.map(function(_, i) {
-        return '<div class="dot' + (i === 0 ? ' ativo' : '') + '"></div>';
-      }).join('');
+      var dotsHTML = '';
+      for (var d = 0; d < slides.length; d++) {
+        dotsHTML += '<div class="dot' + (d === 0 ? ' ativo' : '') + '"></div>';
+      }
+      dotsContainer.innerHTML = dotsHTML;
     }
   }
 
-  /* ── CONTROLE DE SLIDES ────────────────────────────── */
+  // ============================================================
+  // CONTROLE DE SLIDES
+  // ============================================================
   function offsetDomIdx(targetIdx) {
     var o = 0;
     for (var i = 0; i < targetIdx; i++) {
       o++;
-      if (slides[i].saboresTodos && slides[i].saboresTodos.length && slides[i].tipo !== 'prato') o++;
+      if (slides[i].saboresTodos && slides[i].saboresTodos.length && slides[i].tipo !== 'prato') {
+        o++;
+      }
     }
     return o;
   }
@@ -266,30 +407,49 @@
   function setAtivo(on) {
     var container = document.getElementById('slide-container');
     if (!container) return;
-    
+
     var allEls = container.querySelectorAll('.slide-img, .slide-badges');
     var dots = document.getElementById('progress-dots');
     if (!dots) return;
-    
+
     var dotEls = dots.querySelectorAll('.dot');
     var domStart = offsetDomIdx(idx);
     var hasBadges = (slides[idx] && slides[idx].saboresTodos && slides[idx].saboresTodos.length && slides[idx].tipo !== 'prato');
     var domCount = hasBadges ? 2 : 1;
 
     for (var j = domStart; j < domStart + domCount; j++) {
-      if (allEls[j]) allEls[j].classList.toggle('ativo', on);
+      if (allEls[j]) {
+        if (on) {
+          allEls[j].classList.add('ativo');
+        } else {
+          allEls[j].classList.remove('ativo');
+        }
+      }
     }
-    if (dotEls[idx]) dotEls[idx].classList.toggle('ativo', on);
-    
-    ['nome', 'dish-desc', 'dish-categoria', 'separador', 'dish-tags'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.toggle('ativo', on);
-    });
+    if (dotEls[idx]) {
+      if (on) {
+        dotEls[idx].classList.add('ativo');
+      } else {
+        dotEls[idx].classList.remove('ativo');
+      }
+    }
+
+    var elementosTexto = ['nome', 'dish-desc', 'dish-categoria', 'separador', 'dish-tags'];
+    for (var e = 0; e < elementosTexto.length; e++) {
+      var el = document.getElementById(elementosTexto[e]);
+      if (el) {
+        if (on) {
+          el.classList.add('ativo');
+        } else {
+          el.classList.remove('ativo');
+        }
+      }
+    }
   }
 
   function preencherTexto() {
     if (!slides.length || idx >= slides.length) return;
-    
+
     var s = slides[idx];
     var nome = document.getElementById('nome');
     var desc = document.getElementById('dish-desc');
@@ -303,32 +463,43 @@
 
     if (desc) {
       if (s.saboresPrincipais && s.saboresPrincipais.length && s.tipo !== 'prato') {
-        var precoHTML = s.preco ? '<div class="preco-grande">R$ ' + Number(s.preco).toFixed(2).replace('.', ',') + '<span>/ un.</span></div>' : '';
-        desc.innerHTML = '<div class="sabores-principais">' + s.saboresPrincipais.map(function(sb, i) {
-          return '<span class="chip-principal cor-' + (i % 5) + '">' + sb + '</span>';
-        }).join('') + '</div>' + precoHTML;
+        var precoHTML = '';
+        if (s.preco) {
+          precoHTML = '<div class="preco-grande">R$ ' + Number(s.preco).toFixed(2).replace('.', ',') + '<span>/ un.</span></div>';
+        }
+        var chipsHTML = '<div class="sabores-principais">';
+        for (var i = 0; i < s.saboresPrincipais.length; i++) {
+          chipsHTML += '<span class="chip-principal cor-' + (i % 5) + '">' + s.saboresPrincipais[i] + '</span>';
+        }
+        chipsHTML += '</div>';
+        desc.innerHTML = chipsHTML + precoHTML;
       } else {
         desc.textContent = s.descricao || '';
       }
     }
 
     if (tags) {
-      tags.innerHTML = (s.tags || []).map(function(t) {
-        return '<span class="tag' + (t.destaque ? ' tag-destaque' : '') + '">' + t.texto + '</span>';
-      }).join('');
+      var tagsHTML = '';
+      for (var t = 0; t < s.tags.length; t++) {
+        var tag = s.tags[t];
+        tagsHTML += '<span class="tag' + (tag.destaque ? ' tag-destaque' : '') + '">' + tag.texto + '</span>';
+      }
+      tags.innerHTML = tagsHTML;
     }
 
     if (prox && slides.length > 0) {
       prox.textContent = slides[(idx + 1) % slides.length].nome;
     }
     if (num) {
-      num.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+      var numStr = String(idx + 1).padStart(2, '0');
+      var totalStr = String(slides.length).padStart(2, '0');
+      num.textContent = numStr + ' / ' + totalStr;
     }
   }
 
   function trocarSlide() {
     if (!slides.length) return;
-    
+
     setAtivo(false);
     idx = (idx + 1) % slides.length;
     preencherTexto();
@@ -346,35 +517,64 @@
     fill.style.transform = 'scaleX(0)';
   }
 
-  /* ── PAINEL DIREITO — DESTAQUES ────────────────────── */
+  // ============================================================
+  // PAINEL DIREITO — DESTAQUES
+  // ============================================================
   function getSaboresEspetinhos(dados) {
-    var espetinhos = (dados.cardapio || []).filter(function(item) {
-      return item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho';
-    });
-    return espetinhos.length > 0 ? espetinhos.map(function(e) { return e.nome; }) : null;
+    var espetinhos = [];
+    var cardapio = dados.cardapio || [];
+    for (var i = 0; i < cardapio.length; i++) {
+      var item = cardapio[i];
+      if (item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho') {
+        espetinhos.push(item);
+      }
+    }
+    if (espetinhos.length > 0) {
+      var nomes = [];
+      for (var j = 0; j < espetinhos.length; j++) {
+        nomes.push(espetinhos[j].nome);
+      }
+      return nomes;
+    }
+    return null;
   }
 
   function renderizarPratos(dados) {
     var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
-    var pratos = (dados.cardapio || [])
-      .filter(function(p) { return p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato'; })
-      .sort(function(a, b) {
-        var idxA = ordemPersonalizada.indexOf(a.nome);
-        var idxB = ordemPersonalizada.indexOf(b.nome);
-        if (idxA === -1 && idxB === -1) return 0;
-        if (idxA === -1) return 1;
-        if (idxB === -1) return -1;
-        return idxA - idxB;
-      })
-      .slice(0, 8);
-    
+    var pratos = [];
+    var cardapio = dados.cardapio || [];
+    for (var i = 0; i < cardapio.length; i++) {
+      var p = cardapio[i];
+      if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
+        pratos.push(p);
+      }
+    }
+
+    pratos.sort(function(a, b) {
+      var idxA = ordemPersonalizada.indexOf(a.nome);
+      var idxB = ordemPersonalizada.indexOf(b.nome);
+      if (idxA === -1 && idxB === -1) return 0;
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+
+    pratos = pratos.slice(0, 8);
+
     var lista = document.getElementById('dest-lista');
     if (!lista) return false;
-    if (!pratos.length) return false;
-    
-    lista.innerHTML = pratos.map(function(p) {
-      return '<div class="dest-item"><div class="dest-dot"></div><div class="dest-nome">' + p.nome + '</div><div class="dest-cat">' + (p.categoria || '') + '</div></div>';
-    }).join('');
+    if (pratos.length === 0) return false;
+
+    var html = '';
+    for (var j = 0; j < pratos.length; j++) {
+      var p = pratos[j];
+      html += '<div class="dest-item">';
+      html += '<div class="dest-dot"></div>';
+      html += '<div class="dest-nome">' + p.nome + '</div>';
+      html += '<div class="dest-cat">' + (p.categoria || '') + '</div>';
+      html += '</div>';
+    }
+    lista.innerHTML = html;
     return true;
   }
 
@@ -383,36 +583,41 @@
     var lista = document.getElementById('dest-lista');
     if (!lista) return false;
     if (!sabores || sabores.length === 0) return false;
-    
+
     var totalPages = Math.ceil(sabores.length / ESPETINHOS_POR_PAGINA);
     if (espetinhoPage >= totalPages) espetinhoPage = 0;
-    
+
     var start = espetinhoPage * ESPETINHOS_POR_PAGINA;
     var saboresExibir = sabores.slice(start, start + ESPETINHOS_POR_PAGINA);
-    
-    lista.innerHTML = saboresExibir.map(function(sabor) {
-      return '<div class="dest-item"><div class="dest-dot" style="background: #F59B3C;"></div><div class="dest-nome">' + sabor + '</div><div class="dest-cat">Espetinho</div></div>';
-    }).join('');
-    
-    if (totalPages > 1) {
-      var pageIndicator = document.createElement('div');
-      pageIndicator.className = 'dest-item';
-      pageIndicator.style.cssText = 'justify-content: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);';
-      var dotsHTML = '';
-      for (var i = 0; i < totalPages; i++) {
-        dotsHTML += '<div style="width: 6px; height: 6px; border-radius: 50%; background: ' + (i === espetinhoPage ? '#F59B3C' : 'rgba(255,255,255,0.2)') + ';"></div>';
-      }
-      pageIndicator.innerHTML = '<div style="display: flex; gap: 6px; align-items: center; justify-content: center; width: 100%;">' + dotsHTML + '<span style="font-size: 9px; color: rgba(255,255,255,0.25); margin-left: 8px;">' + (espetinhoPage + 1) + '/' + totalPages + '</span></div>';
-      lista.appendChild(pageIndicator);
+
+    var html = '';
+    for (var i = 0; i < saboresExibir.length; i++) {
+      html += '<div class="dest-item">';
+      html += '<div class="dest-dot" style="background: #F59B3C;"></div>';
+      html += '<div class="dest-nome">' + saboresExibir[i] + '</div>';
+      html += '<div class="dest-cat">Espetinho</div>';
+      html += '</div>';
     }
-    
+
+    if (totalPages > 1) {
+      html += '<div class="dest-item" style="justify-content: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">';
+      html += '<div style="display: flex; gap: 6px; align-items: center; justify-content: center; width: 100%;">';
+      for (var d = 0; d < totalPages; d++) {
+        var activeClass = (d === espetinhoPage) ? '#F59B3C' : 'rgba(255,255,255,0.2)';
+        html += '<div style="width: 6px; height: 6px; border-radius: 50%; background: ' + activeClass + ';"></div>';
+      }
+      html += '<span style="font-size: 9px; color: rgba(255,255,255,0.25); margin-left: 8px;">' + (espetinhoPage + 1) + '/' + totalPages + '</span>';
+      html += '</div></div>';
+    }
+
+    lista.innerHTML = html;
     espetinhoPage = (espetinhoPage + 1) % totalPages;
     return true;
   }
 
   function alternarDestaques() {
     if (!ultimosDados) return;
-    
+
     if (destaqueMode === 'pratos') {
       var temEspetinhos = renderizarEspetinhos(ultimosDados);
       if (temEspetinhos) destaqueMode = 'espetinhos';
@@ -430,12 +635,12 @@
   function renderizarDestaques(dados) {
     ultimosDados = dados;
     espetinhoPage = 0;
-    
+
     if (destaqueTimer) {
       clearInterval(destaqueTimer);
       destaqueTimer = null;
     }
-    
+
     var temPratos = renderizarPratos(dados);
     if (!temPratos) {
       var temEspetinhos = renderizarEspetinhos(dados);
@@ -450,16 +655,18 @@
     } else {
       destaqueMode = 'pratos';
     }
-    
+
     destaqueTimer = setInterval(alternarDestaques, DESTAQUE_INTERVALO_MS);
   }
 
-  /* ── RELÓGIO ─────────────────────────────────────────── */
+  // ============================================================
+  // RELÓGIO
+  // ============================================================
   function atualizarHora() {
     var agora = new Date();
     var hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     var data = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' });
-    
+
     var clockEl = document.getElementById('clock');
     var dateEl = document.getElementById('date');
     if (clockEl) clockEl.innerText = hora;
@@ -469,20 +676,23 @@
   setInterval(atualizarHora, 1000);
   atualizarHora();
 
-  /* ── COPA DO MUNDO 2026 ────────────────────────────── */
+  // ============================================================
+  // COPA DO MUNDO 2026
+  // ============================================================
   function getProximoJogo() {
-    if (!COPA_DADOS.jogos || COPA_DADOS.jogos.length === 0) return null;
-    
+    if (!copaDados.jogos || copaDados.jogos.length === 0) return null;
+
     var agora = new Date();
-    var jogosFuturos = COPA_DADOS.jogos.filter(function(jogo) {
-      if (jogo.status === 'TIMED') return true;
-      if (jogo.status === 'SCHEDULED') return true;
-      if (jogo.status === 'IN_PLAY') return true;
-      if (jogo.status === 'PAUSED') return true;
-      if (jogo.dataHora && jogo.dataHora > agora) return true;
-      return false;
-    });
-    
+    var jogosFuturos = [];
+    for (var i = 0; i < copaDados.jogos.length; i++) {
+      var jogo = copaDados.jogos[i];
+      if (jogo.status === 'TIMED' || jogo.status === 'SCHEDULED' || jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED') {
+        jogosFuturos.push(jogo);
+      } else if (jogo.dataHora && jogo.dataHora > agora) {
+        jogosFuturos.push(jogo);
+      }
+    }
+
     if (jogosFuturos.length === 0) return null;
     jogosFuturos.sort(function(a, b) { return a.dataHora - b.dataHora; });
     return jogosFuturos[0];
@@ -491,7 +701,7 @@
   function formatarDataJogo(dataObj) {
     if (!dataObj || isNaN(dataObj.getTime())) return '';
     var diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-    var meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+    var meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
                  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     var diaSemana = diasSemana[dataObj.getDay()];
     var dia = dataObj.getDate();
@@ -499,16 +709,6 @@
     var hora = String(dataObj.getHours()).padStart(2, '0');
     var minuto = String(dataObj.getMinutes()).padStart(2, '0');
     return diaSemana + ', ' + dia + ' de ' + mes + ' às ' + hora + ':' + minuto;
-  }
-
-  function getBandeira(pais) {
-    var bandeiras = {
-      'Brasil': '🇧🇷',
-      'Marrocos': '🇲🇦',
-      'Escócia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-      'Haiti': '🇭🇹'
-    };
-    return bandeiras[pais] || '🏳️';
   }
 
   function copaRenderJogo() {
@@ -521,7 +721,7 @@
     var jogoLiveBadge = document.getElementById('jogo-live-badge');
     var advNomeEl = document.querySelector('.placar-time:last-child .placar-nome');
     var advBandeiraEl = document.querySelector('.placar-time:last-child .placar-bandeira');
-    
+
     if (!proximoJogo) {
       if (placarStatus) placarStatus.textContent = 'Aguardando dados';
       if (placarLocal) placarLocal.textContent = 'Carregando...';
@@ -533,23 +733,23 @@
       if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
       return;
     }
-    
+
     var advNome = proximoJogo.casa === 'Brasil' ? proximoJogo.fora : proximoJogo.casa;
     if (advNomeEl) advNomeEl.textContent = advNome;
-    if (advBandeiraEl) advBandeiraEl.textContent = getBandeira(advNome);
-    
+    if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
+
     var golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '—';
     var golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '—';
     if (golBraEl) golBraEl.textContent = golBra;
     if (golMarEl) golMarEl.textContent = golAdv;
-    
+
     var statusTexto = '';
     var showBadge = false;
     if (proximoJogo.status === 'IN_PLAY') { statusTexto = 'AO VIVO'; showBadge = true; }
     else if (proximoJogo.status === 'PAUSED') { statusTexto = 'INTERVALO'; showBadge = true; }
     else if (proximoJogo.status === 'FINISHED') { statusTexto = 'FIM DE JOGO'; showBadge = false; }
     else { statusTexto = 'PRÓXIMO JOGO'; showBadge = false; }
-    
+
     if (placarStatus) placarStatus.textContent = statusTexto;
     if (jogoLiveBadge) jogoLiveBadge.style.display = showBadge ? 'inline-flex' : 'none';
     if (placarLocal) placarLocal.textContent = proximoJogo.local || 'Estádio do Maracanã';
@@ -561,41 +761,64 @@
   function copaRenderGrupo() {
     var tbody = document.getElementById('grupo-tbody');
     if (!tbody) return;
-    
-    if (!COPA_DADOS.grupo.length) {
+
+    if (!copaDados.grupo.length) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Carregando classificação...</td></tr>';
       return;
     }
-    
-    var sorted = COPA_DADOS.grupo.slice().sort(function(a, b) {
+
+    var sorted = copaDados.grupo.slice().sort(function(a, b) {
       return (b.p - a.p) || ((b.gp - b.gc) - (a.gp - a.gc));
     });
-    
-    tbody.innerHTML = sorted.map(function(s, i) {
-      return '<tr class="' + (s.nome === 'Brasil' ? 'brasil-row' : '') + '"><td>' + (i + 1) + '</td><td>' + s.nome + '</td><td>' + s.j + '</td><td>' + s.v + '</td><td>' + s.e + '</td><td>' + s.d + '</td><td>' + (s.gp - s.gc) + '</td><td><strong>' + s.p + '</strong></td></tr>';
-    }).join('');
+
+    var html = '';
+    for (var i = 0; i < sorted.length; i++) {
+      var s = sorted[i];
+      var rowClass = (s.nome === 'Brasil') ? 'brasil-row' : '';
+      html += '<tr class="' + rowClass + '">';
+      html += '<td>' + (i + 1) + '</td>';
+      html += '<td>' + s.nome + '</td>';
+      html += '<td>' + s.j + '</td>';
+      html += '<td>' + s.v + '</td>';
+      html += '<td>' + s.e + '</td>';
+      html += '<td>' + s.d + '</td>';
+      html += '<td>' + (s.gp - s.gc) + '</td>';
+      html += '<td><strong>' + s.p + '</strong></td>';
+      html += '</tr>';
+    }
+    tbody.innerHTML = html;
   }
 
   function copaRenderJogos() {
     var container = document.getElementById('jogos-lista');
     if (!container) return;
-    
-    if (!COPA_DADOS.jogos.length) {
+
+    if (!copaDados.jogos.length) {
       container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px">Carregando jogos...</div>';
       return;
     }
-    
-    container.innerHTML = COPA_DADOS.jogos.map(function(jogo) {
+
+    var html = '';
+    for (var i = 0; i < copaDados.jogos.length; i++) {
+      var jogo = copaDados.jogos[i];
       var isFinished = jogo.status === 'FINISHED';
       var isLive = jogo.status === 'IN_PLAY' || jogo.status === 'PAUSED';
       var statusText = isLive ? '🔴 AO VIVO' : (isFinished ? '✓ FINALIZADO' : '📅 AGENDADO');
       var statusColor = isLive ? '#f59b3c' : (isFinished ? '#4ade80' : 'rgba(255,255,255,0.5)');
-      var dataFormatada = jogo.dataHora ? jogo.dataHora.toLocaleDateString('pt-BR', { 
+      var dataFormatada = jogo.dataHora ? jogo.dataHora.toLocaleDateString('pt-BR', {
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
       }) : jogo.data;
-      
-      return '<div class="jogo-item" style="background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:0.5rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.55rem;color:rgba(255,255,255,0.5);min-width:100px;">' + dataFormatada + '</div><div style="flex:1;text-align:center;font-weight:600;font-size:0.55rem;">' + jogo.casa + ' vs ' + jogo.fora + '</div><div style="min-width:70px;text-align:right;"><div style="font-weight:700;font-size:0.55rem;">' + ((jogo.golBra !== null && jogo.golBra !== undefined) ? jogo.golBra + '-' + jogo.golAdv : '—') + '</div><div style="font-size:0.4rem;color:' + statusColor + ';">' + statusText + '</div></div></div>';
-    }).join('');
+      var placar = (jogo.golBra !== null && jogo.golBra !== undefined) ? jogo.golBra + '-' + jogo.golAdv : '—';
+
+      html += '<div class="jogo-item" style="background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:0.5rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">';
+      html += '<div style="font-size:0.55rem;color:rgba(255,255,255,0.5);min-width:100px;">' + dataFormatada + '</div>';
+      html += '<div style="flex:1;text-align:center;font-weight:600;font-size:0.55rem;">' + jogo.casa + ' vs ' + jogo.fora + '</div>';
+      html += '<div style="min-width:70px;text-align:right;">';
+      html += '<div style="font-weight:700;font-size:0.55rem;">' + placar + '</div>';
+      html += '<div style="font-size:0.4rem;color:' + statusColor + ';">' + statusText + '</div>';
+      html += '</div></div>';
+    }
+    container.innerHTML = html;
   }
 
   function copaRenderFotos() {
@@ -608,24 +831,43 @@
       VOL: '#4ade80', MEI: '#4ade80', ATA: '#f472b6',
     };
 
-    grid.innerHTML = COPA_DADOS.convocados.map(function(j) {
-      return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:0.4rem;padding:0.3rem 0.4rem;display:flex;align-items:center;gap:0.3rem;"><span style="font-size:0.55rem;font-weight:900;color:#FFD700;min-width:1rem;text-align:center;">' + j.num + '</span><div><div style="font-size:0.5rem;font-weight:700;color:rgba(255,255,255,0.85);line-height:1.2">' + j.nome + '</div><div style="font-size:0.38rem;font-weight:700;color:' + (COR_POS[j.pos] || '#fff') + ';letter-spacing:1px">' + j.pos + '</div></div></div>';
-    }).join('');
+    var html = '';
+    for (var i = 0; i < copaDados.convocados.length; i++) {
+      var j = copaDados.convocados[i];
+      var cor = COR_POS[j.pos] || '#ffffff';
+      html += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:0.4rem;padding:0.3rem 0.4rem;display:flex;align-items:center;gap:0.3rem;">';
+      html += '<span style="font-size:0.55rem;font-weight:900;color:#FFD700;min-width:1rem;text-align:center;">' + j.num + '</span>';
+      html += '<div><div style="font-size:0.5rem;font-weight:700;color:rgba(255,255,255,0.85);line-height:1.2">' + j.nome + '</div>';
+      html += '<div style="font-size:0.38rem;font-weight:700;color:' + cor + ';letter-spacing:1px">' + j.pos + '</div></div></div>';
+    }
+    grid.innerHTML = html;
 
     if (cap) cap.textContent = 'Convocados — Copa do Mundo 2026';
   }
 
   function copaMudarAba(tab) {
     copaTabAtual = tab;
-    
-    document.querySelectorAll('.copa-tab').forEach(function(btn) {
-      btn.classList.toggle('ativo', btn.dataset.tab === tab);
-    });
-    
-    document.querySelectorAll('.copa-panel').forEach(function(panel) {
-      panel.classList.toggle('ativo', panel.id === 'tab-' + tab);
-    });
-    
+
+    var tabs = document.querySelectorAll('.copa-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var btn = tabs[i];
+      if (btn.dataset.tab === tab) {
+        btn.classList.add('ativo');
+      } else {
+        btn.classList.remove('ativo');
+      }
+    }
+
+    var panels = document.querySelectorAll('.copa-panel');
+    for (var j = 0; j < panels.length; j++) {
+      var panel = panels[j];
+      if (panel.id === 'tab-' + tab) {
+        panel.classList.add('ativo');
+      } else {
+        panel.classList.remove('ativo');
+      }
+    }
+
     if (tab === 'jogo') copaRenderJogo();
     if (tab === 'grupo') copaRenderGrupo();
     if (tab === 'jogos') copaRenderJogos();
@@ -642,22 +884,25 @@
   }
 
   function copaIniciar() {
-    document.querySelectorAll('.copa-tab').forEach(function(btn) {
+    var tabs = document.querySelectorAll('.copa-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var btn = tabs[i];
       btn.addEventListener('click', function() {
         if (copaAutoTimer) clearInterval(copaAutoTimer);
-        copaMudarAba(btn.dataset.tab);
+        copaMudarAba(this.dataset.tab);
         setTimeout(copaIniciarRotacao, 20000);
       });
-    });
-    
+    }
+
     copaMudarAba('jogo');
     copaIniciarRotacao();
   }
 
-  /* ── CARREGAR DADOS PRINCIPAIS ────────────────────── */
+  // ============================================================
+  // CARREGAR DADOS PRINCIPAIS
+  // ============================================================
   function carregarDados() {
     try {
-      // Tenta carregar da API
       fetch(API_URL + '?action=getDados')
         .then(function(res) {
           if (res.ok) return res.json();
@@ -704,7 +949,9 @@
     timer = setInterval(trocarSlide, INTERVALO_MS);
   }
 
-  /* ── INIT ────────────────────────────────────────────── */
+  // ============================================================
+  // INIT
+  // ============================================================
   document.addEventListener('DOMContentLoaded', function() {
     copaIniciar();
     carregarDados();
