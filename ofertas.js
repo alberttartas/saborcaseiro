@@ -450,31 +450,20 @@
   }
 
   // ============================================================
-  // PAINEL DIREITO — DESTAQUES
+  // PAINEL CENTRAL — DESTAQUES (PRATOS + ESPETINHOS FIXOS)
   // ============================================================
-  function getSaboresEspetinhos(dados) {
-    var espetinhos = [];
-    var cardapio = dados.cardapio || [];
-    for (var i = 0; i < cardapio.length; i++) {
-      var item = cardapio[i];
-      if (item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho') {
-        espetinhos.push(item);
-      }
-    }
-    if (espetinhos.length > 0) {
-      var nomes = [];
-      for (var j = 0; j < espetinhos.length; j++) {
-        nomes.push(espetinhos[j].nome);
-      }
-      return nomes;
-    }
-    return null;
-  }
 
-  function renderizarPratos(dados) {
-    var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
-    var pratos = [];
+  function renderizarDestaques(dados) {
+    var lista = document.getElementById('dest-lista');
+    if (!lista) return;
+
+    var html = '';
     var cardapio = dados.cardapio || [];
+
+    // --- 1. PRATOS (em cima) ---
+    var pratos = [];
+    var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
+    
     for (var i = 0; i < cardapio.length; i++) {
       var p = cardapio[i];
       if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
@@ -491,104 +480,52 @@
       return idxA - idxB;
     });
 
-    pratos = pratos.slice(0, 8);
+    pratos = pratos.slice(0, 6);
 
-    var lista = document.getElementById('dest-lista');
-    if (!lista) return false;
-    if (pratos.length === 0) return false;
-
-    var html = '';
-    for (var j = 0; j < pratos.length; j++) {
-      var p = pratos[j];
-      html += '<div class="dest-item">';
-      html += '<div class="dest-dot"></div>';
-      html += '<div class="dest-nome">' + p.nome + '</div>';
-      html += '<div class="dest-cat">' + (p.categoria || '') + '</div>';
-      html += '</div>';
-    }
-    lista.innerHTML = html;
-    return true;
-  }
-
-  function renderizarEspetinhos(dados) {
-    var sabores = getSaboresEspetinhos(dados);
-    var lista = document.getElementById('dest-lista');
-    if (!lista) return false;
-    if (!sabores || sabores.length === 0) return false;
-
-    var totalPages = Math.ceil(sabores.length / ESPETINHOS_POR_PAGINA);
-    if (espetinhoPage >= totalPages) espetinhoPage = 0;
-
-    var start = espetinhoPage * ESPETINHOS_POR_PAGINA;
-    var saboresExibir = sabores.slice(start, start + ESPETINHOS_POR_PAGINA);
-
-    var html = '';
-    for (var i = 0; i < saboresExibir.length; i++) {
-      html += '<div class="dest-item">';
-      html += '<div class="dest-dot" style="background: #F59B3C;"></div>';
-      html += '<div class="dest-nome">' + saboresExibir[i] + '</div>';
-      html += '<div class="dest-cat">Espetinho</div>';
+    if (pratos.length > 0) {
+      html += '<div class="dest-grupo">';
+      html += '<div class="dest-grupo-titulo">🍽️ Pratos</div>';
+      for (var j = 0; j < pratos.length; j++) {
+        var p = pratos[j];
+        html += '<div class="dest-item">';
+        html += '<div class="dest-dot" style="background:#F59B3C;"></div>';
+        html += '<div class="dest-nome">' + p.nome + '</div>';
+        html += '<div class="dest-cat">' + (p.categoria || '') + '</div>';
+        html += '</div>';
+      }
       html += '</div>';
     }
 
-    if (totalPages > 1) {
-      html += '<div class="dest-item" style="justify-content: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">';
-      html += '<div style="display: flex; gap: 6px; align-items: center; justify-content: center; width: 100%;">';
-      for (var d = 0; d < totalPages; d++) {
-        var activeClass = (d === espetinhoPage) ? '#F59B3C' : 'rgba(255,255,255,0.2)';
-        html += '<div style="width: 6px; height: 6px; border-radius: 50%; background: ' + activeClass + ';"></div>';
+    // --- 2. ESPETINHOS (em baixo) ---
+    var espetinhos = [];
+    for (var k = 0; k < cardapio.length; k++) {
+      var item = cardapio[k];
+      if (item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho') {
+        espetinhos.push(item);
       }
-      html += '<span style="font-size: 9px; color: rgba(255,255,255,0.25); margin-left: 8px;">' + (espetinhoPage + 1) + '/' + totalPages + '</span>';
-      html += '</div></div>';
+    }
+
+    if (espetinhos.length > 0) {
+      var espetinhosExibir = espetinhos.slice(0, 6);
+      html += '<div class="dest-grupo">';
+      html += '<div class="dest-grupo-titulo">🍢 Espetinhos</div>';
+      for (var l = 0; l < espetinhosExibir.length; l++) {
+        var e = espetinhosExibir[l];
+        html += '<div class="dest-item">';
+        html += '<div class="dest-dot" style="background:#34D399;"></div>';
+        html += '<div class="dest-nome">' + e.nome + '</div>';
+        html += '<div class="dest-cat">Espetinho</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    // Fallback
+    if (html === '') {
+      html = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
     }
 
     lista.innerHTML = html;
-    espetinhoPage = (espetinhoPage + 1) % totalPages;
-    return true;
-  }
-
-  function alternarDestaques() {
-    if (!ultimosDados) return;
-
-    if (destaqueMode === 'pratos') {
-      var temEspetinhos = renderizarEspetinhos(ultimosDados);
-      if (temEspetinhos) destaqueMode = 'espetinhos';
-    } else {
-      var temPratos = renderizarPratos(ultimosDados);
-      if (temPratos) {
-        destaqueMode = 'pratos';
-      } else {
-        renderizarEspetinhos(ultimosDados);
-        destaqueMode = 'espetinhos';
-      }
-    }
-  }
-
-  function renderizarDestaques(dados) {
-    ultimosDados = dados;
-    espetinhoPage = 0;
-
-    if (destaqueTimer) {
-      clearInterval(destaqueTimer);
-      destaqueTimer = null;
-    }
-
-    var temPratos = renderizarPratos(dados);
-    if (!temPratos) {
-      var temEspetinhos = renderizarEspetinhos(dados);
-      if (!temEspetinhos) {
-        var lista = document.getElementById('dest-lista');
-        if (lista) {
-          lista.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
-        }
-        return;
-      }
-      destaqueMode = 'espetinhos';
-    } else {
-      destaqueMode = 'pratos';
-    }
-
-    destaqueTimer = setInterval(alternarDestaques, DESTAQUE_INTERVALO_MS);
   }
 
   // ============================================================
@@ -647,7 +584,6 @@
   function copaRenderJogo() {
     var proximoJogo = getProximoJogo();
     var placarStatus = document.getElementById('placar-status');
-    var placarLocal = document.getElementById('placar-local');
     var placarData = document.getElementById('placar-data');
     var golBraEl = document.getElementById('gol-bra');
     var golMarEl = document.getElementById('gol-mar');
@@ -657,7 +593,6 @@
 
     if (!proximoJogo) {
       if (placarStatus) placarStatus.textContent = 'Aguardando dados';
-      if (placarLocal) placarLocal.textContent = 'Carregando...';
       if (placarData) placarData.textContent = '';
       if (golBraEl) golBraEl.textContent = '—';
       if (golMarEl) golMarEl.textContent = '—';
@@ -692,22 +627,34 @@
 
     if (placarStatus) placarStatus.textContent = statusTexto;
     if (jogoLiveBadge) jogoLiveBadge.style.display = showBadge ? 'inline-flex' : 'none';
-    if (placarLocal) placarLocal.textContent = proximoJogo.local || 'Estádio do Maracanã';
     if (placarData && proximoJogo.dataHora) {
       placarData.textContent = formatarDataJogo(proximoJogo.dataHora);
     }
   }
 
+  // ============================================================
+  // ABA GRUPO - APENAS 4 COLUNAS (apenas Brasil, Marrocos, Escócia, Haiti)
+  // ============================================================
   function copaRenderGrupo() {
     var tbody = document.getElementById('grupo-tbody');
     if (!tbody) return;
 
     if (!copaDados.grupo || copaDados.grupo.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Carregando classificação...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Carregando classificação...</td></tr>';
       return;
     }
 
-    var sorted = copaDados.grupo.slice().sort(function(a, b) {
+    // Filtra apenas Brasil, Marrocos, Escócia, Haiti
+    var nomesPermitidos = ['Brasil', 'Marrocos', 'Escócia', 'Haiti'];
+    var timesFiltrados = copaDados.grupo.filter(function(time) {
+      return nomesPermitidos.indexOf(time.nome) !== -1;
+    });
+
+    if (timesFiltrados.length === 0) {
+      timesFiltrados = copaDados.grupo;
+    }
+
+    var sorted = timesFiltrados.slice().sort(function(a, b) {
       if (b.p !== a.p) return b.p - a.p;
       var sgA = (a.gp || 0) - (a.gc || 0);
       var sgB = (b.gp || 0) - (b.gc || 0);
@@ -718,15 +665,10 @@
     for (var i = 0; i < sorted.length; i++) {
       var s = sorted[i];
       var rowClass = (s.nome === 'Brasil') ? 'brasil-row' : '';
-      var sg = (s.gp || 0) - (s.gc || 0);
       html += '<tr class="' + rowClass + '">';
       html += '<td>' + (i + 1) + '</td>';
       html += '<td>' + s.nome + '</td>';
       html += '<td>' + (s.j || 0) + '</td>';
-      html += '<td>' + (s.v || 0) + '</td>';
-      html += '<td>' + (s.e || 0) + '</td>';
-      html += '<td>' + (s.d || 0) + '</td>';
-      html += '<td>' + sg + '</td>';
       html += '<td><strong>' + (s.p || 0) + '</strong></td>';
       html += '</tr>';
     }
@@ -853,143 +795,143 @@
   }
 
   // ============================================================
-// CARREGAR DADOS DO BACKEND
-// ============================================================
+  // CARREGAR DADOS DO BACKEND
+  // ============================================================
   
-function carregarDadosCopa() {
-  console.log('Carregando dados da Copa via backend...');
-  
-  // Busca classificação - USANDO SEU BACKEND
-  fetch('/api/copa')
-    .then(function(res) {
-      if (!res.ok) {
-        console.warn('Erro ao buscar classificação:', res.status);
-        return null;
-      }
-      return res.json();
-    })
-    .then(function(data) {
-      console.log('Classificação recebida do backend');
-      if (data && data.standings) {
-        var grupo = [];
-        // Procura o grupo do Brasil
-        for (var i = 0; i < data.standings.length; i++) {
-          var standing = data.standings[i];
-          // Verifica se é o grupo C ou se contém Brasil
-          var temBrasil = false;
-          if (standing.table) {
-            for (var t = 0; t < standing.table.length; t++) {
-              if (standing.table[t].team.name === 'Brazil') {
-                temBrasil = true;
-                break;
+  function carregarDadosCopa() {
+    console.log('Carregando dados da Copa via backend...');
+    
+    // Busca classificação - USANDO SEU BACKEND
+    fetch('/api/copa')
+      .then(function(res) {
+        if (!res.ok) {
+          console.warn('Erro ao buscar classificação:', res.status);
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('Classificação recebida do backend');
+        if (data && data.standings) {
+          var grupo = [];
+          // Procura o grupo do Brasil
+          for (var i = 0; i < data.standings.length; i++) {
+            var standing = data.standings[i];
+            // Verifica se é o grupo C ou se contém Brasil
+            var temBrasil = false;
+            if (standing.table) {
+              for (var t = 0; t < standing.table.length; t++) {
+                if (standing.table[t].team.name === 'Brazil') {
+                  temBrasil = true;
+                  break;
+                }
               }
             }
-          }
-          
-          if (temBrasil || (standing.group && standing.group.indexOf('C') !== -1)) {
-            for (var j = 0; j < standing.table.length; j++) {
-              var team = standing.table[j];
-              var nome = team.team.name;
-              if (nome === 'Brazil') nome = 'Brasil';
-              else if (nome === 'Morocco') nome = 'Marrocos';
-              else if (nome === 'Scotland') nome = 'Escócia';
-              else if (nome === 'Haiti') nome = 'Haiti';
-              grupo.push({
-                id: team.team.id,
-                nome: nome,
-                j: team.playedGames || 0,
-                v: team.won || 0,
-                e: team.draw || 0,
-                d: team.lost || 0,
-                gp: team.goalsFor || 0,
-                gc: team.goalsAgainst || 0,
-                p: team.points || 0
-              });
+            
+            if (temBrasil || (standing.group && standing.group.indexOf('C') !== -1)) {
+              for (var j = 0; j < standing.table.length; j++) {
+                var team = standing.table[j];
+                var nome = team.team.name;
+                if (nome === 'Brazil') nome = 'Brasil';
+                else if (nome === 'Morocco') nome = 'Marrocos';
+                else if (nome === 'Scotland') nome = 'Escócia';
+                else if (nome === 'Haiti') nome = 'Haiti';
+                grupo.push({
+                  id: team.team.id,
+                  nome: nome,
+                  j: team.playedGames || 0,
+                  v: team.won || 0,
+                  e: team.draw || 0,
+                  d: team.lost || 0,
+                  gp: team.goalsFor || 0,
+                  gc: team.goalsAgainst || 0,
+                  p: team.points || 0
+                });
+              }
+              break;
             }
-            break;
+          }
+          if (grupo.length > 0) {
+            copaDados.grupo = grupo;
+            copaRenderGrupo();
+            copaRenderJogo();
+            console.log('Grupo atualizado:', grupo);
           }
         }
-        if (grupo.length > 0) {
-          copaDados.grupo = grupo;
-          copaRenderGrupo();
-          copaRenderJogo();
-          console.log('Grupo atualizado:', grupo);
-        }
-      }
-    })
-    .catch(function(err) {
-      console.warn('Erro ao buscar classificação:', err);
-    });
+      })
+      .catch(function(err) {
+        console.warn('Erro ao buscar classificação:', err);
+      });
 
-  // Busca jogos - USANDO SEU BACKEND
-  fetch('/api/copa-matches')
-    .then(function(res) {
-      if (!res.ok) {
-        console.warn('Erro ao buscar jogos:', res.status);
-        return null;
-      }
-      return res.json();
-    })
-    .then(function(data) {
-      console.log('Jogos recebidos do backend');
-      if (data && data.matches) {
-        var jogos = [];
-        for (var i = 0; i < data.matches.length; i++) {
-          var m = data.matches[i];
-          
-          // Verifica se é jogo do Brasil (ID 764)
-          var braCasa = m.homeTeam && m.homeTeam.id === 764;
-          var braFora = m.awayTeam && m.awayTeam.id === 764;
-          var isBrasil = braCasa || braFora;
-          
-          if (!isBrasil) continue; // Pula jogos que não são do Brasil
-          
-          var dt = new Date(m.utcDate);
-          var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
-          
-          var adversario = braCasa ? m.awayTeam : m.homeTeam;
-          var nomeAdv = adversario ? adversario.name : 'Desconhecido';
-          if (nomeAdv === 'Morocco') nomeAdv = 'Marrocos';
-          else if (nomeAdv === 'Scotland') nomeAdv = 'Escócia';
-          else if (nomeAdv === 'Haiti') nomeAdv = 'Haiti';
-          
-          var golBra = null;
-          var golAdv = null;
-          if (m.score && m.score.fullTime) {
-            if (braCasa) {
-              golBra = m.score.fullTime.home;
-              golAdv = m.score.fullTime.away;
-            } else if (braFora) {
-              golBra = m.score.fullTime.away;
-              golAdv = m.score.fullTime.home;
+    // Busca jogos - USANDO SEU BACKEND
+    fetch('/api/copa-matches')
+      .then(function(res) {
+        if (!res.ok) {
+          console.warn('Erro ao buscar jogos:', res.status);
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('Jogos recebidos do backend');
+        if (data && data.matches) {
+          var jogos = [];
+          for (var i = 0; i < data.matches.length; i++) {
+            var m = data.matches[i];
+            
+            // Verifica se é jogo do Brasil (ID 764)
+            var braCasa = m.homeTeam && m.homeTeam.id === 764;
+            var braFora = m.awayTeam && m.awayTeam.id === 764;
+            var isBrasil = braCasa || braFora;
+            
+            if (!isBrasil) continue; // Pula jogos que não são do Brasil
+            
+            var dt = new Date(m.utcDate);
+            var dtBR = new Date(dt.getTime() - 3 * 60 * 60 * 1000);
+            
+            var adversario = braCasa ? m.awayTeam : m.homeTeam;
+            var nomeAdv = adversario ? adversario.name : 'Desconhecido';
+            if (nomeAdv === 'Morocco') nomeAdv = 'Marrocos';
+            else if (nomeAdv === 'Scotland') nomeAdv = 'Escócia';
+            else if (nomeAdv === 'Haiti') nomeAdv = 'Haiti';
+            
+            var golBra = null;
+            var golAdv = null;
+            if (m.score && m.score.fullTime) {
+              if (braCasa) {
+                golBra = m.score.fullTime.home;
+                golAdv = m.score.fullTime.away;
+              } else if (braFora) {
+                golBra = m.score.fullTime.away;
+                golAdv = m.score.fullTime.home;
+              }
             }
+            
+            jogos.push({
+              data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+              hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+              dataHora: dtBR,
+              casa: braCasa ? 'Brasil' : nomeAdv,
+              fora: braCasa ? nomeAdv : 'Brasil',
+              local: m.venue || 'Estádio do Maracanã',
+              status: m.status || 'SCHEDULED',
+              golBra: golBra,
+              golAdv: golAdv
+            });
           }
-          
-          jogos.push({
-            data: dtBR.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-            hora: dtBR.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-            dataHora: dtBR,
-            casa: braCasa ? 'Brasil' : nomeAdv,
-            fora: braCasa ? nomeAdv : 'Brasil',
-            local: m.venue || 'Estádio do Maracanã',
-            status: m.status || 'SCHEDULED',
-            golBra: golBra,
-            golAdv: golAdv
-          });
+          jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
+          if (jogos.length > 0) {
+            copaDados.jogos = jogos;
+            copaRenderJogos();
+            copaRenderJogo();
+            console.log('Jogos atualizados:', jogos.length);
+          }
         }
-        jogos.sort(function(a, b) { return a.dataHora - b.dataHora; });
-        if (jogos.length > 0) {
-          copaDados.jogos = jogos;
-          copaRenderJogos();
-          copaRenderJogo();
-          console.log('Jogos atualizados:', jogos.length);
-        }
-      }
-    })
-    .catch(function(err) {
-      console.warn('Erro ao buscar jogos:', err);
-    });
-}
+      })
+      .catch(function(err) {
+        console.warn('Erro ao buscar jogos:', err);
+      });
+  }
 
   // ============================================================
   // CARREGAR DADOS DO CARDÁPIO
