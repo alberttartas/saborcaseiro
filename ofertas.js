@@ -15,7 +15,7 @@
   var ESPETINHOS_POR_PAGINA = 8;
 
   // ============================================================
-// MAPA DE IMAGENS - ATUALIZADO COM TODOS OS ARQUIVOS
+// MAPA DE IMAGENS - CORRIGIDO
 // ============================================================
 var IMAGENS = {
   // PRATOS
@@ -24,17 +24,18 @@ var IMAGENS = {
   'Arroz de Camarão': 'assets/arroz-camarao.webp',
   'Arroz Branco': 'assets/arroz-branco.webp',
   'Camarão ao Alho': 'assets/camarao.webp',
+  'Camarão Alho e Oleo': 'assets/camarao.webp',     // ← USANDO camarao.webp
   'Vatapá de Camarão': 'assets/vatapa-camarao.webp',
   'Caranguejo': 'assets/caranguejo.webp',
   'Sopa Caseira': 'assets/sopa.webp',
   'Sopa de Carne': 'assets/sopa-de-carne.webp',
   'Canja': 'assets/canja.webp',
-  'Pratinho': 'assets/pratinho.webp',
   'Batata Frita': 'assets/batata.webp',
   'Macaxeira Frita': 'assets/macaxeira.webp',
   
   // ESPETINHOS
   'Espetinhos': 'assets/espetinhos.webp',
+  'Bolinhas': 'assets/espetinhos.webp',             // ← USANDO espetinhos.webp
   
   // SOBREMESAS
   'Mousse': 'assets/mousses.webp',
@@ -60,12 +61,11 @@ var IMAGENS = {
   // 1. Verifica se tem imagem exata
   if (IMAGENS[nome]) return IMAGENS[nome];
   
-  // 2. Busca por correspondência parcial (case insensitive)
+  // 2. Busca por correspondência parcial
   var nomeLow = nome.toLowerCase();
   for (var chave in IMAGENS) {
     if (IMAGENS.hasOwnProperty(chave)) {
       var chaveLow = chave.toLowerCase();
-      // Verifica se o nome contém a chave ou vice-versa
       if (nomeLow.indexOf(chaveLow) !== -1 || chaveLow.indexOf(nomeLow) !== -1) {
         return IMAGENS[chave];
       }
@@ -83,6 +83,7 @@ var IMAGENS = {
     'batata': 'assets/batata.webp',
     'macaxeira': 'assets/macaxeira.webp',
     'espetinho': 'assets/espetinhos.webp',
+    'bolinha': 'assets/espetinhos.webp',
     'mousse': 'assets/mousses.webp',
     'trufa': 'assets/trufas.webp',
     'cone': 'assets/cones-trufados.webp',
@@ -90,7 +91,9 @@ var IMAGENS = {
     'suco': 'assets/sucos.webp',
     'pratinho': 'assets/pratinho.webp',
     'vatapa': 'assets/vatapa-camarao.webp',
-    'delicia': 'assets/delicia-abacaxi.webp'
+    'delicia': 'assets/delicia-abacaxi.webp',
+    'alho': 'assets/camarao.webp',        // ← Para Camarão Alho
+    'oleo': 'assets/camarao.webp'         // ← Para Camarão Oleo
   };
   
   for (var palavra in palavrasChave) {
@@ -101,8 +104,9 @@ var IMAGENS = {
     }
   }
   
-  // 4. FALLBACK: usa uma imagem genérica
-  return 'https://via.placeholder.com/400x400/1a1a1a/F59B3C?text=' + encodeURIComponent(nome);
+  // 4. FALLBACK: SVG com o nome do prato
+  var nomeLimpo = nome.replace(/[^a-zA-Z0-9 ]/g, '');
+  return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%231a1a1a"/%3E%3Crect x="20" y="20" width="360" height="360" rx="10" fill="none" stroke="%23F59B3C" stroke-width="2"/%3E%3Ctext x="200" y="180" font-family="Arial" font-size="40" fill="%23F59B3C" text-anchor="middle"%3E🍽️%3C/text%3E%3Ctext x="200" y="240" font-family="Arial" font-size="18" fill="%23ffffff" text-anchor="middle"%3E' + encodeURIComponent(nomeLimpo) + '%3C/text%3E%3C/svg%3E';
 }
 
   // ============================================================
