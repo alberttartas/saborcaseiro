@@ -465,79 +465,79 @@ for (var j = 0; j < pratosDisp.length; j++) {
   // ============================================================
 
   function renderizarDestaques(dados) {
-    var lista = document.getElementById('dest-lista');
-    if (!lista) return;
+  var lista = document.getElementById('dest-lista');
+  if (!lista) return;
 
-    var html = '';
-    var cardapio = dados.cardapio || [];
+  var html = '';
+  var cardapio = dados.cardapio || [];
 
-    // --- 1. PRATOS (em cima) ---
-    var pratos = [];
-    var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
-    
-    for (var i = 0; i < cardapio.length; i++) {
-      var p = cardapio[i];
-      if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
-        pratos.push(p);
-      }
+  // --- 1. PRATOS (em cima) ---
+  var pratos = [];
+  var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
+  
+  for (var i = 0; i < cardapio.length; i++) {
+    var p = cardapio[i];
+    if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
+      pratos.push(p);
     }
-
-    pratos.sort(function(a, b) {
-      var idxA = ordemPersonalizada.indexOf(a.nome);
-      var idxB = ordemPersonalizada.indexOf(b.nome);
-      if (idxA === -1 && idxB === -1) return 0;
-      if (idxA === -1) return 1;
-      if (idxB === -1) return -1;
-      return idxA - idxB;
-    });
-
-    pratos = pratos.slice(0, 6);
-
-    if (pratos.length > 0) {
-      html += '<div class="dest-grupo">';
-      html += '<div class="dest-grupo-titulo">🍽️ Pratos</div>';
-      for (var j = 0; j < pratos.length; j++) {
-        var p = pratos[j];
-        html += '<div class="dest-item">';
-        html += '<div class="dest-dot" style="background:#F59B3C;"></div>';
-        html += '<div class="dest-nome">' + p.nome + '</div>';
-        html += '<div class="dest-cat">' + (p.categoria || '') + '</div>';
-        html += '</div>';
-      }
-      html += '</div>';
-    }
-
-    // --- 2. ESPETINHOS (em baixo) ---
-    var espetinhos = [];
-    for (var k = 0; k < cardapio.length; k++) {
-      var item = cardapio[k];
-      if (item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho') {
-        espetinhos.push(item);
-      }
-    }
-
-    if (espetinhos.length > 0) {
-      var espetinhosExibir = espetinhos.slice(0, 6);
-      html += '<div class="dest-grupo">';
-      html += '<div class="dest-grupo-titulo">🍢 Espetinhos</div>';
-      for (var l = 0; l < espetinhosExibir.length; l++) {
-        var e = espetinhosExibir[l];
-        html += '<div class="dest-item">';
-        html += '<div class="dest-dot" style="background:#34D399;"></div>';
-        html += '<div class="dest-nome">' + e.nome + '</div>';
-        html += '<div class="dest-cat">Espetinho</div>';
-        html += '</div>';
-      }
-      html += '</div>';
-    }
-
-    // Fallback
-    if (html === '') {
-      html = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
-    }
-
-    lista.innerHTML = html;
   }
+
+  pratos.sort(function(a, b) {
+    var idxA = ordemPersonalizada.indexOf(a.nome);
+    var idxB = ordemPersonalizada.indexOf(b.nome);
+    if (idxA === -1 && idxB === -1) return 0;
+    if (idxA === -1) return 1;
+    if (idxB === -1) return -1;
+    return idxA - idxB;
+  });
+
+  pratos = pratos.slice(0, 8);
+
+  if (pratos.length > 0) {
+    html += '<div class="dest-grupo">';
+    html += '<div class="dest-grupo-titulo">🍽️ Pratos</div>';
+    html += '<div class="dest-grid">';
+    for (var j = 0; j < pratos.length; j++) {
+      var p = pratos[j];
+      html += '<div class="dest-item">';
+      html += '<div class="dest-dot" style="background:#F59B3C;"></div>';
+      html += '<div class="dest-nome">' + p.nome + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // --- 2. ESPETINHOS (em baixo) ---
+  var espetinhos = [];
+  for (var k = 0; k < cardapio.length; k++) {
+    var item = cardapio[k];
+    if (item.disponivel && item.categoria && item.categoria.toLowerCase() === 'espetinho') {
+      espetinhos.push(item);
+    }
+  }
+
+  if (espetinhos.length > 0) {
+    var espetinhosExibir = espetinhos.slice(0, 8);
+    html += '<div class="dest-grupo">';
+    html += '<div class="dest-grupo-titulo">🍢 Espetinhos</div>';
+    html += '<div class="dest-grid">';
+    for (var l = 0; l < espetinhosExibir.length; l++) {
+      var e = espetinhosExibir[l];
+      html += '<div class="dest-item">';
+      html += '<div class="dest-dot" style="background:#34D399;"></div>';
+      html += '<div class="dest-nome">' + e.nome + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // Fallback
+  if (html === '') {
+    html = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
+  }
+
+  lista.innerHTML = html;
+}
 
   // ============================================================
   // RELÓGIO
