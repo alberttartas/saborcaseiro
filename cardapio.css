@@ -462,20 +462,20 @@ body {
 }
 
 /* ════════════════════════════════════
-   COLUNA 3 — COPA DO MUNDO 2026 (GRID COMPLETO)
+   COLUNA 3 — COPA DO MUNDO 2026
 ════════════════════════════════════ */
 
 #right {
   flex: 1.3 1 0;
   min-width: 0;
   display: grid;
-  grid-template-rows: 1fr auto;  /* ← CONTEÚDO FLEXÍVEL + SLIDE FIXO */
+  grid-template-rows: 1fr auto;  /* CONTEÚDO + SLIDE FIXO */
   gap: 0.6rem;
   overflow: hidden;
   height: 100%;
 }
 
-/* BOX DA COPA - OCUPA O ESPAÇO DISPONÍVEL */
+/* BOX DA COPA - OCUPA TODO O ESPAÇO DISPONÍVEL */
 #copa-box {
   min-height: 0;
   background: rgba(10,30,10,0.40);
@@ -483,8 +483,8 @@ body {
   border-radius: 0.8rem;
   padding: 0.4rem 0.6rem;
   backdrop-filter: blur(8px);
-  display: grid;
-  grid-template-rows: auto 1fr;  /* CABEÇALHO + CONTEÚDO */
+  display: flex;
+  flex-direction: column;
   gap: 0.3rem;
   overflow: hidden;
 }
@@ -494,6 +494,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 #copa-flag { font-size: 1.1rem; }
@@ -541,6 +542,7 @@ body {
 #copa-tabs {
   display: flex;
   gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .copa-tab {
@@ -564,22 +566,266 @@ body {
   color: #FFD700;
 }
 
+/* CONTEÚDO DAS ABAS */
 #copa-content {
+  flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
 }
 
-.copa-panel { display: none; height: 100%; }
-.copa-panel.ativo { display: flex; flex-direction: column; }
+.copa-panel {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.copa-panel.ativo {
+  display: flex;
+  flex-direction: column;
+}
+
+/* PLACAR */
+#placar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.2rem 0;
+  flex-shrink: 0;
+}
+
+.placar-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  flex: 1;
+}
+
+.placar-bandeira { font-size: 1.5rem; }
+.placar-nome { 
+  font-size: 0.5rem; 
+  font-weight: 700; 
+  color: rgba(255,255,255,0.8); 
+  letter-spacing: 0.5px;
+}
+
+.placar-gol {
+  font-family: var(--fonte-titulo);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #FFD700;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255,215,0,0.2);
+}
+
+#placar-meio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+#placar-status { 
+  font-size: 0.7rem; 
+  font-weight: 800; 
+  color: white;
+  text-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.placar-data { 
+  font-size: 0.42rem; 
+  color: rgba(255,255,255,0.45); 
+  margin-top: 2px; 
+}
+
+#jogo-info {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jogo-tag {
+  font-size: 0.42rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.5);
+}
+
+.jogo-tag-ao-vivo {
+  border-color: rgba(255,60,60,0.6);
+  color: #ff6060;
+  animation: pisca 1s infinite;
+}
+
+@keyframes pisca { 50% { opacity: 0.4; } }
+
+/* TABELA DO GRUPO */
+#grupo-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.48rem;
+}
+
+#grupo-tabela th {
+  color: rgba(255,215,0,0.5);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding: 0.15rem 0.15rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+#grupo-tabela th:nth-child(2) { text-align: left; }
+
+#grupo-tabela td {
+  padding: 0.3rem 0.15rem;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+}
+
+#grupo-tabela td:nth-child(2) { text-align: left; }
+
+#grupo-tabela tr.brasil-row td { color: #FFD700; font-weight: 700; }
+
+#grupo-nota {
+  font-size: 0.38rem;
+  color: rgba(255,255,255,0.2);
+  margin-top: 0.2rem;
+  text-align: center;
+}
+
+/* PRÓXIMOS JOGOS */
+#jogos-lista { 
+  overflow-y: auto; 
+  flex: 1; 
+}
+
+.jogo-item {
+  background: rgba(255,255,255,0.03);
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* SELEÇÃO / CONVOCADOS */
+#fotos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin-bottom: 0.2rem;
+}
+
+#fotos-caption {
+  font-size: 0.42rem;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
 
 /* ── SLIDE DE FOTOS DA COPA - ALTURA FIXA ── */
 #copa-fotos-slide {
-  height: 160px;            /* ← ALTURA FIXA */
+  height: 160px;
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
   border: 1px solid rgba(255,215,0,0.15);
   background: rgba(0,0,0,0.30);
+}
+
+#cfs-track {
+  position: absolute;
+  inset: 0;
+}
+
+.cfs-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.cfs-img.ativo { opacity: 1; }
+
+#copa-fotos-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+#cfs-label {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 0.4rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.85);
+  z-index: 4;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+#cfs-dots {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 4;
+}
+
+.cfs-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.30);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.cfs-dot.ativo { 
+  background: #FFD700; 
+  width: 0.9rem; 
+  border-radius: 2px; 
+}
+
+.cfs-dot:hover {
+  background: rgba(255,215,0,0.5);
+  transform: scale(1.2);
+}
+
+.cfs-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1;
+}
+
+.cfs-slide.ativo {
+  opacity: 1;
+  z-index: 2;
 }
 
 /* ════════════════════════════════
