@@ -734,7 +734,7 @@ body {
 
 /* ── SLIDE DE FOTOS DA COPA - ALTURA FIXA ── */
 #copa-fotos-slide {
-  height: 250px;
+  height: 280px;
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
