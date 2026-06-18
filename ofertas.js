@@ -131,20 +131,23 @@
     }
 
     var slidesPratos = [];
-    for (var j = 0; j < pratosDisp.length; j++) {
-      var prato = pratosDisp[j];
-      slidesPratos.push({
-        tipo: 'prato',
-        nome: prato.nome,
-        categoria: prato.categoria || 'Prato do Dia',
-        descricao: 'Feito com ingredientes frescos · Sabor caseiro de verdade.',
-        saboresPrincipais: null,
-        saboresTodos: null,
-        preco: null,
-        tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
-        imagem: getImagem(prato.nome),
-      });
-    }
+for (var j = 0; j < pratosDisp.length; j++) {
+  var prato = pratosDisp[j];
+  // Pega o valor do prato (coluna D da planilha)
+  var precoPrato = prato.valor ? Number(prato.valor) : null;
+  
+  slidesPratos.push({
+    tipo: 'prato',
+    nome: prato.nome,
+    categoria: prato.categoria || 'Prato do Dia',
+    descricao: 'Feito com ingredientes frescos · Sabor caseiro de verdade.',
+    saboresPrincipais: null,
+    saboresTodos: null,
+    preco: precoPrato,  // ← ADICIONA O PREÇO
+    tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
+    imagem: getImagem(prato.nome),
+  });
+}
 
     var catsSob = {};
     for (var k = 0; k < sobremesas.length; k++) {
@@ -380,54 +383,62 @@
   }
 
   function preencherTexto() {
-    if (!slides.length || idx >= slides.length) return;
+  if (!slides.length || idx >= slides.length) return;
 
-    var s = slides[idx];
-    var nome = document.getElementById('nome');
-    var desc = document.getElementById('dish-desc');
-    var cat = document.getElementById('cat-texto');
-    var tags = document.getElementById('dish-tags');
-    var prox = document.getElementById('prox-nome');
-    var num = document.getElementById('slide-num');
+  var s = slides[idx];
+  var nome = document.getElementById('nome');
+  var desc = document.getElementById('dish-desc');
+  var cat = document.getElementById('cat-texto');
+  var tags = document.getElementById('dish-tags');
+  var prox = document.getElementById('prox-nome');
+  var num = document.getElementById('slide-num');
 
-    if (cat) cat.textContent = s.categoria || '';
-    if (nome) nome.textContent = s.nome || '—';
+  if (cat) cat.textContent = s.categoria || '';
+  if (nome) nome.textContent = s.nome || '—';
 
-    if (desc) {
-      if (s.saboresPrincipais && s.saboresPrincipais.length && s.tipo !== 'prato') {
-        var precoHTML = '';
-        if (s.preco) {
-          precoHTML = '<div class="preco-grande">R$ ' + Number(s.preco).toFixed(2).replace('.', ',') + '<span>/ un.</span></div>';
-        }
-        var chipsHTML = '<div class="sabores-principais">';
-        for (var i = 0; i < s.saboresPrincipais.length; i++) {
-          chipsHTML += '<span class="chip-principal cor-' + (i % 5) + '">' + s.saboresPrincipais[i] + '</span>';
-        }
-        chipsHTML += '</div>';
-        desc.innerHTML = chipsHTML + precoHTML;
-      } else {
-        desc.textContent = s.descricao || '';
+  if (desc) {
+    // Se tiver sabores principais (sobremesas, sucos, dindins)
+    if (s.saboresPrincipais && s.saboresPrincipais.length && s.tipo !== 'prato') {
+      var precoHTML = '';
+      if (s.preco) {
+        precoHTML = '<div class="preco-destaque">R$ ' + Number(s.preco).toFixed(2).replace('.', ',') + ' <span>/ un.</span></div>';
       }
-    }
-
-    if (tags) {
-      var tagsHTML = '';
-      for (var t = 0; t < s.tags.length; t++) {
-        var tag = s.tags[t];
-        tagsHTML += '<span class="tag' + (tag.destaque ? ' tag-destaque' : '') + '">' + tag.texto + '</span>';
+      var chipsHTML = '<div class="sabores-principais">';
+      for (var i = 0; i < s.saboresPrincipais.length; i++) {
+        chipsHTML += '<span class="chip-principal cor-' + (i % 5) + '">' + s.saboresPrincipais[i] + '</span>';
       }
-      tags.innerHTML = tagsHTML;
-    }
-
-    if (prox && slides.length > 0) {
-      prox.textContent = slides[(idx + 1) % slides.length].nome;
-    }
-    if (num) {
-      var numStr = String(idx + 1).padStart(2, '0');
-      var totalStr = String(slides.length).padStart(2, '0');
-      num.textContent = numStr + ' / ' + totalStr;
+      chipsHTML += '</div>';
+      desc.innerHTML = chipsHTML + precoHTML;
+    } 
+    // Se for prato, mostra descrição + preço
+    else {
+      var descTexto = s.descricao || '';
+      var precoHTML = '';
+      if (s.preco) {
+        precoHTML = '<div class="preco-destaque">R$ ' + Number(s.preco).toFixed(2).replace('.', ',') + '</div>';
+      }
+      desc.innerHTML = descTexto + precoHTML;
     }
   }
+
+  if (tags) {
+    var tagsHTML = '';
+    for (var t = 0; t < s.tags.length; t++) {
+      var tag = s.tags[t];
+      tagsHTML += '<span class="tag' + (tag.destaque ? ' tag-destaque' : '') + '">' + tag.texto + '</span>';
+    }
+    tags.innerHTML = tagsHTML;
+  }
+
+  if (prox && slides.length > 0) {
+    prox.textContent = slides[(idx + 1) % slides.length].nome;
+  }
+  if (num) {
+    var numStr = String(idx + 1).padStart(2, '0');
+    var totalStr = String(slides.length).padStart(2, '0');
+    num.textContent = numStr + ' / ' + totalStr;
+  }
+}
 
   function trocarSlide() {
     if (!slides.length) return;
