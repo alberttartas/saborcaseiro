@@ -1,6 +1,8 @@
 /* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — cardapio.css (FONTES VISÍVEIS)
+   LM SABOR CASEIRO — cardapio.css
    Layout em 3 colunas: Prato | Cardápio do Dia | Copa 2026
+   Otimizado para TV (escala por viewport, sem depender
+   de breakpoints de "tela de computador").
 ══════════════════════════════════════════════════════ */
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -10,13 +12,23 @@
   --laranja-claro: #F59B3C;
   --creme:         #FDF6EC;
   --escuro:        #0D0A06;
+  --dourado:       #FFD700;
   --fonte-titulo:  'Playfair Display', Georgia, serif;
   --fonte-corpo:   'DM Sans', Arial, sans-serif;
+
+  /* Altura FIXA do slide de fotos da Copa (não cresce nem encolhe com o conteúdo) */
+  --copa-foto-altura: 7.5rem;
 }
 
-/* ESCALA GLOBAL: tudo baseado na largura da tela */
+/* ── ESCALA GLOBAL ──
+   Tudo no layout usa rem, e o rem é definido a partir do viewport.
+   Como vw+vh mantém a mesma proporção em qualquer resolução de TV
+   com a mesma razão de tela (1280x720, 1920x1080, 3840x2160 = 16:9),
+   o layout fica visualmente idêntico em qualquer uma delas.
+   O clamp() é só uma rede de segurança para TVs com proporção
+   diferente de 16:9 (ex: monitores verticais ou ultrawide). */
 html {
-  font-size: calc(0.9vw + 0.9vh);
+  font-size: clamp(15px, calc(0.9vw + 0.9vh), 36px);
 }
 
 body {
@@ -29,7 +41,9 @@ body {
   position: relative;
 }
 
-/* ── FUNDO MAIS CLARO ── */
+/* ════════════════════════════════
+   CAMADAS DE FUNDO
+════════════════════════════════ */
 #bg-fallback {
   position:absolute; inset:0; z-index:0;
   background:
@@ -39,7 +53,7 @@ body {
 
 #background {
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; 
+  object-fit:cover;
   filter: brightness(0.60) saturate(0.95) contrast(0.95);
   z-index:0;
 }
@@ -72,29 +86,6 @@ body {
   background-size:200px;
 }
 
-/* Caixas mais transparentes */
-#copa-box {
-  background: rgba(10,30,10,0.20);
-  border: 1px solid rgba(255,215,0,0.10);
-  backdrop-filter: blur(6px);
-}
-
-#destaques-box {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
-  backdrop-filter: blur(6px);
-}
-
-#datetime-box {
-  background: rgba(0,0,0,0.12);
-  backdrop-filter: blur(4px);
-}
-
-#copa-fotos-slide {
-  background: rgba(0,0,0,0.15);
-  border: 1px solid rgba(255,215,0,0.10);
-}
-
 /* ════════════════════════════════
    #UI — CONTAINER DAS 3 COLUNAS
 ════════════════════════════════ */
@@ -120,7 +111,6 @@ body {
   justify-content: space-between;
 }
 
-/* Logo */
 #logo-area {
   display: flex;
   align-items: center;
@@ -232,10 +222,10 @@ body {
 }
 
 #cat-linha { width: 2rem; height: 2px; background: var(--laranja); }
-#cat-texto { 
-  font-size: 0.65rem; 
-  font-weight: 700; 
-  letter-spacing: 3px; 
+#cat-texto {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 3px;
   color: var(--laranja-claro);
   text-shadow: 0 0 10px rgba(232,112,10,0.2);
 }
@@ -265,7 +255,7 @@ body {
   max-width: 95%;
 }
 
-/* Preço dos pratos  */
+/* Preço dos pratos */
 .preco-destaque {
   display: block;
   margin-top: 0.6rem;
@@ -287,7 +277,7 @@ body {
   color: rgba(255,255,255,0.4);
 }
 
-/* Sabores principais - mais visíveis */
+/* Sabores principais */
 .sabores-principais {
   display: flex;
   flex-wrap: wrap;
@@ -331,17 +321,15 @@ body {
   color: rgba(255,255,255,0.6);
 }
 
-.tag-destaque { 
-  border-color: var(--laranja); 
-  color: var(--laranja-claro); 
+.tag-destaque {
+  border-color: var(--laranja);
+  color: var(--laranja-claro);
   background: rgba(232,112,10,0.12);
   text-shadow: 0 0 10px rgba(232,112,10,0.15);
 }
 
 /* Progresso */
-#progress-wrap {
-  margin-top: 0.5rem;
-}
+#progress-wrap { margin-top: 0.5rem; }
 
 #prox-info {
   display: flex;
@@ -354,10 +342,7 @@ body {
 #prox-seta { color: var(--laranja); }
 #prox-nome { color: rgba(255,255,255,0.65); }
 
-#progress-dots {
-  display: flex;
-  gap: 0.4rem;
-}
+#progress-dots { display: flex; gap: 0.4rem; }
 
 .dot {
   width: 0.5rem;
@@ -428,42 +413,58 @@ body {
 #dest-lista {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;  
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.5rem;
+}
+
+/* Grupo de destaques (ex: "Pratos", "Espetinhos") */
+.dest-grupo { width: 100%; }
+.dest-grupo:last-child { margin-bottom: 0; }
+
+.dest-grupo-titulo {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Itens do grupo lado a lado (2 colunas) */
+.dest-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
 }
 
 .dest-item {
-  flex: 1 1 44%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.5rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .dest-dot {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: var(--laranja);
   flex-shrink: 0;
 }
 
 .dest-nome {
   font-size: 0.7rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.85);
   flex: 1;
-}
-
-.dest-cat { 
-  font-size: 0.5rem; 
-  color: rgba(255,255,255,0.3);
-  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ════════════════════════════════
@@ -478,38 +479,37 @@ body {
   overflow: hidden;
 }
 
+/* Caixa principal (header + abas + conteúdo) ocupa todo o espaço
+   que sobra depois do slide de fotos, que agora tem altura fixa */
 #copa-box {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
-  background: rgba(10,30,10,0.40);
+  background: rgba(10,30,10,0.35);
   border: 1px solid rgba(255,215,0,0.15);
   border-radius: 0.8rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.5rem 0.7rem;
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
   overflow: hidden;
 }
 
-/* CABEÇALHO DA COPA */
+/* Cabeçalho */
 #copa-header {
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-#copa-flag  { font-size: 1.1rem; }
-
-#copa-titulo-wrap {
-  flex: 1;
-}
+#copa-flag { font-size: 1.1rem; }
+#copa-titulo-wrap { flex: 1; }
 
 #copa-titulo {
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: #FFD700;
+  color: var(--dourado);
   line-height: 1.2;
   text-shadow: 0 0 20px rgba(255,215,0,0.15);
 }
@@ -520,31 +520,8 @@ body {
   letter-spacing: 1px;
 }
 
-#copa-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.1rem;
-}
-
-#copa-trofeu { font-size: 0.9rem; }
-
-#copa-countdown {
-  font-size: 0.45rem;
-  font-weight: 700;
-  color: rgba(255,215,0,0.8);
-  background: rgba(255,215,0,0.08);
-  border: 1px solid rgba(255,215,0,0.15);
-  border-radius: 6px;
-  padding: 0.05rem 0.4rem;
-  white-space: nowrap;
-}
-
-/* TABS */
-#copa-tabs {
-  display: flex;
-  gap: 0.25rem;
-}
+/* Abas */
+#copa-tabs { display: flex; gap: 0.25rem; }
 
 .copa-tab {
   flex: 1;
@@ -564,19 +541,27 @@ body {
 .copa-tab.ativo {
   background: rgba(255,215,0,0.12);
   border-color: rgba(255,215,0,0.4);
-  color: #FFD700;
+  color: var(--dourado);
 }
 
+/* Conteúdo das abas — ocupa o restante da altura do copa-box */
 #copa-content {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
 }
 
-.copa-panel { display: none; height: 100%; }
-.copa-panel.ativo { display: flex; flex-direction: column; }
+.copa-panel { display: none; height: 100%; min-height: 0; }
+.copa-panel.ativo {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
 
-/* Placar */
+/* Aba "Próximo Jogo" — centraliza o placar verticalmente */
+#tab-jogo.ativo { justify-content: center; gap: 0.6rem; }
+
 #placar-wrap {
   display: flex;
   align-items: center;
@@ -593,10 +578,10 @@ body {
 }
 
 .placar-bandeira { font-size: 1.5rem; }
-.placar-nome     { 
-  font-size: 0.5rem; 
-  font-weight: 700; 
-  color: rgba(255,255,255,0.8); 
+.placar-nome {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
   letter-spacing: 0.5px;
 }
 
@@ -604,7 +589,7 @@ body {
   font-family: var(--fonte-titulo);
   font-size: 1.8rem;
   font-weight: 900;
-  color: #FFD700;
+  color: var(--dourado);
   line-height: 1;
   text-shadow: 0 0 20px rgba(255,215,0,0.2);
 }
@@ -616,21 +601,20 @@ body {
   gap: 0.1rem;
 }
 
-#placar-status { 
-  font-size: 0.7rem; 
-  font-weight: 800; 
+#placar-status {
+  font-size: 0.7rem;
+  font-weight: 800;
   color: white;
   text-shadow: 0 0 20px rgba(255,255,255,0.1);
 }
-#placar-local  { font-size: 0.42rem; color: rgba(255,255,255,0.4); text-align: center; }
-.placar-data   { font-size: 0.42rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+#placar-local { font-size: 0.42rem; color: rgba(255,255,255,0.4); text-align: center; }
+.placar-data { font-size: 0.42rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
 
 #jogo-info {
   display: flex;
   gap: 0.3rem;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 0.2rem;
 }
 
 .jogo-tag {
@@ -651,27 +635,9 @@ body {
 
 @keyframes pisca { 50% { opacity: 0.4; } }
 
-/* Estádio / cidade / transmissão */
-#jogo-extra {
-  margin-top: 0.2rem;
-  padding-top: 0.3rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
+/* Aba "Grupo" — centraliza a tabela verticalmente */
+#tab-grupo.ativo { justify-content: center; }
 
-.jogo-extra-item {
-  font-size: 0.48rem;
-  color: rgba(255,255,255,0.5);
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.jogo-extra-item span { color: rgba(255,255,255,0.75); font-weight: 600; }
-
-/* Tabela do grupo */
 #grupo-tabela {
   width: 100%;
   border-collapse: collapse;
@@ -697,10 +663,7 @@ body {
 }
 
 #grupo-tabela td:nth-child(2) { text-align: left; }
-
-#grupo-tabela tr.brasil-row td { color: #FFD700; font-weight: 700; }
-
-.pos-num { font-weight: 800; color: rgba(255,255,255,0.3); }
+#grupo-tabela tr.brasil-row td { color: var(--dourado); font-weight: 700; }
 
 #grupo-nota {
   font-size: 0.38rem;
@@ -709,38 +672,21 @@ body {
   text-align: center;
 }
 
-/* Próximos jogos */
-#jogos-lista { overflow-y: auto; flex: 1; }
+/* Aba "Jogos" — lista com rolagem própria, preenche a altura disponível */
+#tab-jogos.ativo { justify-content: flex-start; }
+#jogos-lista { flex: 1; min-height: 0; overflow-y: auto; }
 
-.jogo-card {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.25rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-}
+/* Aba "Seleção" — grid de convocados com rolagem própria */
+#tab-fotos.ativo { justify-content: flex-start; }
 
-.jogo-card-data  { font-size: 0.45rem; color: rgba(255,215,0,0.6); font-weight: 700; min-width: 2rem; }
-.jogo-card-times { font-size: 0.5rem; font-weight: 600; color: rgba(255,255,255,0.8); flex: 1; }
-.jogo-card-local { font-size: 0.38rem; color: rgba(255,255,255,0.25); text-align: right; }
-
-/* Seleção / convocados */
 #fotos-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.3rem;
   margin-bottom: 0.2rem;
-}
-
-.foto-slot {
-  aspect-ratio: 4/3;
-  border-radius: 0.3rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
 }
 
 #fotos-caption {
@@ -750,10 +696,12 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ── SLIDE DE FOTOS DA COPA ── */
+/* ── SLIDE DE FOTOS DA COPA — ALTURA FIXA ──
+   Não usa flex-grow: o tamanho é sempre --copa-foto-altura,
+   independente de quanto conteúdo o copa-box tiver acima. */
 #copa-fotos-slide {
-  flex: 1 1 auto;
-  min-height: 120px;
+  flex: 0 0 auto;
+  height: var(--copa-foto-altura);
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
@@ -761,10 +709,7 @@ body {
   background: rgba(0,0,0,0.30);
 }
 
-#cfs-track {
-  position: absolute;
-  inset: 0;
-}
+#cfs-track { position: absolute; inset: 0; }
 
 .cfs-img {
   position: absolute;
@@ -816,35 +761,16 @@ body {
   cursor: pointer;
 }
 
-.cfs-dot.ativo { background: #FFD700; width: 0.9rem; border-radius: 2px; }
+.cfs-dot.ativo { background: var(--dourado); width: 0.9rem; border-radius: 2px; }
 
 .cfs-dot:hover {
   background: rgba(255,215,0,0.5);
   transform: scale(1.2);
 }
 
-/* Slides da Copa - para imagens e DIVs */
-.cfs-slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1;
-}
-
-.cfs-slide.ativo {
-  opacity: 1;
-  z-index: 2;
-}
-
-/* Timer */
+/* ════════════════════════════════
+   TIMER / LOADER / ANIMAÇÕES
+════════════════════════════════ */
 #timer-bar {
   position: absolute;
   bottom: 0;
@@ -861,7 +787,6 @@ body {
   transform-origin: left;
 }
 
-/* Animações e loader */
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(20px); }
   to   { opacity:1; transform:translateY(0); }
@@ -874,6 +799,7 @@ body {
   flex-direction:column; gap:1rem; transition:opacity 0.6s;
 }
 #loader-overlay.oculto { opacity:0; pointer-events:none; }
+
 .loader-spinner {
   width:40px; height:40px;
   border:3px solid rgba(255,255,255,0.08);
@@ -882,133 +808,28 @@ body {
 }
 @keyframes spin { to { transform:rotate(360deg); } }
 
-/* Ajustes para telas menores */
-@media (max-width: 1400px) {
-  #ui { gap: 1.2rem; padding: 2.2% 2.2%; }
+/* ════════════════════════════════
+   REDE DE SEGURANÇA — TVs de baixa resolução
+   (ex: smart TVs 1366x768 / 1280x720 mais antigas).
+   Em qualquer TV 1080p, 4K etc. o clamp() do html já
+   resolve a escala; isso aqui só evita aperto em telas
+   bem menores.
+════════════════════════════════ */
+@media (max-width: 1366px) {
+  :root { --copa-foto-altura: 6rem; }
+
+  #ui { gap: 1.2rem; padding: 2.2%; }
   #nome { font-size: 1.5rem; }
   #clock { font-size: 2rem; }
   #dish-image-wrap { width: 55%; }
-  .badge { font-size: 0.5rem; padding: 0.1rem 0.5rem; }
-  #grupo-tabela { font-size: 0.42rem; }
-  #copa-fotos-slide { min-height: 90px; }
   #logo-img { width: 2.4rem; height: 2.4rem; }
   #brand-nome { font-size: 0.9rem; }
+
+  .badge { font-size: 0.5rem; padding: 0.1rem 0.5rem; }
   .chip-principal { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
   .preco-destaque { font-size: 0.9rem; padding: 0.2rem 0.6rem; }
-}
 
-/* Ajustes para telas muito pequenas */
-@media (max-width: 1200px) {
-  #ui { gap: 0.8rem; padding: 1.5% 1.5%; }
-  #right { flex: 1 1 0; }
-  #copa-fotos-slide { min-height: 70px; }
+  #grupo-tabela { font-size: 0.42rem; }
   .placar-gol { font-size: 1.4rem; }
   .placar-bandeira { font-size: 1.2rem; }
-  #nome { font-size: 1.2rem; }
-  .chip-principal { font-size: 0.5rem; padding: 0.15rem 0.5rem; }
-  .preco-destaque { font-size: 0.7rem; }
-}
-/* Grupos de destaques (pratos e espetinhos) */
-.dest-grupo {
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.dest-grupo:last-child {
-  margin-bottom: 0;
-}
-
-.dest-grupo-titulo {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 0.3rem;
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.dest-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.4rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
-  margin-bottom: 0.2rem;
-}
-
-.dest-item:last-child {
-  margin-bottom: 0;
-}
-
-.dest-dot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.dest-nome {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  flex: 1;
-}
-
-.dest-cat {
-  font-size: 0.5rem;
-  color: rgba(255,255,255,0.25);
-  font-weight: 500;
-}
-/* Grupos de destaques (pratos e espetinhos) */
-.dest-grupo {
-  width: 100%;
-  margin-bottom: 0.6rem;
-}
-
-.dest-grupo:last-child {
-  margin-bottom: 0;
-}
-
-.dest-grupo-titulo {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 0.3rem;
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-/* GRID - ITENS LADO A LADO (2 colunas) */
-.dest-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.3rem;
-}
-
-.dest-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.4rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
-}
-
-.dest-dot {
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.dest-nome {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  flex: 1;
 }
