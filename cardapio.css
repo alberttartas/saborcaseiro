@@ -20,13 +20,7 @@
   --copa-foto-altura: 7.5rem;
 }
 
-/* ── ESCALA GLOBAL ──
-   Tudo no layout usa rem, e o rem é definido a partir do viewport.
-   Como vw+vh mantém a mesma proporção em qualquer resolução de TV
-   com a mesma razão de tela (1280x720, 1920x1080, 3840x2160 = 16:9),
-   o layout fica visualmente idêntico em qualquer uma delas.
-   O clamp() é só uma rede de segurança para TVs com proporção
-   diferente de 16:9 (ex: monitores verticais ou ultrawide). */
+
 html {
   font-size: clamp(15px, calc(0.9vw + 0.9vh), 36px);
 }
@@ -467,35 +461,35 @@ body {
   text-overflow: ellipsis;
 }
 
-/* ════════════════════════════════
-   COLUNA 3 — COPA DO MUNDO 2026
-════════════════════════════════ */
+/* ════════════════════════════════════
+   COLUNA 3 — COPA DO MUNDO 2026 (GRID COMPLETO)
+════════════════════════════════════ */
+
 #right {
   flex: 1.3 1 0;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr auto;  /* ← CONTEÚDO FLEXÍVEL + SLIDE FIXO */
   gap: 0.6rem;
   overflow: hidden;
+  height: 100%;
 }
 
-/* Caixa principal (header + abas + conteúdo) ocupa todo o espaço
-   que sobra depois do slide de fotos, que agora tem altura fixa */
+/* BOX DA COPA - OCUPA O ESPAÇO DISPONÍVEL */
 #copa-box {
-  flex: 1 1 auto;
   min-height: 0;
-  background: rgba(10,30,10,0.35);
+  background: rgba(10,30,10,0.40);
   border: 1px solid rgba(255,215,0,0.15);
   border-radius: 0.8rem;
-  padding: 0.5rem 0.7rem;
+  padding: 0.4rem 0.6rem;
   backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  display: grid;
+  grid-template-rows: auto 1fr;  /* CABEÇALHO + CONTEÚDO */
+  gap: 0.3rem;
   overflow: hidden;
 }
 
-/* Cabeçalho */
+/* CABEÇALHO DA COPA */
 #copa-header {
   display: flex;
   align-items: center;
@@ -503,13 +497,16 @@ body {
 }
 
 #copa-flag { font-size: 1.1rem; }
-#copa-titulo-wrap { flex: 1; }
+
+#copa-titulo-wrap {
+  flex: 1;
+}
 
 #copa-titulo {
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: var(--dourado);
+  color: #FFD700;
   line-height: 1.2;
   text-shadow: 0 0 20px rgba(255,215,0,0.15);
 }
@@ -520,8 +517,31 @@ body {
   letter-spacing: 1px;
 }
 
-/* Abas */
-#copa-tabs { display: flex; gap: 0.25rem; }
+#copa-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+#copa-trofeu { font-size: 0.9rem; }
+
+#copa-countdown {
+  font-size: 0.45rem;
+  font-weight: 700;
+  color: rgba(255,215,0,0.8);
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 6px;
+  padding: 0.05rem 0.4rem;
+  white-space: nowrap;
+}
+
+/* TABS */
+#copa-tabs {
+  display: flex;
+  gap: 0.25rem;
+}
 
 .copa-tab {
   flex: 1;
@@ -541,231 +561,25 @@ body {
 .copa-tab.ativo {
   background: rgba(255,215,0,0.12);
   border-color: rgba(255,215,0,0.4);
-  color: var(--dourado);
+  color: #FFD700;
 }
 
-/* Conteúdo das abas — ocupa o restante da altura do copa-box */
 #copa-content {
-  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
 }
 
-.copa-panel { display: none; height: 100%; min-height: 0; }
-.copa-panel.ativo {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
+.copa-panel { display: none; height: 100%; }
+.copa-panel.ativo { display: flex; flex-direction: column; }
 
-/* Aba "Próximo Jogo" — centraliza o placar verticalmente */
-#tab-jogo.ativo { justify-content: center; gap: 0.6rem; }
-
-#placar-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.2rem 0;
-}
-
-.placar-time {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-  flex: 1;
-}
-
-.placar-bandeira { font-size: 1.5rem; }
-.placar-nome {
-  font-size: 0.5rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.8);
-  letter-spacing: 0.5px;
-}
-
-.placar-gol {
-  font-family: var(--fonte-titulo);
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--dourado);
-  line-height: 1;
-  text-shadow: 0 0 20px rgba(255,215,0,0.2);
-}
-
-#placar-meio {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-}
-
-#placar-status {
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: white;
-  text-shadow: 0 0 20px rgba(255,255,255,0.1);
-}
-#placar-local { font-size: 0.42rem; color: rgba(255,255,255,0.4); text-align: center; }
-.placar-data { font-size: 0.42rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-
-#jogo-info {
-  display: flex;
-  gap: 0.3rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.jogo-tag {
-  font-size: 0.42rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 0.1rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.5);
-}
-
-.jogo-tag-ao-vivo {
-  border-color: rgba(255,60,60,0.6);
-  color: #ff6060;
-  animation: pisca 1s infinite;
-}
-
-@keyframes pisca { 50% { opacity: 0.4; } }
-
-/* Aba "Grupo" — centraliza a tabela verticalmente */
-#tab-grupo.ativo { justify-content: center; }
-
-#grupo-tabela {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.48rem;
-}
-
-#grupo-tabela th {
-  color: rgba(255,215,0,0.5);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-align: center;
-  padding: 0.15rem 0.15rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-#grupo-tabela th:nth-child(2) { text-align: left; }
-
-#grupo-tabela td {
-  padding: 0.3rem 0.15rem;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  color: rgba(255,255,255,0.7);
-  text-align: center;
-}
-
-#grupo-tabela td:nth-child(2) { text-align: left; }
-#grupo-tabela tr.brasil-row td { color: var(--dourado); font-weight: 700; }
-
-#grupo-nota {
-  font-size: 0.38rem;
-  color: rgba(255,255,255,0.2);
-  margin-top: 0.2rem;
-  text-align: center;
-}
-
-/* Aba "Jogos" — lista com rolagem própria, preenche a altura disponível */
-#tab-jogos.ativo { justify-content: flex-start; }
-#jogos-lista { flex: 1; min-height: 0; overflow-y: auto; }
-
-/* Aba "Seleção" — grid de convocados com rolagem própria */
-#tab-fotos.ativo { justify-content: flex-start; }
-
-#fotos-grid {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.3rem;
-  margin-bottom: 0.2rem;
-}
-
-#fotos-caption {
-  font-size: 0.42rem;
-  color: rgba(255,255,255,0.25);
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-
-/* ── SLIDE DE FOTOS DA COPA — ALTURA FIXA ──
-   Não usa flex-grow: o tamanho é sempre --copa-foto-altura,
-   independente de quanto conteúdo o copa-box tiver acima. */
+/* ── SLIDE DE FOTOS DA COPA - ALTURA FIXA ── */
 #copa-fotos-slide {
-  flex: 0 0 auto;
-  height: var(--copa-foto-altura);
+  height: 160px;            /* ← ALTURA FIXA */
   position: relative;
   border-radius: 0.8rem;
   overflow: hidden;
   border: 1px solid rgba(255,215,0,0.15);
   background: rgba(0,0,0,0.30);
-}
-
-#cfs-track { position: absolute; inset: 0; }
-
-.cfs-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.cfs-img.ativo { opacity: 1; }
-
-#copa-fotos-slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-#cfs-label {
-  position: absolute;
-  left: 0.7rem;
-  bottom: 0.4rem;
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.85);
-  z-index: 2;
-  text-shadow: 0 0 10px rgba(0,0,0,0.8);
-}
-
-#cfs-dots {
-  position: absolute;
-  right: 0.6rem;
-  bottom: 0.5rem;
-  display: flex;
-  gap: 0.25rem;
-  z-index: 2;
-}
-
-.cfs-dot {
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.30);
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.cfs-dot.ativo { background: var(--dourado); width: 0.9rem; border-radius: 2px; }
-
-.cfs-dot:hover {
-  background: rgba(255,215,0,0.5);
-  transform: scale(1.2);
 }
 
 /* ════════════════════════════════
