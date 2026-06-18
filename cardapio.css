@@ -259,30 +259,30 @@ body {
 #sep-linha { width: 3rem; height: 1px; background: linear-gradient(to right, var(--laranja), transparent); }
 
 #dish-desc {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   line-height: 1.5;
   color: rgba(255,255,255,0.75);
   max-width: 95%;
 }
 
-/* PRECO SEPARADO DOS SABORES */
+/* Preço dos pratos  */
 .preco-destaque {
   display: block;
-  margin-top: 0.4rem;
-  padding: 0.3rem 0.8rem;
+  margin-top: 0.6rem;
+  padding: 0.5rem 1rem;
   background: rgba(232,112,10,0.15);
-  border: 1px solid rgba(232,112,10,0.25);
-  border-radius: 8px;
-  font-size: 1.1rem;
+  border: 2px solid rgba(232,112,10,0.30);
+  border-radius: 10px;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--laranja-claro);
-  text-shadow: 0 0 20px rgba(232,112,10,0.2);
+  color: #F59B3C;
+  text-shadow: 0 0 30px rgba(232,112,10,0.2);
   text-align: center;
   letter-spacing: 1px;
 }
 
 .preco-destaque span {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 400;
   color: rgba(255,255,255,0.4);
 }
