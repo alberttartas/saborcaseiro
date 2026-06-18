@@ -428,11 +428,10 @@ body {
 #dest-lista {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;  
   display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .dest-item {
@@ -962,4 +961,54 @@ body {
   font-size: 0.5rem;
   color: rgba(255,255,255,0.25);
   font-weight: 500;
+}
+/* Grupos de destaques (pratos e espetinhos) */
+.dest-grupo {
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.dest-grupo:last-child {
+  margin-bottom: 0;
+}
+
+.dest-grupo-titulo {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* GRID - ITENS LADO A LADO (2 colunas) */
+.dest-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+}
+
+.dest-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.dest-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dest-nome {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  flex: 1;
 }
