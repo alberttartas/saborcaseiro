@@ -185,7 +185,7 @@ var IMAGENS = {
     var slidesPratos = [];
 for (var j = 0; j < pratosDisp.length; j++) {
   var prato = pratosDisp[j];
-  // Pega o valor do prato (coluna D da planilha)
+  // Pega o valor da planilha (coluna D)
   var precoPrato = prato.valor ? Number(prato.valor) : null;
   
   slidesPratos.push({
@@ -195,7 +195,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
     descricao: 'Feito com ingredientes frescos · Sabor caseiro de verdade.',
     saboresPrincipais: null,
     saboresTodos: null,
-    preco: precoPrato,  // ← ADICIONA O PREÇO
+    preco: precoPrato,  // ← ADICIONADO
     tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
     imagem: getImagem(prato.nome),
   });
