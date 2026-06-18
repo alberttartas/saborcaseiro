@@ -15,43 +15,95 @@
   var ESPETINHOS_POR_PAGINA = 8;
 
   // ============================================================
-  // MAPA DE IMAGENS
-  // ============================================================
-  var IMAGENS = {
-    'Baião Cremoso': 'assets/baiao-cremoso.webp',
-    'Baião Tradicional': 'assets/baiao-tradicional.webp',
-    'Arroz de Camarão': 'assets/arroz-camarao.webp',
-    'Arroz Branco': 'assets/arroz-branco.webp',
-    'Camarão ao Alho': 'assets/camarao.webp',
-    'Vatapá de Camarão': 'assets/vatapa-camarao.webp',
-    'Caranguejo': 'assets/caranguejo.webp',
-    'Sopa Caseira': 'assets/sopa.webp',
-    'Espetinhos': 'assets/espetinhos.webp',
-    'Mousse': 'assets/mousses.webp',
-    'Mousses': 'assets/mousses.webp',
-    'Cone Trufado': 'assets/cones-trufados.webp',
-    'Cones Trufados': 'assets/cones-trufados.webp',
-    'Trufa': 'assets/trufas.webp',
-    'Trufas': 'assets/trufas.webp',
-    'Delícia de Abacaxi': 'assets/delicia-abacaxi.webp',
-    'Dindin': 'assets/dindin-gourmet.webp',
-    'Dindins Gourmet': 'assets/dindin-gourmet.webp',
-    'Suco Natural': 'assets/sucos.webp',
-  };
+// MAPA DE IMAGENS - ATUALIZADO COM TODOS OS ARQUIVOS
+// ============================================================
+var IMAGENS = {
+  // PRATOS
+  'Baião Cremoso': 'assets/baiao-cremoso.webp',
+  'Baião Tradicional': 'assets/baiao-tradicional.webp',
+  'Arroz de Camarão': 'assets/arroz-camarao.webp',
+  'Arroz Branco': 'assets/arroz-branco.webp',
+  'Camarão ao Alho': 'assets/camarao.webp',
+  'Vatapá de Camarão': 'assets/vatapa-camarao.webp',
+  'Caranguejo': 'assets/caranguejo.webp',
+  'Sopa Caseira': 'assets/sopa.webp',
+  'Sopa de Carne': 'assets/sopa-de-carne.webp',
+  'Canja': 'assets/canja.webp',
+  'Pratinho': 'assets/pratinho.webp',
+  'Batata Frita': 'assets/batata.webp',
+  'Macaxeira Frita': 'assets/macaxeira.webp',
+  
+  // ESPETINHOS
+  'Espetinhos': 'assets/espetinhos.webp',
+  
+  // SOBREMESAS
+  'Mousse': 'assets/mousses.webp',
+  'Mousses': 'assets/mousses.webp',
+  'Cone Trufado': 'assets/cones-trufados.webp',
+  'Cones Trufados': 'assets/cones-trufados.webp',
+  'Trufa': 'assets/trufas.webp',
+  'Trufas': 'assets/trufas.webp',
+  'Delícia de Abacaxi': 'assets/delicia-abacaxi.webp',
+  
+  // GELADOS
+  'Dindin': 'assets/dindin-gourmet.webp',
+  'Dindins Gourmet': 'assets/dindin-gourmet.webp',
+  
+  // BEBIDAS
+  'Suco Natural': 'assets/sucos.webp',
+  'Sucos': 'assets/sucos.webp',
+};
 
   function getImagem(nome) {
-    if (!nome) return null;
-    if (IMAGENS[nome]) return IMAGENS[nome];
-    var nomeLow = nome.toLowerCase();
-    for (var chave in IMAGENS) {
-      if (IMAGENS.hasOwnProperty(chave)) {
-        if (nomeLow.indexOf(chave.toLowerCase()) !== -1 || chave.toLowerCase().indexOf(nomeLow) !== -1) {
-          return IMAGENS[chave];
-        }
+  if (!nome) return null;
+  
+  // 1. Verifica se tem imagem exata
+  if (IMAGENS[nome]) return IMAGENS[nome];
+  
+  // 2. Busca por correspondência parcial (case insensitive)
+  var nomeLow = nome.toLowerCase();
+  for (var chave in IMAGENS) {
+    if (IMAGENS.hasOwnProperty(chave)) {
+      var chaveLow = chave.toLowerCase();
+      // Verifica se o nome contém a chave ou vice-versa
+      if (nomeLow.indexOf(chaveLow) !== -1 || chaveLow.indexOf(nomeLow) !== -1) {
+        return IMAGENS[chave];
       }
     }
-    return null;
   }
+  
+  // 3. Tenta encontrar por palavras-chave
+  var palavrasChave = {
+    'baiao': 'assets/baiao-cremoso.webp',
+    'arroz': 'assets/arroz-branco.webp',
+    'camarao': 'assets/camarao.webp',
+    'caranguejo': 'assets/caranguejo.webp',
+    'sopa': 'assets/sopa.webp',
+    'canja': 'assets/canja.webp',
+    'batata': 'assets/batata.webp',
+    'macaxeira': 'assets/macaxeira.webp',
+    'espetinho': 'assets/espetinhos.webp',
+    'mousse': 'assets/mousses.webp',
+    'trufa': 'assets/trufas.webp',
+    'cone': 'assets/cones-trufados.webp',
+    'dindin': 'assets/dindin-gourmet.webp',
+    'suco': 'assets/sucos.webp',
+    'pratinho': 'assets/pratinho.webp',
+    'vatapa': 'assets/vatapa-camarao.webp',
+    'delicia': 'assets/delicia-abacaxi.webp'
+  };
+  
+  for (var palavra in palavrasChave) {
+    if (palavrasChave.hasOwnProperty(palavra)) {
+      if (nomeLow.indexOf(palavra) !== -1) {
+        return palavrasChave[palavra];
+      }
+    }
+  }
+  
+  // 4. FALLBACK: usa uma imagem genérica
+  return 'https://via.placeholder.com/400x400/1a1a1a/F59B3C?text=' + encodeURIComponent(nome);
+}
 
   // ============================================================
   // ESTADOS
