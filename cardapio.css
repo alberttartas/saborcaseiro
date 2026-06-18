@@ -909,3 +909,57 @@ body {
   .chip-principal { font-size: 0.5rem; padding: 0.15rem 0.5rem; }
   .preco-destaque { font-size: 0.7rem; }
 }
+/* Grupos de destaques (pratos e espetinhos) */
+.dest-grupo {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.dest-grupo:last-child {
+  margin-bottom: 0;
+}
+
+.dest-grupo-titulo {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.dest-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  margin-bottom: 0.2rem;
+}
+
+.dest-item:last-child {
+  margin-bottom: 0;
+}
+
+.dest-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dest-nome {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  flex: 1;
+}
+
+.dest-cat {
+  font-size: 0.5rem;
+  color: rgba(255,255,255,0.25);
+  font-weight: 500;
+}
