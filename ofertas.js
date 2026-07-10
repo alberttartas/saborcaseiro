@@ -200,7 +200,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
     saboresPrincipais: null,
     saboresTodos: null,
     preco: precoPrato,  // ← ADICIONADO
-    tags: [{ texto: '✓ Disponível', destaque: true }, { texto: 'Feito na Hora' }],
+    tags: [{ texto: 'Disponível', destaque: true }, { texto: 'Feito na Hora' }],
     imagem: getImagem(prato.nome),
   });
 }
@@ -234,7 +234,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
           saboresPrincipais: saboresPrincipais,
           saboresTodos: saboresTodos,
           preco: preco,
-          tags: [{ texto: '🍮 Artesanal', destaque: true }, { texto: itens.length + ' Sabores' }],
+          tags: [{ texto: 'Artesanal', destaque: true }, { texto: itens.length + ' Sabores' }],
           imagem: getImagem(catNome),
         });
       }
@@ -269,7 +269,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
           saboresPrincipais: saboresPrincipaisSuco,
           saboresTodos: saboresTodosSuco,
           preco: precoSuco,
-          tags: [{ texto: '🥤 Natural', destaque: true }, { texto: itensSuco.length + ' Sabores' }],
+          tags: [{ texto: 'Natural', destaque: true }, { texto: itensSuco.length + ' Sabores' }],
           imagem: getImagem('Suco Natural'),
         });
       }
@@ -298,7 +298,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
         saboresPrincipais: saboresPrincipaisDindin,
         saboresTodos: saboresTodosDindin,
         preco: valorDindin,
-        tags: [{ texto: '🧊 Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: 'R$ ' + valorDindin.toFixed(2).replace('.', ',') + ' un.' }],
+        tags: [{ texto: 'Gelados', destaque: true }, { texto: dindins.length + ' Sabores' }, { texto: 'R$ ' + valorDindin.toFixed(2).replace('.', ',') + ' un.' }],
         imagem: getImagem('Dindin'),
       });
     }
@@ -551,7 +551,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
 
   if (pratos.length > 0) {
     html += '<div class="dest-grupo">';
-    html += '<div class="dest-grupo-titulo">🍽️ Pratos</div>';
+    html += '<div class="dest-grupo-titulo">Pratos</div>';
     html += '<div class="dest-grid">';
     for (var j = 0; j < pratos.length; j++) {
       var p = pratos[j];
@@ -575,7 +575,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
   if (espetinhos.length > 0) {
     var espetinhosExibir = espetinhos.slice(0, 8);
     html += '<div class="dest-grupo">';
-    html += '<div class="dest-grupo-titulo">🍢 Espetinhos</div>';
+    html += '<div class="dest-grupo-titulo">Espetinhos</div>';
     html += '<div class="dest-grid">';
     for (var l = 0; l < espetinhosExibir.length; l++) {
       var e = espetinhosExibir[l];
@@ -665,13 +665,13 @@ for (var j = 0; j < pratosDisp.length; j++) {
       if (golMarEl) golMarEl.textContent = '—';
       if (jogoLiveBadge) jogoLiveBadge.style.display = 'none';
       if (advNomeEl) advNomeEl.textContent = 'A definir';
-      if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
+      if (advBandeiraEl) advBandeiraEl.textContent = '';
       return;
     }
 
     var advNome = proximoJogo.casa === 'Brasil' ? proximoJogo.fora : proximoJogo.casa;
     if (advNomeEl) advNomeEl.textContent = advNome;
-    if (advBandeiraEl) advBandeiraEl.textContent = '🏳️';
+    if (advBandeiraEl) advBandeiraEl.textContent = '';
 
     var golBra = (proximoJogo.golBra !== null && proximoJogo.golBra !== undefined) ? proximoJogo.golBra : '—';
     var golAdv = (proximoJogo.golAdv !== null && proximoJogo.golAdv !== undefined) ? proximoJogo.golAdv : '—';
