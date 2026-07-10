@@ -1,10 +1,13 @@
 /* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — cardapio.css
-   Menu board profissional (estilo Outback / Coco Bambu / McDonald's)
-   Layout: Topbar | Prato (foto+info) + Cardápio do Dia | Rodapé
+   LM SABOR CASEIRO — cardapio.css (versão final)
+   Layout: foto + info lado a lado, rodapé fixo
    ══════════════════════════════════════════════════════ */
 
-* { margin:0; padding:0; box-sizing:border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
   --laranja:       #E8700A;
@@ -31,27 +34,28 @@ body {
   font-family: var(--fonte-corpo);
   background: var(--escuro);
   color: var(--creme);
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ════════════════════════════════
-   CAMADAS DE FUNDO
+   FUNDO (sem alterações)
    ════════════════════════════════ */
 #bg-fallback {
-  position:absolute; inset:0; z-index:0;
+  position: absolute; inset: 0; z-index: 0;
   background: radial-gradient(ellipse at 50% 40%, #241608 0%, #0D0A06 65%);
 }
 
 #background {
-  position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover;
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
   filter: blur(6px) brightness(0.45) saturate(1.05);
-  transform: scale(1.08); /* evita borda do blur */
-  z-index:0;
+  transform: scale(1.08);
+  z-index: 0;
 }
 
 #overlay {
-  position:absolute; inset:0; z-index:1;
+  position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(180deg,
     rgba(13,10,6,0.78) 0%,
     rgba(13,10,6,0.55) 18%,
@@ -60,13 +64,13 @@ body {
 }
 
 #grain {
-  position:absolute; inset:0; z-index:1; opacity:0.02; pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:200px;
+  position: absolute; inset: 0; z-index: 1; opacity: 0.02; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
 }
 
 /* ════════════════════════════════
-   GLASSMORPHISM BASE
+   GLASSMORPHISM
    ════════════════════════════════ */
 .glass-card {
   background: var(--card-bg);
@@ -78,23 +82,15 @@ body {
 }
 
 /* ════════════════════════════════
-   ESTRUTURA GERAL (topbar / main / footer)
+   TOPBAR (fixa)
    ════════════════════════════════ */
-#topbar, #main, #footer-bar {
-  position: relative;
-  z-index: 2;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-}
-
 #topbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.6% 2.6% 0.8%;
+  padding: 1.2% 2.6% 0.6%;
+  z-index: 2;
   animation: fadeDown 0.7s ease both;
 }
 
@@ -140,38 +136,53 @@ body {
 #clock-sep { color: rgba(255,255,255,0.25); }
 
 /* ════════════════════════════════
-   MAIN — 2 COLUNAS
+   MAIN — ocupa o espaço restante
    ════════════════════════════════ */
 #main {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
+  height: calc(100vh - 150px); /* ajuste conforme altura do topo+footer */
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 1.4fr 0.6fr; /* mais espaço para o prato */
   gap: 1.6rem;
-  padding: 0.6% 2.6% 1%;
+  padding: 0.6% 2.6% 0.8%;
+  z-index: 2;
 }
 
-/* ─────────────── PAINEL DO PRATO ─────────────── */
+/* ─────────────── PAINEL DO PRATO (com grid interno) ─────────────── */
 #painel-prato {
   min-width: 0;
-  padding: 1.6rem 2rem;
+  padding: 1.2rem 1.6rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.4rem;
+  overflow: hidden; /* evita vazamento */
 }
 
+/* Layout interno: foto + info lado a lado */
+#dish-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr; /* foto menor, info maior */
+  gap: 1.2rem;
+  align-items: center; /* centraliza verticalmente */
+  min-height: 0;
+}
+
+/* Imagem */
 #dish-image-wrap {
   position: relative;
-  width: 68%;
-  max-width: 22rem;
+  width: 100%;
   aspect-ratio: 1 / 1;
-  margin: 0 auto 0.4rem;
+  max-width: 18rem;   /* limite para não crescer demais */
+  justify-self: center;
   animation: flutuar 5s ease-in-out infinite;
 }
 
-#slide-container { position: relative; width: 100%; height: 100%; }
+#slide-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
 .slide-img {
   position: absolute;
@@ -225,12 +236,13 @@ body {
   font-weight: 600;
 }
 
-#dish-area {
+/* Informações do prato */
+#dish-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 0.25rem;
-  animation: fadeUp 0.6s ease both;
+  justify-content: center;
+  min-width: 0;
 }
 
 #dish-categoria {
@@ -250,11 +262,12 @@ body {
 
 #nome {
   font-family: var(--fonte-titulo);
-  font-size: 2.1rem;
+  font-size: 2rem;
   font-weight: 900;
   line-height: 1.05;
   color: var(--creme);
   text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  margin-top: 0.3rem;
 }
 
 #separador { display: flex; align-items: center; gap: 0.8rem; margin: 0.2rem 0; }
@@ -265,10 +278,11 @@ body {
   font-size: 0.9rem;
   line-height: 1.5;
   color: rgba(255,255,255,0.75);
-  max-width: 34rem;
+  max-height: 4.2rem;    /* limite de 2 linhas */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Preço em destaque — cartão laranja (gerado via JS dentro de #dish-area) */
 .preco-destaque {
   display: inline-block;
   margin-top: 0.5rem;
@@ -280,6 +294,7 @@ body {
   color: var(--creme);
   box-shadow: 0 0.5rem 1.2rem rgba(232,112,10,0.35);
   letter-spacing: 0.5px;
+  align-self: flex-start;
 }
 .preco-destaque span {
   font-size: 0.7rem;
@@ -290,7 +305,6 @@ body {
 #dish-tags {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 0.4rem;
   margin-top: 0.3rem;
 }
@@ -311,9 +325,19 @@ body {
   background: rgba(232,112,10,0.12);
 }
 
-#bottom-left { margin-top: auto; width: 100%; padding-top: 0.6rem; }
+/* Progresso (próximos pratos) */
+#bottom-left {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  width: 100%;
+}
 
-#progress-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+#progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
 
 #prox-info {
   display: flex;
@@ -334,11 +358,11 @@ body {
   padding: 1.4rem 1.6rem;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 #destaques-box {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -357,7 +381,6 @@ body {
 
 #dest-lista {
   flex: 1;
-  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -414,13 +437,12 @@ body {
 }
 
 /* ════════════════════════════════
-   RODAPÉ
+   RODAPÉ (fixo)
    ════════════════════════════════ */
 #footer-bar {
-  position: relative;
-  overflow: hidden;
-  margin: 0 2.6% 1.4%;
-  padding: 0.65rem 1.6rem;
+  flex-shrink: 0;
+  margin: 0 2.6% 1.2%;
+  padding: 0.45rem 1.2rem;
   border-radius: 14px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
@@ -430,10 +452,12 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.6rem;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 600;
   color: rgba(255,255,255,0.8);
   letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
 }
 
 .footer-item strong { color: var(--laranja-claro); }
@@ -461,7 +485,7 @@ body {
 }
 @keyframes flutuar {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
+  50%      { transform: translateY(-8px); }
 }
 @keyframes brilho {
   0%   { left: -40%; }
@@ -493,23 +517,25 @@ body {
 @keyframes spin { to { transform:rotate(360deg); } }
 
 /* ════════════════════════════════
-   TVs de resolução menor (1366x768 / 1280x720)
+   RESPONSIVIDADE PARA TELAS MENORES (1366x768)
    ════════════════════════════════ */
 @media (max-width: 1366px) {
-  #main { gap: 1rem; }
-  #nome { font-size: 1.5rem; }
-  #dish-image-wrap { width: 58%; }
-  #logo-img { width: 1.8rem; height: 1.8rem; }
-  #brand-nome { font-size: 0.95rem; }
-  .preco-destaque { font-size: 1.1rem; padding: 0.4rem 0.9rem; }
+  #main { height: calc(100vh - 130px); }
+  #painel-prato { padding: 0.8rem 1.2rem; }
+  #dish-layout { gap: 0.8rem; }
+  #dish-image-wrap { max-width: 14rem; }
+  #nome { font-size: 1.6rem; }
+  .preco-destaque { font-size: 1.2rem; padding: 0.4rem 0.9rem; }
+  #dish-desc { font-size: 0.8rem; max-height: 3.6rem; }
   #dest-titulo { font-size: 0.95rem; }
   .dest-nome { font-size: 0.75rem; }
 }
 
 /* ════════════════════════════════
-   Modo retrato / celular (fallback — o painel é feito para TV,
-   mas isso evita quebra caso seja aberto num celular)
+   MODO RETRATO (fallback)
    ════════════════════════════════ */
 @media (max-aspect-ratio: 4/5) {
-  #main { grid-template-columns: 1fr; grid-auto-rows: 1fr; overflow-y: auto; }
+  #main { grid-template-columns: 1fr; grid-auto-rows: auto; height: auto; overflow-y: auto; }
+  #dish-layout { grid-template-columns: 1fr; }
+  #dish-image-wrap { max-width: 60%; }
 }
