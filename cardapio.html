@@ -6,7 +6,7 @@
 <title>LM Sabor Caseiro — Cardápio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="cardapio.css">
 </head>
 <body>
@@ -20,25 +20,28 @@
 <!-- FUNDO -->
 <div id="bg-fallback"></div>
 <img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
-<div id="overlay-left"></div>
-<div id="overlay-right"></div>
-<div id="overlay-bottom"></div>
+<div id="overlay"></div>
 <div id="grain"></div>
 
-<!-- UI PRINCIPAL (3 colunas: prato | cardápio do dia | copa) -->
-<div id="ui">
+<!-- TOPO -->
+<div id="topbar">
+  <div id="brand">
+    <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
+    <span id="brand-nome">LM SABOR CASEIRO</span>
+  </div>
+  <div id="datetime-box">
+    <span id="date">—</span>
+    <span id="clock-sep">•</span>
+    <span id="clock">--:--</span>
+  </div>
+</div>
 
-  <!-- COLUNA 1 — PRATO (imagem em cima do nome) -->
-  <div id="left">
-    <div id="logo-area">
-      <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
-      <div id="logo-texto">
-        <div id="brand-nome">LM Sabor Caseiro</div>
-        <div id="brand-slogan">Comida feita com amor</div>
-      </div>
-    </div>
+<!-- CONTEÚDO PRINCIPAL: 2 COLUNAS -->
+<div id="main">
 
-    <!-- imagem do prato, agora acima do nome -->
+  <!-- PAINEL DO PRATO -->
+  <div id="painel-prato" class="glass-card">
+
     <div id="dish-image-wrap">
       <div id="slide-container">
         <div id="slide-num">01 / --</div>
@@ -50,11 +53,14 @@
         <div id="cat-linha"></div>
         <div id="cat-texto">...</div>
       </div>
+
       <div id="nome">—</div>
+
       <div id="separador">
         <div id="sep-bolinha"></div>
         <div id="sep-linha"></div>
       </div>
+
       <div id="dish-desc"></div>
       <div id="dish-tags"></div>
     </div>
@@ -69,116 +75,29 @@
         <div id="progress-dots"></div>
       </div>
     </div>
-  </div>
 
-  <!-- COLUNA 2 — CARDÁPIO DO DIA -->
-  <div id="centro">
-    <div id="datetime-box">
-      <div id="date"></div>
-      <div id="clock">--:--</div>
-    </div>
+  </div><!-- /painel-prato -->
 
+  <!-- PAINEL DO CARDÁPIO DO DIA -->
+  <div id="painel-cardapio" class="glass-card">
     <div id="destaques-box">
-      <div id="dest-titulo">✦ Cardápio de Hoje</div>
+      <div id="dest-titulo">🍽️ Cardápio de Hoje</div>
       <div id="dest-lista"></div>
     </div>
-  </div>
+  </div><!-- /painel-cardapio -->
 
-  <!-- COLUNA 3 — COPA DO MUNDO 2026 -->
-  <div id="right">
+</div><!-- /main -->
 
-    <div id="copa-box">
-
-      <div id="copa-header">
-        <span id="copa-flag">🇧🇷</span>
-        <div id="copa-titulo-wrap">
-          <div id="copa-titulo">COPA DO MUNDO 2026</div>
-          <div id="copa-subtitulo">Grupo C · Brasil</div>
-        </div>
-        </div>
-
-      <div id="copa-tabs">
-        <button class="copa-tab ativo" data-tab="jogo">📅 Próximo Jogo</button>
-        <button class="copa-tab" data-tab="grupo">📊 Grupo</button>
-        <button class="copa-tab" data-tab="jogos">⚽ Jogos</button>
-        <button class="copa-tab" data-tab="fotos">🇧🇷 Seleção</button>
-      </div>
-
-      <div id="copa-content">
-
-        <!-- ABA: PRÓXIMO JOGO (placar + estádio/transmissão) -->
-        <div class="copa-panel ativo" id="tab-jogo">
-          <div id="placar-wrap">
-            <div class="placar-time">
-              <div class="placar-bandeira">🇧🇷</div>
-              <div class="placar-nome">Brasil</div>
-              <div class="placar-gol" id="gol-bra">–</div>
-            </div>
-            <div id="placar-meio">
-              <div id="placar-status">Próximo Jogo</div>
-              <div id="placar-local">A definir</div>
-              <div id="placar-data" class="placar-data"></div>
-            </div>
-            <div class="placar-time">
-              <div class="placar-bandeira">🏳️</div>
-              <div class="placar-nome">A definir</div>
-              <div class="placar-gol" id="gol-mar">–</div>
-            </div>
-          </div>
-
-          <div id="jogo-info">
-            <span class="jogo-tag">Grupo C</span>
-            <span class="jogo-tag jogo-tag-ao-vivo" id="jogo-live-badge" style="display:none">🔴 AO VIVO</span>
-          </div>
-
-          </div>
-
-        <!-- ABA: GRUPO C (tabela completa) -->
-<div class="copa-panel" id="tab-grupo">
-  <table id="grupo-tabela">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Seleção</th>
-        <th>J</th>
-        <th>P</th>
-      </tr>
-    </thead>
-    <tbody id="grupo-tbody"></tbody>
-  </table>
-  <div id="grupo-nota">Os 2 primeiros + melhores 3ºs avançam</div>
+<!-- RODAPÉ -->
+<div id="footer-bar">
+  <div id="footer-shine"></div>
+  <span class="footer-item">🛵 <strong>DELIVERY</strong> • (85) 99403-4673</span>
+  <span class="footer-sep">•</span>
+  <span class="footer-item">📍 Rua Duarte Coelho, 840 – Casa 06</span>
+  <span class="footer-sep">•</span>
+  <span class="footer-item">🕕 Quinta a Sábado • 18:00 às 00:00</span>
 </div>
 
-        <!-- ABA: PRÓXIMOS JOGOS -->
-        <div class="copa-panel" id="tab-jogos">
-          <div id="jogos-lista"></div>
-        </div>
-
-        <!-- ABA: SELEÇÃO (convocados) -->
-        <div class="copa-panel" id="tab-fotos">
-          <div id="fotos-grid"></div>
-          <div id="fotos-caption"></div>
-        </div>
-
-      </div><!-- /copa-content -->
-    </div><!-- /copa-box -->
-
-    <!-- SLIDE DE FOTOS DA COPA (fixo, sempre visível) -->
-    <div id="copa-fotos-slide">
-      <div id="cfs-track">
-        <img class="cfs-img" src="https://esportesmais.com.br/wp-content/uploads/2026/05/Brasil-na-Copa-do-Mundo-2026-768x512.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
-        <img class="cfs-img" src="assets/copa/foto2.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
-        <img class="cfs-img" src="assets/copa/foto3.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
-        <img class="cfs-img" src="https://aventurasnahistoria.com.br/wp-content/uploads/personagem/1970_copa_pele_abraco.jpg" alt="Copa do Mundo 2026" onerror="this.remove()">
-      </div>
-      <div id="cfs-dots"></div>
-      <div id="cfs-label">📷 Copa do Mundo 2026</div>
-    </div>
-
-  </div><!-- /right -->
-</div><!-- /ui -->
-
 <script src="ofertas.js"></script>
-<script src="copa-slide.js"></script>
 </body>
 </html>
