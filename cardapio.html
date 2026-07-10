@@ -41,14 +41,17 @@
 
   <!-- PAINEL DO PRATO -->
   <div id="painel-prato" class="glass-card">
-
+  <div id="dish-layout">
+    <!-- Lado esquerdo: imagem -->
     <div id="dish-image-wrap">
       <div id="slide-container">
         <div id="slide-num">01 / --</div>
+        <!-- as imagens serão inseridas via JS -->
       </div>
     </div>
 
-    <div id="dish-area">
+    <!-- Lado direito: informações -->
+    <div id="dish-info">
       <div id="dish-categoria">
         <div id="cat-linha"></div>
         <div id="cat-texto">...</div>
@@ -63,20 +66,22 @@
 
       <div id="dish-desc"></div>
       <div id="dish-tags"></div>
+      <!-- preço será injetado aqui pelo JS -->
     </div>
+  </div>
 
-    <div id="bottom-left">
-      <div id="progress-wrap">
-        <div id="prox-info">
-          <span id="prox-label">A seguir</span>
-          <span id="prox-seta">→</span>
-          <span id="prox-nome">...</span>
-        </div>
-        <div id="progress-dots"></div>
+  <!-- Rodapé do painel (próximos pratos) -->
+  <div id="bottom-left">
+    <div id="progress-wrap">
+      <div id="prox-info">
+        <span id="prox-label">A seguir</span>
+        <span id="prox-seta">→</span>
+        <span id="prox-nome">...</span>
       </div>
+      <div id="progress-dots"></div>
     </div>
-
-  </div><!-- /painel-prato -->
+  </div>
+</div>
 
   <!-- PAINEL DO CARDÁPIO DO DIA -->
   <div id="painel-cardapio" class="glass-card">
