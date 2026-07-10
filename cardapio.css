@@ -269,6 +269,35 @@ body {
   text-overflow: ellipsis;
 }
 
+/* Chips de sabores (sobremesas, sucos, dindins) dentro da descrição.
+   Antes não existia CSS para essas classes, então os spans ficavam
+   grudados sem espaço/vírgula entre os sabores. */
+.sabores-principais {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.chip-principal {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+}
+
+.chip-principal.cor-0 { border-color: rgba(232,112,10,0.55); background: rgba(232,112,10,0.14); color: var(--laranja-claro); }
+.chip-principal.cor-1 { border-color: rgba(96,165,250,0.5);  background: rgba(96,165,250,0.14); color: #93c5fd; }
+.chip-principal.cor-2 { border-color: rgba(74,222,128,0.5);  background: rgba(74,222,128,0.14); color: #86efac; }
+.chip-principal.cor-3 { border-color: rgba(244,114,182,0.5); background: rgba(244,114,182,0.14); color: #f9a8d4; }
+.chip-principal.cor-4 { border-color: rgba(253,224,71,0.5);  background: rgba(253,224,71,0.14);  color: #fde68a; }
+
 .preco-destaque {
   display: inline-block;
   margin-top: 0.5rem;
@@ -329,12 +358,12 @@ body {
 
 #dest-titulo {
   font-family: var(--fonte-titulo);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--creme);
   text-align: center;
-  margin-bottom: 0.9rem;
-  padding-bottom: 0.7rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -343,7 +372,7 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.45rem;
 }
 
 .dest-grupo { width: 100%; }
@@ -352,41 +381,41 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--laranja-claro);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.3rem;
 }
 
 .dest-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.4rem;
+  gap: 0.28rem;
 }
 
 .dest-item {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.6rem;
+  gap: 0.5rem;
+  padding: 0.32rem 0.6rem;
+  border-radius: 0.5rem;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.05);
   transition: background .3s;
 }
 
 .dest-dot {
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.35rem;
+  height: 0.35rem;
   border-radius: 50%;
   background: var(--laranja);
   flex-shrink: 0;
 }
 
 .dest-nome {
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   font-weight: 500;
   color: rgba(255,255,255,0.88);
   flex: 1;
@@ -401,26 +430,26 @@ body {
 #footer-bar {
   flex-shrink: 0;
   margin: 0 2.6% 1.2%;
-  padding: 0.45rem 1.2rem;
+  padding: 0.5rem 1.2rem;
   border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.2);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.6rem;
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.92);
   letter-spacing: 0.3px;
   position: relative;
   overflow: hidden;
 }
 
 .footer-item strong { color: var(--laranja-claro); }
-.footer-sep { color: rgba(255,255,255,0.25); }
+.footer-sep { color: rgba(255,255,255,0.45); }
 
 #footer-shine {
   position: absolute;
@@ -486,8 +515,9 @@ body {
   #nome { font-size: 1.6rem; }
   .preco-destaque { font-size: 1.2rem; padding: 0.4rem 0.9rem; }
   #dish-desc { font-size: 0.8rem; max-height: 3.6rem; }
-  #dest-titulo { font-size: 0.95rem; }
-  .dest-nome { font-size: 0.75rem; }
+  #dest-titulo { font-size: 0.9rem; }
+  .dest-nome { font-size: 0.7rem; }
+  .dest-item { padding: 0.28rem 0.5rem; }
 }
 
 /* ════════════════════════════════
