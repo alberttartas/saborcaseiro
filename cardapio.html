@@ -1,108 +1,93 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LM Sabor Caseiro — Cardápio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="cardapio.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LM Sabor Caseiro — Cardápio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cardapio.css">
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader-overlay">
-  <div class="loader-spinner"></div>
-  <div class="loader-texto">Carregando cardápio...</div>
-</div>
-
-<!-- FUNDO -->
-<div id="bg-fallback"></div>
-<img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
-<div id="overlay"></div>
-<div id="grain"></div>
-
-<!-- TOPO -->
-<div id="topbar">
-  <div id="brand">
-    <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
-    <span id="brand-nome">LM SABOR CASEIRO</span>
+  <!-- LOADER -->
+  <div id="loader-overlay">
+    <div class="loader-spinner"></div>
+    <div class="loader-texto">Carregando cardápio...</div>
   </div>
-  <div id="datetime-box">
-    <span id="date">—</span>
-    <span id="clock-sep">•</span>
-    <span id="clock">--:--</span>
-  </div>
-</div>
 
-<!-- CONTEÚDO PRINCIPAL: 2 COLUNAS -->
-<div id="main">
+  <!-- FUNDO -->
+  <div id="bg-fallback"></div>
+  <img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
+  <div id="overlay"></div>
+  <div id="grain"></div>
 
-  <!-- PAINEL DO PRATO -->
-  <div id="painel-prato" class="glass-card">
-  <div id="dish-layout">
-    <!-- Lado esquerdo: imagem -->
-    <div id="dish-image-wrap">
-      <div id="slide-container">
-        <div id="slide-num">01 / --</div>
-        <!-- as imagens serão inseridas via JS -->
-      </div>
+  <!-- TOPO -->
+  <div id="topbar">
+    <div id="brand">
+      <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
+      <span id="brand-nome">LM SABOR CASEIRO</span>
     </div>
-
-    <!-- Lado direito: informações -->
-    <div id="dish-info">
-      <div id="dish-categoria">
-        <div id="cat-linha"></div>
-        <div id="cat-texto">...</div>
-      </div>
-
-      <div id="nome">—</div>
-
-      <div id="separador">
-        <div id="sep-bolinha"></div>
-        <div id="sep-linha"></div>
-      </div>
-
-      <div id="dish-desc"></div>
-      <div id="dish-tags"></div>
-      <!-- preço será injetado aqui pelo JS -->
+    <div id="datetime-box">
+      <span id="date">—</span>
+      <span id="clock-sep">•</span>
+      <span id="clock">--:--</span>
     </div>
   </div>
 
-  <!-- Rodapé do painel (próximos pratos) -->
-  <div id="bottom-left">
-    <div id="progress-wrap">
-      <div id="prox-info">
-        <span id="prox-label">A seguir</span>
-        <span id="prox-seta">→</span>
-        <span id="prox-nome">...</span>
+  <!-- CONTEÚDO PRINCIPAL: 2 COLUNAS -->
+  <div id="main">
+    <!-- PAINEL DO PRATO -->
+    <div id="painel-prato" class="glass-card">
+      <div id="dish-layout">
+        <!-- Lado esquerdo: imagem -->
+        <div id="dish-image-wrap">
+          <div id="slide-container">
+            <!-- as imagens serão inseridas via JS -->
+          </div>
+        </div>
+
+        <!-- Lado direito: informações -->
+        <div id="dish-info">
+          <div id="dish-categoria">
+            <div id="cat-linha"></div>
+            <div id="cat-texto">...</div>
+          </div>
+
+          <div id="nome">—</div>
+
+          <div id="separador">
+            <div id="sep-bolinha"></div>
+            <div id="sep-linha"></div>
+          </div>
+
+          <div id="dish-desc"></div>
+          <div id="dish-tags"></div>
+          <!-- preço será injetado aqui pelo JS -->
+        </div>
       </div>
-      <div id="progress-dots"></div>
+    </div>
+
+    <!-- PAINEL DO CARDÁPIO DO DIA -->
+    <div id="painel-cardapio" class="glass-card">
+      <div id="destaques-box">
+        <div id="dest-titulo">🍽️ Cardápio de Hoje</div>
+        <div id="dest-lista"></div>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- PAINEL DO CARDÁPIO DO DIA -->
-  <div id="painel-cardapio" class="glass-card">
-    <div id="destaques-box">
-      <div id="dest-titulo">🍽️ Cardápio de Hoje</div>
-      <div id="dest-lista"></div>
-    </div>
-  </div><!-- /painel-cardapio -->
+  <!-- RODAPÉ -->
+  <div id="footer-bar">
+    <div id="footer-shine"></div>
+    <span class="footer-item">🛵 <strong>DELIVERY</strong> • (85) 99403-4673</span>
+    <span class="footer-sep">•</span>
+    <span class="footer-item">📍 Rua Duarte Coelho, 840 – Casa 06</span>
+    <span class="footer-sep">•</span>
+    <span class="footer-item">🕕 Quinta a Sábado • 18:00 às 00:00</span>
+  </div>
 
-</div><!-- /main -->
-
-<!-- RODAPÉ -->
-<div id="footer-bar">
-  <div id="footer-shine"></div>
-  <span class="footer-item">🛵 <strong>DELIVERY</strong> • (85) 99403-4673</span>
-  <span class="footer-sep">•</span>
-  <span class="footer-item">📍 Rua Duarte Coelho, 840 – Casa 06</span>
-  <span class="footer-sep">•</span>
-  <span class="footer-item">🕕 Quinta a Sábado • 18:00 às 00:00</span>
-</div>
-
-<script src="ofertas.js"></script>
+  <script src="ofertas.js"></script>
 </body>
 </html>
