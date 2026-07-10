@@ -1,9 +1,8 @@
 /* ══════════════════════════════════════════════════════
    LM SABOR CASEIRO — cardapio.css
-   Layout em 3 colunas: Prato | Cardápio do Dia | Copa 2026
-   Otimizado para TV (escala por viewport, sem depender
-   de breakpoints de "tela de computador").
-══════════════════════════════════════════════════════ */
+   Menu board profissional (estilo Outback / Coco Bambu / McDonald's)
+   Layout: Topbar | Prato (foto+info) + Cardápio do Dia | Rodapé
+   ══════════════════════════════════════════════════════ */
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -12,14 +11,14 @@
   --laranja-claro: #F59B3C;
   --creme:         #FDF6EC;
   --escuro:        #0D0A06;
-  --dourado:       #FFD700;
+
   --fonte-titulo:  'Playfair Display', Georgia, serif;
   --fonte-corpo:   'DM Sans', Arial, sans-serif;
 
-  /* Altura FIXA do slide de fotos da Copa (não cresce nem encolhe com o conteúdo) */
-  --copa-foto-altura: 7.5rem;
+  --card-bg:     rgba(255,255,255,.05);
+  --card-border: rgba(255,255,255,.08);
+  --radius:      20px;
 }
-
 
 html {
   font-size: clamp(15px, calc(0.9vw + 0.9vh), 36px);
@@ -31,122 +30,148 @@ body {
   overflow: hidden;
   font-family: var(--fonte-corpo);
   background: var(--escuro);
-  color: white;
+  color: var(--creme);
   position: relative;
 }
 
 /* ════════════════════════════════
    CAMADAS DE FUNDO
-════════════════════════════════ */
+   ════════════════════════════════ */
 #bg-fallback {
   position:absolute; inset:0; z-index:0;
-  background:
-    radial-gradient(ellipse at 68% 50%, #2a1a0a 0%, #0D0A06 60%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' view='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background: radial-gradient(ellipse at 50% 40%, #241608 0%, #0D0A06 65%);
 }
 
 #background {
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover;
-  filter: brightness(0.60) saturate(0.95) contrast(0.95);
+  filter: blur(6px) brightness(0.45) saturate(1.05);
+  transform: scale(1.08); /* evita borda do blur */
   z-index:0;
 }
 
-#overlay-left {
+#overlay {
   position:absolute; inset:0; z-index:1;
-  background:linear-gradient(to right,
-    rgba(13,10,6,0.75) 0%,
-    rgba(13,10,6,0.50) 25%,
-    rgba(13,10,6,0.15) 50%,
-    transparent 72%);
-}
-
-#overlay-right {
-  position:absolute; inset:0; z-index:1;
-  background:linear-gradient(to left,
-    rgba(13,10,6,0.70) 0%,
-    rgba(13,10,6,0.20) 20%,
-    transparent 48%);
-}
-
-#overlay-bottom {
-  position:absolute; bottom:0; left:0; right:0; height:15vh; z-index:1;
-  background:linear-gradient(to top, rgba(13,10,6,0.30) 0%, transparent 100%);
+  background: linear-gradient(180deg,
+    rgba(13,10,6,0.78) 0%,
+    rgba(13,10,6,0.55) 18%,
+    rgba(13,10,6,0.55) 82%,
+    rgba(13,10,6,0.85) 100%);
 }
 
 #grain {
-  position:absolute; inset:0; z-index:1; opacity:0.015; pointer-events:none;
+  position:absolute; inset:0; z-index:1; opacity:0.02; pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:200px;
 }
 
 /* ════════════════════════════════
-   #UI — CONTAINER DAS 3 COLUNAS
-════════════════════════════════ */
-#ui {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  padding: 2.8% 2.8% 3.2% 2.8%;
-  gap: 2rem;
+   GLASSMORPHISM BASE
+   ════════════════════════════════ */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.35);
 }
 
 /* ════════════════════════════════
-   COLUNA 1 — PRATO
-════════════════════════════════ */
-#left {
-  flex: 1.2 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+   ESTRUTURA GERAL (topbar / main / footer)
+   ════════════════════════════════ */
+#topbar, #main, #footer-bar {
+  position: relative;
+  z-index: 2;
 }
 
-#logo-area {
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#topbar {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.3rem;
+  justify-content: space-between;
+  padding: 1.6% 2.6% 0.8%;
+  animation: fadeDown 0.7s ease both;
+}
+
+#brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 #logo-img {
-  width: 3rem;
-  height: 3rem;
+  width: 2.2rem;
+  height: 2.2rem;
   object-fit: contain;
   filter: drop-shadow(0 0 0.4rem rgba(232,112,10,0.35));
 }
 
 #brand-nome {
   font-family: var(--fonte-titulo);
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1px;
   color: var(--creme);
   text-shadow: 0 0 20px rgba(232,112,10,0.15);
 }
 
-#brand-slogan {
-  font-size: 0.55rem;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,0.5);
+#datetime-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
 }
 
-/* Imagem do prato */
+#clock {
+  color: var(--laranja-claro);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+#clock-sep { color: rgba(255,255,255,0.25); }
+
+/* ════════════════════════════════
+   MAIN — 2 COLUNAS
+   ════════════════════════════════ */
+#main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.6rem;
+  padding: 0.6% 2.6% 1%;
+}
+
+/* ─────────────── PAINEL DO PRATO ─────────────── */
+#painel-prato {
+  min-width: 0;
+  padding: 1.6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+}
+
 #dish-image-wrap {
   position: relative;
-  width: 65%;
-  max-width: 20rem;
+  width: 68%;
+  max-width: 22rem;
   aspect-ratio: 1 / 1;
-  margin: 0 auto 0.6rem;
+  margin: 0 auto 0.4rem;
+  animation: flutuar 5s ease-in-out infinite;
 }
 
-#slide-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
+#slide-container { position: relative; width: 100%; height: 100%; }
 
 .slide-img {
   position: absolute;
@@ -155,8 +180,9 @@ body {
   height: 100%;
   object-fit: contain;
   opacity: 0;
-  transition: opacity 0.5s;
-  filter: drop-shadow(0 0.5rem 1rem rgba(0,0,0,0.5));
+  border-radius: 1rem;
+  transition: opacity 0.6s ease;
+  filter: drop-shadow(0 1rem 1.6rem rgba(0,0,0,0.55));
 }
 
 .slide-img.ativo { opacity: 1; }
@@ -164,8 +190,7 @@ body {
 .slide-badges {
   position: absolute;
   bottom: 0.2rem;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -173,7 +198,6 @@ body {
   opacity: 0;
   transition: opacity 0.5s;
 }
-
 .slide-badges.ativo { opacity: 1; }
 
 .badge {
@@ -201,107 +225,74 @@ body {
   font-weight: 600;
 }
 
-/* Área de texto do prato */
 #dish-area {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  align-items: center;
+  gap: 0.25rem;
+  animation: fadeUp 0.6s ease both;
 }
 
 #dish-categoria {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.2rem;
 }
 
-#cat-linha { width: 2rem; height: 2px; background: var(--laranja); }
+#cat-linha { width: 1.6rem; height: 2px; background: var(--laranja); }
 #cat-texto {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--laranja-claro);
-  text-shadow: 0 0 10px rgba(232,112,10,0.2);
+  text-transform: uppercase;
 }
 
 #nome {
   font-family: var(--fonte-titulo);
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 900;
   line-height: 1.05;
   color: var(--creme);
   text-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
 
-#separador {
-  display: flex;
-  gap: 0.8rem;
-  margin: 0.4rem 0;
-}
-
+#separador { display: flex; align-items: center; gap: 0.8rem; margin: 0.2rem 0; }
 #sep-bolinha { width: 0.4rem; height: 0.4rem; background: var(--laranja); border-radius: 50%; }
 #sep-linha { width: 3rem; height: 1px; background: linear-gradient(to right, var(--laranja), transparent); }
 
 #dish-desc {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   line-height: 1.5;
   color: rgba(255,255,255,0.75);
-  max-width: 95%;
+  max-width: 34rem;
 }
 
-/* Preço dos pratos */
+/* Preço em destaque — cartão laranja (gerado via JS dentro de #dish-area) */
 .preco-destaque {
-  display: block;
-  margin-top: 0.6rem;
-  padding: 0.5rem 1rem;
-  background: rgba(232,112,10,0.15);
-  border: 2px solid rgba(232,112,10,0.30);
-  border-radius: 10px;
-  font-size: 1.4rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.3rem;
+  background: var(--laranja);
+  border-radius: 12px;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #F59B3C;
-  text-shadow: 0 0 30px rgba(232,112,10,0.2);
-  text-align: center;
-  letter-spacing: 1px;
+  color: var(--creme);
+  box-shadow: 0 0.5rem 1.2rem rgba(232,112,10,0.35);
+  letter-spacing: 0.5px;
 }
-
 .preco-destaque span {
   font-size: 0.7rem;
   font-weight: 400;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.75);
 }
 
-/* Sabores principais */
-.sabores-principais {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0.2rem 0;
-}
-
-.chip-principal {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.85);
-  letter-spacing: 0.5px;
-}
-
-.chip-principal.cor-0 { border-color: #F59B3C; color: #F59B3C; background: rgba(245,155,60,0.12); }
-.chip-principal.cor-1 { border-color: #60A5FA; color: #60A5FA; background: rgba(96,165,250,0.12); }
-.chip-principal.cor-2 { border-color: #34D399; color: #34D399; background: rgba(52,211,153,0.12); }
-.chip-principal.cor-3 { border-color: #F472B6; color: #F472B6; background: rgba(244,114,182,0.12); }
-.chip-principal.cor-4 { border-color: #A78BFA; color: #A78BFA; background: rgba(167,139,250,0.12); }
-
-/* Tags */
 #dish-tags {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.4rem;
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
 }
 
 .tag {
@@ -314,94 +305,54 @@ body {
   background: rgba(255,255,255,0.04);
   color: rgba(255,255,255,0.6);
 }
-
 .tag-destaque {
   border-color: var(--laranja);
   color: var(--laranja-claro);
   background: rgba(232,112,10,0.12);
-  text-shadow: 0 0 10px rgba(232,112,10,0.15);
 }
 
-/* Progresso */
-#progress-wrap { margin-top: 0.5rem; }
+#bottom-left { margin-top: auto; width: 100%; padding-top: 0.6rem; }
+
+#progress-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
 
 #prox-info {
   display: flex;
-  gap: 0.5rem;
-  font-size: 0.6rem;
-  margin-bottom: 0.3rem;
+  gap: 0.4rem;
+  font-size: 0.62rem;
 }
-
-#prox-label { color: rgba(255,255,255,0.4); letter-spacing: 2px; }
+#prox-label { color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
 #prox-seta { color: var(--laranja); }
-#prox-nome { color: rgba(255,255,255,0.65); }
+#prox-nome { color: rgba(255,255,255,0.7); }
 
 #progress-dots { display: flex; gap: 0.4rem; }
-
-.dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-}
-
+.dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all .3s; }
 .dot.ativo { background: var(--laranja); width: 1.5rem; border-radius: 4px; }
 
-/* ════════════════════════════════
-   COLUNA 2 — CARDÁPIO DO DIA
-════════════════════════════════ */
-#centro {
-  flex: 1 1 0;
+/* ─────────────── PAINEL DO CARDÁPIO ─────────────── */
+#painel-cardapio {
   min-width: 0;
+  padding: 1.4rem 1.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-}
-
-#datetime-box {
-  text-align: center;
-  background: rgba(0,0,0,0.25);
-  padding: 0.4rem 1rem;
-  border-radius: 0.8rem;
-  backdrop-filter: blur(8px);
-}
-
-#date {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.6);
-  letter-spacing: 1px;
-}
-
-#clock {
-  font-family: var(--fonte-titulo);
-  font-size: 2.4rem;
-  font-weight: 900;
-  color: var(--laranja);
-  line-height: 1;
-  text-shadow: 0 0 20px rgba(232,112,10,0.4);
 }
 
 #destaques-box {
-  flex: 1 1 0;
+  flex: 1;
   min-height: 0;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 0.8rem;
-  padding: 0.8rem 1rem;
-  backdrop-filter: blur(8px);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 #dest-titulo {
-  font-size: 0.65rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 0.5rem;
+  color: var(--creme);
   text-align: center;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 #dest-lista {
@@ -410,436 +361,117 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.8rem;
 }
 
-/* Grupo de destaques (ex: "Pratos", "Espetinhos") */
 .dest-grupo { width: 100%; }
-.dest-grupo:last-child { margin-bottom: 0; }
 
 .dest-grupo-titulo {
-  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 0.3rem;
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-transform: uppercase;
+  color: var(--laranja-claro);
+  margin-bottom: 0.45rem;
 }
 
-/* Itens do grupo lado a lado (2 colunas) */
 .dest-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
 }
 
 .dest-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.5rem;
-  border-radius: 0.4rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: background .3s;
 }
 
 .dest-dot {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
+  background: var(--laranja);
   flex-shrink: 0;
 }
 
 .dest-nome {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.88);
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ════════════════════════════════════
-   COLUNA 3 — COPA DO MUNDO 2026
-════════════════════════════════════ */
-
-#right {
-  flex: 1.3 1 0;
-  min-width: 0;
-  display: grid;
-  grid-template-rows: 1fr auto;  /* CONTEÚDO + SLIDE FIXO */
-  gap: 0.6rem;
-  overflow: hidden;
-  height: 100%;
-}
-
-/* BOX DA COPA - OCUPA TODO O ESPAÇO DISPONÍVEL */
-#copa-box {
-  min-height: 0;
-  max-height: 240px;
-  background: rgba(10,30,10,0.40);
-  border: 1px solid rgba(255,215,0,0.15);
-  border-radius: 0.8rem;
-  padding: 0.3rem 0.5rem;
-  backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  overflow: hidden;
-}
-
-/* CABEÇALHO DA COPA */
-#copa-header {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
-}
-
-#copa-flag { font-size: 1.1rem; }
-
-#copa-titulo-wrap {
-  flex: 1;
-}
-
-#copa-titulo {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: #FFD700;
-  line-height: 1.2;
-  text-shadow: 0 0 20px rgba(255,215,0,0.15);
-}
-
-#copa-subtitulo {
-  font-size: 0.45rem;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 1px;
-}
-
-#copa-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.1rem;
-}
-
-#copa-trofeu { font-size: 0.9rem; }
-
-#copa-countdown {
-  font-size: 0.45rem;
-  font-weight: 700;
-  color: rgba(255,215,0,0.8);
-  background: rgba(255,215,0,0.08);
-  border: 1px solid rgba(255,215,0,0.15);
-  border-radius: 6px;
-  padding: 0.05rem 0.4rem;
-  white-space: nowrap;
-}
-
-/* TABS */
-#copa-tabs {
-  display: flex;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-.copa-tab {
-  flex: 1;
-  font-size: 0.45rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 0.2rem 0;
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
-  color: rgba(255,255,255,0.4);
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.25s;
-}
-
-.copa-tab.ativo {
-  background: rgba(255,215,0,0.12);
-  border-color: rgba(255,215,0,0.4);
-  color: #FFD700;
-}
-
-/* CONTEÚDO DAS ABAS */
-#copa-content {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.copa-panel {
-  display: none;
-  height: 100%;
-  overflow-y: auto;
-}
-
-.copa-panel.ativo {
-  display: flex;
-  flex-direction: column;
-}
-
-/* PLACAR */
-#placar-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.2rem 0;
-  flex-shrink: 0;
-}
-
-.placar-time {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-  flex: 1;
-}
-
-.placar-bandeira { font-size: 1.5rem; }
-.placar-nome { 
-  font-size: 0.5rem; 
-  font-weight: 700; 
-  color: rgba(255,255,255,0.8); 
-  letter-spacing: 0.5px;
-}
-
-.placar-gol {
-  font-family: var(--fonte-titulo);
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #FFD700;
-  line-height: 1;
-  text-shadow: 0 0 20px rgba(255,215,0,0.2);
-}
-
-#placar-meio {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-}
-
-#placar-status { 
-  font-size: 0.7rem; 
-  font-weight: 800; 
-  color: white;
-  text-shadow: 0 0 20px rgba(255,255,255,0.1);
-}
-
-.placar-data { 
-  font-size: 0.42rem; 
-  color: rgba(255,255,255,0.45); 
-  margin-top: 2px; 
-}
-
-#jogo-info {
-  display: flex;
-  gap: 0.3rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.jogo-tag {
-  font-size: 0.42rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 0.1rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.5);
-}
-
-.jogo-tag-ao-vivo {
-  border-color: rgba(255,60,60,0.6);
-  color: #ff6060;
-  animation: pisca 1s infinite;
-}
-
-@keyframes pisca { 50% { opacity: 0.4; } }
-
-/* TABELA DO GRUPO */
-#grupo-tabela {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.48rem;
-}
-
-#grupo-tabela th {
-  color: rgba(255,215,0,0.5);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-align: center;
-  padding: 0.15rem 0.15rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-#grupo-tabela th:nth-child(2) { text-align: left; }
-
-#grupo-tabela td {
-  padding: 0.3rem 0.15rem;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  color: rgba(255,255,255,0.7);
-  text-align: center;
-}
-
-#grupo-tabela td:nth-child(2) { text-align: left; }
-
-#grupo-tabela tr.brasil-row td { color: #FFD700; font-weight: 700; }
-
-#grupo-nota {
-  font-size: 0.38rem;
-  color: rgba(255,255,255,0.2);
-  margin-top: 0.2rem;
-  text-align: center;
-}
-
-/* PRÓXIMOS JOGOS */
-#jogos-lista { 
-  overflow-y: auto; 
-  flex: 1; 
-}
-
-.jogo-item {
-  background: rgba(255,255,255,0.03);
-  border-radius: 0.5rem;
-  padding: 0.4rem;
-  margin-bottom: 0.4rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* SELEÇÃO / CONVOCADOS */
-#fotos-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.3rem;
-  margin-bottom: 0.2rem;
-}
-
-#fotos-caption {
-  font-size: 0.42rem;
-  color: rgba(255,255,255,0.25);
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-
-/* ── SLIDE DE FOTOS DA COPA - ALTURA FIXA ── */
-#copa-fotos-slide {
-  height: 280px;
+/* ════════════════════════════════
+   RODAPÉ
+   ════════════════════════════════ */
+#footer-bar {
   position: relative;
-  border-radius: 0.8rem;
   overflow: hidden;
-  border: 1px solid rgba(255,215,0,0.15);
-  background: rgba(0,0,0,0.30);
-}
-
-#cfs-track {
-  position: absolute;
-  inset: 0;
-}
-
-.cfs-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.cfs-img.ativo { opacity: 1; }
-
-#copa-fotos-slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 3;
-}
-
-#cfs-label {
-  position: absolute;
-  left: 0.7rem;
-  bottom: 0.4rem;
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.85);
-  z-index: 4;
-  text-shadow: 0 0 10px rgba(0,0,0,0.8);
-}
-
-#cfs-dots {
-  position: absolute;
-  right: 0.6rem;
-  bottom: 0.5rem;
-  display: flex;
-  gap: 0.25rem;
-  z-index: 4;
-}
-
-.cfs-dot {
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.30);
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.cfs-dot.ativo { 
-  background: #FFD700; 
-  width: 0.9rem; 
-  border-radius: 2px; 
-}
-
-.cfs-dot:hover {
-  background: rgba(255,215,0,0.5);
-  transform: scale(1.2);
-}
-
-.cfs-slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s ease;
+  margin: 0 2.6% 1.4%;
+  padding: 0.65rem 1.6rem;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.3px;
 }
 
-.cfs-slide.ativo {
-  opacity: 1;
-  z-index: 2;
+.footer-item strong { color: var(--laranja-claro); }
+.footer-sep { color: rgba(255,255,255,0.25); }
+
+#footer-shine {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.09), transparent);
+  animation: brilho 6s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* ════════════════════════════════
-   TIMER / LOADER / ANIMAÇÕES
-════════════════════════════════ */
-
-
+   ANIMAÇÕES
+   ════════════════════════════════ */
 @keyframes fadeUp {
-  from { opacity:0; transform:translateY(20px); }
+  from { opacity:0; transform:translateY(16px); }
   to   { opacity:1; transform:translateY(0); }
 }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeDown {
+  from { opacity:0; transform:translateY(-12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes flutuar {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes brilho {
+  0%   { left: -40%; }
+  50%  { left: 110%; }
+  100% { left: 110%; }
+}
 
+/* ════════════════════════════════
+   LOADER
+   ════════════════════════════════ */
 #loader-overlay {
   position:fixed; inset:0; background:var(--escuro); z-index:99;
   display:flex; align-items:center; justify-content:center;
@@ -853,30 +485,31 @@ body {
   border-top-color:var(--laranja);
   border-radius:50%; animation:spin 0.8s linear infinite;
 }
+.loader-texto {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+}
 @keyframes spin { to { transform:rotate(360deg); } }
 
 /* ════════════════════════════════
-   REDE DE SEGURANÇA — TVs de baixa resolução
-   (ex: smart TVs 1366x768 / 1280x720 mais antigas).
-   Em qualquer TV 1080p, 4K etc. o clamp() do html já
-   resolve a escala; isso aqui só evita aperto em telas
-   bem menores.
-════════════════════════════════ */
+   TVs de resolução menor (1366x768 / 1280x720)
+   ════════════════════════════════ */
 @media (max-width: 1366px) {
-  :root { --copa-foto-altura: 6rem; }
-
-  #ui { gap: 1.2rem; padding: 2.2%; }
+  #main { gap: 1rem; }
   #nome { font-size: 1.5rem; }
-  #clock { font-size: 2rem; }
-  #dish-image-wrap { width: 55%; }
-  #logo-img { width: 2.4rem; height: 2.4rem; }
-  #brand-nome { font-size: 0.9rem; }
+  #dish-image-wrap { width: 58%; }
+  #logo-img { width: 1.8rem; height: 1.8rem; }
+  #brand-nome { font-size: 0.95rem; }
+  .preco-destaque { font-size: 1.1rem; padding: 0.4rem 0.9rem; }
+  #dest-titulo { font-size: 0.95rem; }
+  .dest-nome { font-size: 0.75rem; }
+}
 
-  .badge { font-size: 0.5rem; padding: 0.1rem 0.5rem; }
-  .chip-principal { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
-  .preco-destaque { font-size: 0.9rem; padding: 0.2rem 0.6rem; }
-
-  #grupo-tabela { font-size: 0.42rem; }
-  .placar-gol { font-size: 1.4rem; }
-  .placar-bandeira { font-size: 1.2rem; }
+/* ════════════════════════════════
+   Modo retrato / celular (fallback — o painel é feito para TV,
+   mas isso evita quebra caso seja aberto num celular)
+   ════════════════════════════════ */
+@media (max-aspect-ratio: 4/5) {
+  #main { grid-template-columns: 1fr; grid-auto-rows: 1fr; overflow-y: auto; }
 }
