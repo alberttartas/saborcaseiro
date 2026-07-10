@@ -1,582 +1,90 @@
-/* ══════════════════════════════════════════════════════
-   LM SABOR CASEIRO — cardapio.css (versão final)
-   Layout: foto + info lado a lado, rodapé fixo
-   ══════════════════════════════════════════════════════ */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --laranja:       #E8700A;
-  --laranja-claro: #F59B3C;
-  --creme:         #FDF6EC;
-  --escuro:        #0D0A06;
-
-  --fonte-titulo:  'Playfair Display', Georgia, serif;
-  --fonte-corpo:   'DM Sans', Arial, sans-serif;
-
-  --card-bg:     rgba(255,255,255,.05);
-  --card-border: rgba(255,255,255,.08);
-  --radius:      20px;
-}
-
-html {
-  font-size: clamp(15px, calc(0.9vw + 0.9vh), 36px);
-}
-
-body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  font-family: var(--fonte-corpo);
-  background: var(--escuro);
-  color: var(--creme);
-  display: flex;
-  flex-direction: column;
-}
-
-/* ════════════════════════════════
-   FUNDO
-   ════════════════════════════════ */
-#bg-fallback {
-  position: absolute; inset: 0; z-index: 0;
-  background: radial-gradient(ellipse at 50% 40%, #241608 0%, #0D0A06 65%);
-}
-
-#background {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover;
-  filter: blur(6px) brightness(0.45) saturate(1.05);
-  transform: scale(1.08);
-  z-index: 0;
-}
-
-#overlay {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg,
-    rgba(13,10,6,0.78) 0%,
-    rgba(13,10,6,0.55) 18%,
-    rgba(13,10,6,0.55) 82%,
-    rgba(13,10,6,0.85) 100%);
-}
-
-#grain {
-  position: absolute; inset: 0; z-index: 1; opacity: 0.02; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px;
-}
-
-/* ════════════════════════════════
-   GLASSMORPHISM
-   ════════════════════════════════ */
-.glass-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.35);
-}
-
-/* ════════════════════════════════
-   TOPBAR
-   ════════════════════════════════ */
-#topbar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.2% 2.6% 0.6%;
-  z-index: 2;
-  animation: fadeDown 0.7s ease both;
-}
-
-#brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-#logo-img {
-  width: 2.2rem;
-  height: 2.2rem;
-  object-fit: contain;
-  filter: drop-shadow(0 0 0.4rem rgba(232,112,10,0.35));
-}
-
-#brand-nome {
-  font-family: var(--fonte-titulo);
-  font-size: 1.15rem;
-  font-weight: 900;
-  letter-spacing: 1px;
-  color: var(--creme);
-  text-shadow: 0 0 20px rgba(232,112,10,0.15);
-}
-
-#datetime-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.65);
-  text-transform: uppercase;
-}
-
-#clock-box {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.85rem;
-  border-radius: 10px;
-  background: rgba(232,112,10,0.16);
-  border: 1px solid rgba(245,155,60,0.5);
-  box-shadow: 0 0 1.2rem rgba(232,112,10,0.3);
-}
-
-#clock {
-  color: var(--laranja-claro);
-  font-weight: 900;
-  font-size: 1.05rem;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 12px rgba(245,155,60,0.5);
-}
-
-#clock-sep { color: rgba(255,255,255,0.25); }
-
-/* ════════════════════════════════
-   MAIN
-   ════════════════════════════════ */
-#main {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: calc(100vh - 150px); /* ajuste conforme altura do topo+footer */
-  display: grid;
-  grid-template-columns: 1.4fr 0.6fr;
-  gap: 1.6rem;
-  padding: 0.6% 2.6% 0.8%;
-  z-index: 2;
-}
-
-/* ─────────────── PAINEL DO PRATO ─────────────── */
-#painel-prato {
-  min-width: 0;
-  padding: 1.2rem 1.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-}
-
-#dish-layout {
-  flex: 0 1 auto;
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 1.2rem;
-  align-items: center;
-  justify-items: center;
-  max-height: 100%;
-}
-
-#dish-image-wrap {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 18rem;
-  animation: flutuar 5s ease-in-out infinite;
-}
-
-#slide-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.slide-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  border-radius: 1rem;
-  transition: opacity 0.6s ease;
-  filter: drop-shadow(0 1rem 1.6rem rgba(0,0,0,0.55));
-}
-
-.slide-img.ativo { opacity: 1; }
-
-.slide-badges {
-  position: absolute;
-  bottom: -0.6rem;
-  left: 0; right: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.3rem;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-.slide-badges.ativo { opacity: 1; }
-
-.badge {
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  background: rgba(13,10,6,0.85);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.85);
-  backdrop-filter: blur(4px);
-  white-space: nowrap;
-}
-
-/* Informações */
-#dish-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  justify-content: center;
-  min-width: 0;
-  width: 100%;
-}
-
-#dish-categoria {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-#cat-linha { width: 1.6rem; height: 2px; background: var(--laranja); }
-#cat-texto {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 3px;
-  color: var(--laranja-claro);
-  text-transform: uppercase;
-}
-
-#nome {
-  font-family: var(--fonte-titulo);
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1.05;
-  color: var(--creme);
-  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
-  margin-top: 0.3rem;
-}
-
-#separador { display: flex; align-items: center; gap: 0.8rem; margin: 0.2rem 0; }
-#sep-bolinha { width: 0.4rem; height: 0.4rem; background: var(--laranja); border-radius: 50%; }
-#sep-linha { width: 3rem; height: 1px; background: linear-gradient(to right, var(--laranja), transparent); }
-
-#dish-desc {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgba(255,255,255,0.75);
-  max-height: 4.2rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#dish-preco {
-  margin-top: 0.6rem;
-}
-
-/* Chips de sabores (sobremesas, sucos, dindins) dentro da descrição.
-   Antes não existia CSS para essas classes, então os spans ficavam
-   grudados sem espaço/vírgula entre os sabores. */
-.sabores-principais {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.4rem;
-}
-
-.chip-principal {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.25rem 0.7rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.9);
-  white-space: nowrap;
-}
-
-.chip-principal.cor-0 { border-color: rgba(232,112,10,0.55); background: rgba(232,112,10,0.14); color: var(--laranja-claro); }
-.chip-principal.cor-1 { border-color: rgba(96,165,250,0.5);  background: rgba(96,165,250,0.14); color: #93c5fd; }
-.chip-principal.cor-2 { border-color: rgba(74,222,128,0.5);  background: rgba(74,222,128,0.14); color: #86efac; }
-.chip-principal.cor-3 { border-color: rgba(244,114,182,0.5); background: rgba(244,114,182,0.14); color: #f9a8d4; }
-.chip-principal.cor-4 { border-color: rgba(253,224,71,0.5);  background: rgba(253,224,71,0.14);  color: #fde68a; }
-
-.preco-destaque {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.5rem 1.3rem;
-  background: var(--laranja);
-  border-radius: 12px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--creme);
-  box-shadow: 0 0.5rem 1.2rem rgba(232,112,10,0.35);
-  letter-spacing: 0.5px;
-  align-self: flex-start;
-}
-.preco-destaque span {
-  font-size: 0.7rem;
-  font-weight: 400;
-  color: rgba(255,255,255,0.75);
-}
-
-#dish-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-}
-
-.tag {
-  font-size: 0.55rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  padding: 0.25rem 0.8rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.13);
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.6);
-}
-.tag-destaque {
-  border-color: var(--laranja);
-  color: var(--laranja-claro);
-  background: rgba(232,112,10,0.12);
-}
-
-/* ─────────────── PAINEL DO CARDÁPIO ─────────────── */
-#painel-cardapio {
-  min-width: 0;
-  padding: 1.4rem 1.6rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-#destaques-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-#dest-titulo {
-  font-family: var(--fonte-titulo);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--creme);
-  text-align: center;
-  margin-bottom: 0.6rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-#dest-tabs-nav {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 0.7rem;
-}
-
-.dest-tab-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: background .4s, transform .4s;
-}
-
-.dest-tab-dot.ativa {
-  background: var(--laranja-claro);
-  transform: scale(1.3);
-}
-
-#dest-lista-wrap {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-}
-
-.dest-tab {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  overflow-y: auto;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  pointer-events: none;
-}
-
-.dest-tab.ativa {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.dest-grupo { width: 100%; }
-
-.dest-grupo-titulo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--laranja-claro);
-  margin-bottom: 0.4rem;
-}
-
-.dest-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.4rem;
-}
-
-.dest-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 0.6rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
-  transition: background .3s;
-}
-
-.dest-dot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--laranja);
-  flex-shrink: 0;
-}
-
-.dest-nome {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.88);
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ════════════════════════════════
-   RODAPÉ
-   ════════════════════════════════ */
-#footer-bar {
-  flex-shrink: 0;
-  margin: 0 2.6% 1.2%;
-  padding: 0.55rem 1.2rem;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.16);
-  border: 1px solid rgba(255,255,255,0.32);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.98);
-  letter-spacing: 0.3px;
-  position: relative;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.footer-item strong { color: var(--laranja-claro); }
-.footer-sep { color: rgba(255,255,255,0.6); }
-
-#footer-shine {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 30%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.09), transparent);
-  animation: brilho 6s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* ════════════════════════════════
-   ANIMAÇÕES
-   ════════════════════════════════ */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(16px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-@keyframes fadeDown {
-  from { opacity:0; transform:translateY(-12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-@keyframes flutuar {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-@keyframes brilho {
-  0%   { left: -40%; }
-  50%  { left: 110%; }
-  100% { left: 110%; }
-}
-
-/* ════════════════════════════════
-   LOADER
-   ════════════════════════════════ */
-#loader-overlay {
-  position:fixed; inset:0; background:var(--escuro); z-index:99;
-  display:flex; align-items:center; justify-content:center;
-  flex-direction:column; gap:1rem; transition:opacity 0.6s;
-}
-#loader-overlay.oculto { opacity:0; pointer-events:none; }
-
-.loader-spinner {
-  width:40px; height:40px;
-  border:3px solid rgba(255,255,255,0.08);
-  border-top-color:var(--laranja);
-  border-radius:50%; animation:spin 0.8s linear infinite;
-}
-.loader-texto {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 1px;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-
-/* ════════════════════════════════
-   RESPONSIVIDADE (1366x768)
-   ════════════════════════════════ */
-@media (max-width: 1366px) {
-  #main { height: calc(100vh - 130px); }
-  #painel-prato { padding: 0.8rem 1.2rem; }
-  #dish-layout { gap: 0.8rem; }
-  #dish-image-wrap { max-width: 14rem; }
-  #nome { font-size: 1.6rem; }
-  .preco-destaque { font-size: 1.2rem; padding: 0.4rem 0.9rem; }
-  #dish-desc { font-size: 0.8rem; max-height: 3.6rem; }
-  #dest-titulo { font-size: 0.9rem; }
-  .dest-nome { font-size: 0.7rem; }
-  .dest-item { padding: 0.28rem 0.5rem; }
-}
-
-/* ════════════════════════════════
-   MODO RETRATO (fallback)
-   ════════════════════════════════ */
-@media (max-aspect-ratio: 4/5) {
-  #main { grid-template-columns: 1fr; grid-auto-rows: auto; height: auto; overflow-y: auto; }
-  #dish-layout { grid-template-columns: 1fr; }
-  #dish-image-wrap { max-width: 60%; }
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LM Sabor Caseiro — Cardápio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cardapio.css">
+</head>
+<body>
+  <!-- LOADER -->
+  <div id="loader-overlay">
+    <div class="loader-spinner"></div>
+    <div class="loader-texto">Carregando cardápio...</div>
+  </div>
+  <!-- FUNDO -->
+  <div id="bg-fallback"></div>
+  <img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
+  <div id="overlay"></div>
+  <div id="grain"></div>
+  <!-- TOPO -->
+  <div id="topbar">
+    <div id="brand">
+      <img id="logo-img" src="assets/logomarca.webp" onerror="this.style.display='none'">
+      <span id="brand-nome">LM SABOR CASEIRO</span>
+    </div>
+    <div id="datetime-box">
+      <span id="date">—</span>
+      <span id="clock-sep">•</span>
+      <span id="clock-box"><span id="clock">--:--</span></span>
+    </div>
+  </div>
+  <!-- CONTEÚDO PRINCIPAL: 2 COLUNAS -->
+  <div id="main">
+    <!-- PAINEL DO PRATO -->
+    <div id="painel-prato" class="glass-card">
+      <div id="dish-layout">
+        <!-- Lado esquerdo: imagem -->
+        <div id="dish-image-wrap">
+          <div id="slide-container">
+            <!-- as imagens serão inseridas via JS -->
+          </div>
+        </div>
+        <!-- Lado direito: informações -->
+        <div id="dish-info">
+          <div id="dish-categoria">
+            <div id="cat-linha"></div>
+            <div id="cat-texto">...</div>
+          </div>
+          <div id="nome">—</div>
+          <div id="separador">
+            <div id="sep-bolinha"></div>
+            <div id="sep-linha"></div>
+          </div>
+          <div id="dish-desc"></div>
+          <div id="dish-preco"></div>
+          <div id="dish-tags"></div>
+          <!-- preço será injetado aqui pelo JS -->
+        </div>
+      </div>
+    </div>
+    <!-- PAINEL DO CARDÁPIO DO DIA -->
+    <div id="painel-cardapio" class="glass-card">
+      <div id="destaques-box">
+        <div id="dest-titulo">Cardápio de Hoje</div>
+        <div id="dest-tabs-nav">
+          <span class="dest-tab-dot ativa" data-dest-tab="pratos"></span>
+          <span class="dest-tab-dot" data-dest-tab="espetinhos"></span>
+        </div>
+        <div id="dest-lista-wrap">
+          <div id="dest-tab-pratos" class="dest-tab ativa"></div>
+          <div id="dest-tab-espetinhos" class="dest-tab"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- RODAPÉ -->
+  <div id="footer-bar">
+    <div id="footer-shine"></div>
+    <span class="footer-item">🛵 <strong>DELIVERY</strong> • (85) 99403-4673</span>
+    <span class="footer-sep">•</span>
+    <span class="footer-item">📍 Rua Duarte Coelho, 840 – Casa 06</span>
+    <span class="footer-sep">•</span>
+    <span class="footer-item">🕕 Quinta a Sábado • 18:00 às 00:00</span>
+  </div>
+  <script src="ofertas.js"></script>
+</body>
+</html>
