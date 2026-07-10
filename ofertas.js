@@ -120,6 +120,13 @@ var IMAGENS = {
   var ultimosDados = null;
   var espetinhoPage = 0;
 
+  function primeiroValor(itens) {
+    for (var i = 0; i < itens.length; i++) {
+      if (itens[i] && itens[i].valor) return Number(itens[i].valor);
+    }
+    return null;
+  }
+
   // ============================================================
   // CONSTRUIR SLIDES
   // ============================================================
@@ -199,7 +206,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
         for (var b = 0; b < itens.length; b++) {
           saboresTodos.push(itens[b].nome);
         }
-        var preco = itens[0] && itens[0].valor ? Number(itens[0].valor) : null;
+        var preco = primeiroValor(itens);
         slidesSob.push({
           tipo: 'sobremesa',
           nome: catNome,
@@ -234,7 +241,7 @@ for (var j = 0; j < pratosDisp.length; j++) {
         for (var e = 0; e < itensSuco.length; e++) {
           saboresTodosSuco.push(itensSuco[e].nome);
         }
-        var precoSuco = itensSuco[0] && itensSuco[0].valor ? Number(itensSuco[0].valor) : null;
+        var precoSuco = primeiroValor(itensSuco);
         slidesSuco.push({
           tipo: 'suco',
           nome: catSucoNome,
@@ -250,8 +257,9 @@ for (var j = 0; j < pratosDisp.length; j++) {
     }
 
     var valorDindin = 6;
-    if (dindins.length > 0 && dindins[0].valor) {
-      valorDindin = Number(dindins[0].valor);
+    var valorDindinEncontrado = primeiroValor(dindins);
+    if (valorDindinEncontrado) {
+      valorDindin = valorDindinEncontrado;
     }
 
     var slideDindins = [];
