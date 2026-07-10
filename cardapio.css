@@ -101,8 +101,8 @@ body {
 }
 
 #logo-img {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 3.2rem;
+  height: 3.2rem;
   object-fit: contain;
   filter: drop-shadow(0 0 0.4rem rgba(232,112,10,0.35));
 }
