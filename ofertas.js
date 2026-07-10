@@ -502,16 +502,16 @@ for (var j = 0; j < pratosDisp.length; j++) {
   // ============================================================
 
   function renderizarDestaques(dados) {
-  var lista = document.getElementById('dest-lista');
-  if (!lista) return;
+  var tabPratos = document.getElementById('dest-tab-pratos');
+  var tabEspetinhos = document.getElementById('dest-tab-espetinhos');
+  if (!tabPratos || !tabEspetinhos) return;
 
-  var html = '';
   var cardapio = dados.cardapio || [];
 
-  // --- 1. PRATOS (em cima) ---
+  // --- 1. PRATOS ---
   var pratos = [];
   var ordemPersonalizada = ['Baião Cremoso', 'Arroz de Camarão', 'Caranguejo'];
-  
+
   for (var i = 0; i < cardapio.length; i++) {
     var p = cardapio[i];
     if (p.disponivel && p.categoria && p.categoria.toLowerCase() === 'prato') {
@@ -528,23 +528,25 @@ for (var j = 0; j < pratosDisp.length; j++) {
     return idxA - idxB;
   });
 
-  pratos = pratos.slice(0, 8);
-
+  var htmlPratos = '';
   if (pratos.length > 0) {
-    html += '<div class="dest-grupo">';
-    html += '<div class="dest-grupo-titulo">Pratos</div>';
-    html += '<div class="dest-grid">';
+    htmlPratos += '<div class="dest-grupo">';
+    htmlPratos += '<div class="dest-grupo-titulo">Pratos</div>';
+    htmlPratos += '<div class="dest-grid">';
     for (var j = 0; j < pratos.length; j++) {
-      var p = pratos[j];
-      html += '<div class="dest-item">';
-      html += '<div class="dest-dot" style="background:#F59B3C;"></div>';
-      html += '<div class="dest-nome">' + p.nome + '</div>';
-      html += '</div>';
+      var p2 = pratos[j];
+      htmlPratos += '<div class="dest-item">';
+      htmlPratos += '<div class="dest-dot" style="background:#F59B3C;"></div>';
+      htmlPratos += '<div class="dest-nome">' + p2.nome + '</div>';
+      htmlPratos += '</div>';
     }
-    html += '</div></div>';
+    htmlPratos += '</div></div>';
+  } else {
+    htmlPratos = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
   }
+  tabPratos.innerHTML = htmlPratos;
 
-  // --- 2. ESPETINHOS (em baixo) ---
+  // --- 2. ESPETINHOS ---
   var espetinhos = [];
   for (var k = 0; k < cardapio.length; k++) {
     var item = cardapio[k];
@@ -553,28 +555,47 @@ for (var j = 0; j < pratosDisp.length; j++) {
     }
   }
 
+  var htmlEspetinhos = '';
   if (espetinhos.length > 0) {
-    var espetinhosExibir = espetinhos.slice(0, 8);
-    html += '<div class="dest-grupo">';
-    html += '<div class="dest-grupo-titulo">Espetinhos</div>';
-    html += '<div class="dest-grid">';
-    for (var l = 0; l < espetinhosExibir.length; l++) {
-      var e = espetinhosExibir[l];
-      html += '<div class="dest-item">';
-      html += '<div class="dest-dot" style="background:#34D399;"></div>';
-      html += '<div class="dest-nome">' + e.nome + '</div>';
-      html += '</div>';
+    htmlEspetinhos += '<div class="dest-grupo">';
+    htmlEspetinhos += '<div class="dest-grupo-titulo">Espetinhos</div>';
+    htmlEspetinhos += '<div class="dest-grid">';
+    for (var l = 0; l < espetinhos.length; l++) {
+      var e = espetinhos[l];
+      htmlEspetinhos += '<div class="dest-item">';
+      htmlEspetinhos += '<div class="dest-dot" style="background:#34D399;"></div>';
+      htmlEspetinhos += '<div class="dest-nome">' + e.nome + '</div>';
+      htmlEspetinhos += '</div>';
     }
-    html += '</div></div>';
+    htmlEspetinhos += '</div></div>';
+  } else {
+    htmlEspetinhos = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Sem espetinhos disponíveis no momento.</div>';
   }
+  tabEspetinhos.innerHTML = htmlEspetinhos;
 
-  // Fallback
-  if (html === '') {
-    html = '<div style="font-size:12px;color:rgba(255,255,255,0.22);padding:6px 0">Cardápio sendo atualizado...</div>';
-  }
-
-  lista.innerHTML = html;
+  iniciarRotacaoDestaques();
 }
+
+  function trocarAbaDestaque() {
+    destaqueMode = (destaqueMode === 'pratos') ? 'espetinhos' : 'pratos';
+
+    var tabPratos = document.getElementById('dest-tab-pratos');
+    var tabEspetinhos = document.getElementById('dest-tab-espetinhos');
+    var dots = document.querySelectorAll('.dest-tab-dot');
+
+    if (tabPratos) tabPratos.classList.toggle('ativa', destaqueMode === 'pratos');
+    if (tabEspetinhos) tabEspetinhos.classList.toggle('ativa', destaqueMode === 'espetinhos');
+
+    for (var i = 0; i < dots.length; i++) {
+      var alvo = dots[i].getAttribute('data-dest-tab');
+      dots[i].classList.toggle('ativa', alvo === destaqueMode);
+    }
+  }
+
+  function iniciarRotacaoDestaques() {
+    if (destaqueTimer) clearInterval(destaqueTimer);
+    destaqueTimer = setInterval(trocarAbaDestaque, DESTAQUE_INTERVALO_MS);
+  }
 
   // ============================================================
   // RELÓGIO
