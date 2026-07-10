@@ -10,19 +10,16 @@
   <link rel="stylesheet" href="cardapio.css">
 </head>
 <body>
-
   <!-- LOADER -->
   <div id="loader-overlay">
     <div class="loader-spinner"></div>
     <div class="loader-texto">Carregando cardápio...</div>
   </div>
-
   <!-- FUNDO -->
   <div id="bg-fallback"></div>
   <img id="background" src="assets/fundo.webp" onerror="this.style.display='none'">
   <div id="overlay"></div>
   <div id="grain"></div>
-
   <!-- TOPO -->
   <div id="topbar">
     <div id="brand">
@@ -35,7 +32,6 @@
       <span id="clock">--:--</span>
     </div>
   </div>
-
   <!-- CONTEÚDO PRINCIPAL: 2 COLUNAS -->
   <div id="main">
     <!-- PAINEL DO PRATO -->
@@ -47,37 +43,31 @@
             <!-- as imagens serão inseridas via JS -->
           </div>
         </div>
-
         <!-- Lado direito: informações -->
         <div id="dish-info">
           <div id="dish-categoria">
             <div id="cat-linha"></div>
             <div id="cat-texto">...</div>
           </div>
-
           <div id="nome">—</div>
-
           <div id="separador">
             <div id="sep-bolinha"></div>
             <div id="sep-linha"></div>
           </div>
-
           <div id="dish-desc"></div>
           <div id="dish-tags"></div>
           <!-- preço será injetado aqui pelo JS -->
         </div>
       </div>
     </div>
-
     <!-- PAINEL DO CARDÁPIO DO DIA -->
     <div id="painel-cardapio" class="glass-card">
       <div id="destaques-box">
-        <div id="dest-titulo">🍽️ Cardápio de Hoje</div>
+        <div id="dest-titulo">Cardápio de Hoje</div>
         <div id="dest-lista"></div>
       </div>
     </div>
   </div>
-
   <!-- RODAPÉ -->
   <div id="footer-bar">
     <div id="footer-shine"></div>
@@ -87,7 +77,6 @@
     <span class="footer-sep">•</span>
     <span class="footer-item">🕕 Quinta a Sábado • 18:00 às 00:00</span>
   </div>
-
   <script src="ofertas.js"></script>
 </body>
 </html>
