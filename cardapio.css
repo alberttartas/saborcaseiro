@@ -127,10 +127,22 @@ body {
   text-transform: uppercase;
 }
 
+#clock-box {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(232,112,10,0.16);
+  border: 1px solid rgba(245,155,60,0.5);
+  box-shadow: 0 0 1.2rem rgba(232,112,10,0.3);
+}
+
 #clock {
   color: var(--laranja-claro);
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 12px rgba(245,155,60,0.5);
 }
 
 #clock-sep { color: rgba(255,255,255,0.25); }
@@ -371,12 +383,47 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-#dest-lista {
+#dest-tabs-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.dest-tab-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background .4s, transform .4s;
+}
+
+.dest-tab-dot.ativa {
+  background: var(--laranja-claro);
+  transform: scale(1.3);
+}
+
+#dest-lista-wrap {
   flex: 1;
-  overflow-y: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.dest-tab {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.55rem;
+  overflow-y: auto;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.dest-tab.ativa {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .dest-grupo { width: 100%; }
@@ -385,41 +432,41 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--laranja-claro);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
 }
 
 .dest-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.28rem;
+  gap: 0.4rem;
 }
 
 .dest-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.32rem 0.6rem;
-  border-radius: 0.5rem;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.6rem;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.05);
   transition: background .3s;
 }
 
 .dest-dot {
-  width: 0.35rem;
-  height: 0.35rem;
+  width: 0.4rem;
+  height: 0.4rem;
   border-radius: 50%;
   background: var(--laranja);
   flex-shrink: 0;
 }
 
 .dest-nome {
-  font-size: 0.76rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: rgba(255,255,255,0.88);
   flex: 1;
