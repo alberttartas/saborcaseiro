@@ -39,7 +39,7 @@ body {
 }
 
 /* ════════════════════════════════
-   FUNDO (sem alterações)
+   FUNDO
    ════════════════════════════════ */
 #bg-fallback {
   position: absolute; inset: 0; z-index: 0;
@@ -82,7 +82,7 @@ body {
 }
 
 /* ════════════════════════════════
-   TOPBAR (fixa)
+   TOPBAR
    ════════════════════════════════ */
 #topbar {
   flex-shrink: 0;
@@ -136,45 +136,43 @@ body {
 #clock-sep { color: rgba(255,255,255,0.25); }
 
 /* ════════════════════════════════
-   MAIN — ocupa o espaço restante
+   MAIN
    ════════════════════════════════ */
 #main {
   flex: 1 1 auto;
   min-height: 0;
   height: calc(100vh - 150px); /* ajuste conforme altura do topo+footer */
   display: grid;
-  grid-template-columns: 1.4fr 0.6fr; /* mais espaço para o prato */
+  grid-template-columns: 1.4fr 0.6fr;
   gap: 1.6rem;
   padding: 0.6% 2.6% 0.8%;
   z-index: 2;
 }
 
-/* ─────────────── PAINEL DO PRATO (com grid interno) ─────────────── */
+/* ─────────────── PAINEL DO PRATO ─────────────── */
 #painel-prato {
   min-width: 0;
   padding: 1.2rem 1.6rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* evita vazamento */
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* Layout interno: foto + info lado a lado */
 #dish-layout {
-  flex: 1;
+  flex: 0 1 auto;
   display: grid;
-  grid-template-columns: 1fr 1.2fr; /* foto menor, info maior */
+  grid-template-columns: 1fr 1.2fr;
   gap: 1.2rem;
-  align-items: center; /* centraliza verticalmente */
-  min-height: 0;
+  align-items: center;
+  justify-items: center;
+  max-height: 100%;
 }
 
-/* Imagem */
 #dish-image-wrap {
-  position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: 18rem;   /* limite para não crescer demais */
-  justify-self: center;
+  max-width: 18rem;
   animation: flutuar 5s ease-in-out infinite;
 }
 
@@ -223,26 +221,14 @@ body {
   white-space: nowrap;
 }
 
-#slide-num {
-  position: absolute;
-  top: 0.2rem;
-  right: 0.2rem;
-  font-size: 0.6rem;
-  color: rgba(255,255,255,0.4);
-  background: rgba(13,10,6,0.6);
-  padding: 0.1rem 0.5rem;
-  border-radius: 8px;
-  z-index: 2;
-  font-weight: 600;
-}
-
-/* Informações do prato */
+/* Informações */
 #dish-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   justify-content: center;
   min-width: 0;
+  width: 100%;
 }
 
 #dish-categoria {
@@ -278,7 +264,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.5;
   color: rgba(255,255,255,0.75);
-  max-height: 4.2rem;    /* limite de 2 linhas */
+  max-height: 4.2rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -324,33 +310,6 @@ body {
   color: var(--laranja-claro);
   background: rgba(232,112,10,0.12);
 }
-
-/* Progresso (próximos pratos) */
-#bottom-left {
-  margin-top: auto;
-  padding-top: 0.6rem;
-  width: 100%;
-}
-
-#progress-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-#prox-info {
-  display: flex;
-  gap: 0.4rem;
-  font-size: 0.62rem;
-}
-#prox-label { color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
-#prox-seta { color: var(--laranja); }
-#prox-nome { color: rgba(255,255,255,0.7); }
-
-#progress-dots { display: flex; gap: 0.4rem; }
-.dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all .3s; }
-.dot.ativo { background: var(--laranja); width: 1.5rem; border-radius: 4px; }
 
 /* ─────────────── PAINEL DO CARDÁPIO ─────────────── */
 #painel-cardapio {
@@ -437,7 +396,7 @@ body {
 }
 
 /* ════════════════════════════════
-   RODAPÉ (fixo)
+   RODAPÉ
    ════════════════════════════════ */
 #footer-bar {
   flex-shrink: 0;
@@ -517,7 +476,7 @@ body {
 @keyframes spin { to { transform:rotate(360deg); } }
 
 /* ════════════════════════════════
-   RESPONSIVIDADE PARA TELAS MENORES (1366x768)
+   RESPONSIVIDADE (1366x768)
    ════════════════════════════════ */
 @media (max-width: 1366px) {
   #main { height: calc(100vh - 130px); }
